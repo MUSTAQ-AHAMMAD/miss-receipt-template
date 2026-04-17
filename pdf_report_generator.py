@@ -14,15 +14,18 @@ import io
 
 def generate_pdf_from_text(text_content: str, title: str = "Report") -> bytes:
     """
-    Generate a simple PDF from text content without external dependencies.
-    Uses basic HTML to PDF conversion approach.
+    Generate HTML content from text for browser-based PDF conversion.
+    
+    Note: This function returns HTML encoded as UTF-8 bytes, not actual PDF bytes.
+    The HTML is designed to be displayed in a browser where users can use
+    the browser's "Print to PDF" function to generate the final PDF.
     
     Args:
-        text_content: The text content to convert to PDF
-        title: Title for the PDF document
+        text_content: The text content to convert to HTML
+        title: Title for the HTML document
         
     Returns:
-        PDF content as bytes
+        HTML content as UTF-8 encoded bytes (not actual PDF)
     """
     # Create HTML wrapper for the text content
     html_content = f"""
@@ -93,15 +96,17 @@ def generate_invoice_summary_pdf(
     output_path: Optional[str] = None
 ) -> bytes:
     """
-    Generate a PDF summary report from AR Invoice data.
+    Generate an HTML summary report from AR Invoice data.
+    
+    Note: Returns HTML (not actual PDF) for browser-based PDF conversion.
     
     Args:
         ar_invoice_path: Path to AR Invoice CSV
         metadata_path: Optional path to metadata CSV
-        output_path: Optional output path to save PDF
+        output_path: Optional output path to save HTML
         
     Returns:
-        PDF content as bytes
+        HTML content as UTF-8 encoded bytes (not actual PDF)
     """
     import pandas as pd
     
@@ -192,14 +197,14 @@ def generate_invoice_summary_pdf(
     
     summary_text = "\n".join(summary_lines)
     
-    # Generate PDF
-    pdf_bytes = generate_pdf_from_text(summary_text, "AR Invoice Summary Report")
+    # Generate HTML (not actual PDF)
+    html_bytes = generate_pdf_from_text(summary_text, "AR Invoice Summary Report")
     
     # Save if output path provided
     if output_path:
-        Path(output_path).write_bytes(pdf_bytes)
+        Path(output_path).write_bytes(html_bytes)
     
-    return pdf_bytes
+    return html_bytes
 
 
 def generate_comparison_pdf(
@@ -210,17 +215,19 @@ def generate_comparison_pdf(
     output_path: Optional[str] = None
 ) -> bytes:
     """
-    Generate a PDF comparing AR Invoice totals with input sheet totals.
+    Generate HTML comparing AR Invoice totals with input sheet totals.
+    
+    Note: Returns HTML (not actual PDF) for browser-based PDF conversion.
     
     Args:
         ar_total: Total from AR Invoice
         input_total: Total from input sheet
         ar_invoice_path: Path to AR Invoice file
         date_breakdown: Optional dictionary with date-wise breakdown
-        output_path: Optional output path to save PDF
+        output_path: Optional output path to save HTML
         
     Returns:
-        PDF content as bytes
+        HTML content as UTF-8 encoded bytes (not actual PDF)
     """
     summary_lines = []
     summary_lines.append("="*80)
@@ -260,11 +267,11 @@ def generate_comparison_pdf(
     
     summary_text = "\n".join(summary_lines)
     
-    # Generate PDF
-    pdf_bytes = generate_pdf_from_text(summary_text, "AR Invoice Comparison Report")
+    # Generate HTML (not actual PDF)
+    html_bytes = generate_pdf_from_text(summary_text, "AR Invoice Comparison Report")
     
     # Save if output path provided
     if output_path:
-        Path(output_path).write_bytes(pdf_bytes)
+        Path(output_path).write_bytes(html_bytes)
     
-    return pdf_bytes
+    return html_bytes

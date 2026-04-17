@@ -206,7 +206,6 @@ def _run_integration(sid: str, cfg: dict):
                 ar_by_date = ar_df.groupby('Transaction Date')['Transaction Line Amount'].sum().to_dict()
                 
                 # Group input by date
-                import pandas as pd
                 line_items_with_date = integration.line_items.copy()
                 line_items_with_date['adjusted_amount'] = line_items_with_date.apply(calculate_adjusted_amount, axis=1)
                 
@@ -630,22 +629,26 @@ def list_reports():
 def view_report(filename: str):
     """View a report as text"""
     try:
-        # Security: only allow accessing .txt files
-        if not filename.endswith('.txt'):
-            return jsonify({"error": "Invalid file type"}), 400
+        # Security: validate filename - only allow alphanumeric, dash, underscore, and .txt extension
+        import os
+        import re
+        
+        filename = os.path.basename(filename)  # Prevent directory traversal
+        if not re.match(r'^[a-zA-Z0-9_\-]+\.txt$', filename):
+            return jsonify({"error": "Invalid filename"}), 400
         
         # Try to find the file in reports dir or session dirs
         report_path = None
         
         # Check reports directory
         candidate = REPORTS_DIR / filename
-        if candidate.exists():
+        if candidate.exists() and candidate.is_file():
             report_path = candidate
         else:
             # Check session directories
             for session_dir in UPLOAD_BASE.glob("*"):
                 candidate = session_dir / "ORACLE_FUSION_OUTPUT" / filename
-                if candidate.exists():
+                if candidate.exists() and candidate.is_file():
                     report_path = candidate
                     break
         
@@ -660,29 +663,36 @@ def view_report(filename: str):
         })
     
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        # Don't expose stack trace to user
+        import logging
+        logging.error(f"Error viewing report: {e}", exc_info=True)
+        return jsonify({"error": "Failed to load report"}), 500
 
 
 @app.route("/api/reports/download/<path:filename>", methods=["GET"])
 def download_report(filename: str):
     """Download a report file"""
     try:
-        # Security: only allow accessing .txt files
-        if not filename.endswith('.txt'):
-            return jsonify({"error": "Invalid file type"}), 400
+        # Security: validate filename
+        import os
+        import re
+        
+        filename = os.path.basename(filename)  # Prevent directory traversal
+        if not re.match(r'^[a-zA-Z0-9_\-]+\.txt$', filename):
+            return jsonify({"error": "Invalid filename"}), 400
         
         # Try to find the file
         report_path = None
         
         # Check reports directory
         candidate = REPORTS_DIR / filename
-        if candidate.exists():
+        if candidate.exists() and candidate.is_file():
             report_path = candidate
         else:
             # Check session directories
             for session_dir in UPLOAD_BASE.glob("*"):
                 candidate = session_dir / "ORACLE_FUSION_OUTPUT" / filename
-                if candidate.exists():
+                if candidate.exists() and candidate.is_file():
                     report_path = candidate
                     break
         
@@ -697,31 +707,36 @@ def download_report(filename: str):
         )
     
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        import logging
+        logging.error(f"Error downloading report: {e}", exc_info=True)
+        return jsonify({"error": "Failed to download report"}), 500
 
 
 @app.route("/api/reports/download-pdf/<path:filename>", methods=["GET"])
 def download_report_pdf(filename: str):
-    """Download a report as PDF"""
+    """Download a report as HTML for browser PDF conversion"""
     try:
         import pdf_report_generator
+        import os
+        import re
         
-        # Security: only allow accessing .txt files
-        if not filename.endswith('.txt'):
-            return jsonify({"error": "Invalid file type"}), 400
+        # Security: validate filename
+        filename = os.path.basename(filename)  # Prevent directory traversal
+        if not re.match(r'^[a-zA-Z0-9_\-]+\.txt$', filename):
+            return jsonify({"error": "Invalid filename"}), 400
         
         # Try to find the file
         report_path = None
         
         # Check reports directory
         candidate = REPORTS_DIR / filename
-        if candidate.exists():
+        if candidate.exists() and candidate.is_file():
             report_path = candidate
         else:
             # Check session directories
             for session_dir in UPLOAD_BASE.glob("*"):
                 candidate = session_dir / "ORACLE_FUSION_OUTPUT" / filename
-                if candidate.exists():
+                if candidate.exists() and candidate.is_file():
                     report_path = candidate
                     break
         
@@ -731,29 +746,31 @@ def download_report_pdf(filename: str):
         # Read the text content
         text_content = report_path.read_text(encoding="utf-8")
         
-        # Generate PDF
-        pdf_content = pdf_report_generator.generate_pdf_from_text(
+        # Generate HTML for browser-based PDF conversion
+        html_content = pdf_report_generator.generate_pdf_from_text(
             text_content,
             title=f"Verification Report - {filename}"
         )
         
-        # Return PDF
-        pdf_filename = filename.replace('.txt', '.pdf')
+        # Return HTML for browser to convert to PDF via print dialog
+        pdf_filename = filename.replace('.txt', '.html')
         return Response(
-            pdf_content,
-            mimetype='application/pdf',
+            html_content,
+            mimetype='text/html',
             headers={
-                'Content-Disposition': f'attachment; filename="{pdf_filename}"'
+                'Content-Disposition': f'inline; filename="{pdf_filename}"'
             }
         )
     
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        import logging
+        logging.error(f"Error generating report HTML: {e}", exc_info=True)
+        return jsonify({"error": "Failed to generate report"}), 500
 
 
 @app.route("/api/reports/summary-pdf", methods=["POST"])
 def generate_summary_pdf():
-    """Generate a PDF summary from AR Invoice data"""
+    """Generate an HTML summary from AR Invoice data for browser-based PDF conversion"""
     try:
         import pdf_report_generator
         
@@ -765,20 +782,22 @@ def generate_summary_pdf():
         if not ar_file:
             return jsonify({"error": "AR Invoice file required"}), 400
         
-        # Generate PDF
-        pdf_content = pdf_report_generator.generate_invoice_summary_pdf(ar_file)
+        # Generate HTML (not actual PDF, for browser conversion)
+        html_content = pdf_report_generator.generate_invoice_summary_pdf(ar_file)
         
-        # Return PDF
+        # Return HTML for browser to convert to PDF
         return Response(
-            pdf_content,
-            mimetype='application/pdf',
+            html_content,
+            mimetype='text/html',
             headers={
-                'Content-Disposition': 'attachment; filename="ar_invoice_summary.pdf"'
+                'Content-Disposition': 'inline; filename="ar_invoice_summary.html"'
             }
         )
     
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        import logging
+        logging.error(f"Error generating summary: {e}", exc_info=True)
+        return jsonify({"error": "Failed to generate summary"}), 500
 
 
 # ---------------------------------------------------------------------------
