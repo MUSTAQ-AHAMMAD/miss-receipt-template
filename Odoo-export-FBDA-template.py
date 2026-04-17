@@ -2085,16 +2085,13 @@ class OracleFusionIntegration:
                 payment_file_path, set(self.invoice_store.keys())
             )
             if payment_data is not None:
-                # Clear Cash-based payments and apply the file's method breakdown
-                self.invoice_payments.clear()
+                # Override payments only for invoices present in the payment file;
+                # all other invoices retain their existing Cash allocation.
                 for inv_ref, methods in payment_data.items():
+                    if inv_ref in self.invoice_payments:
+                        self.invoice_payments[inv_ref].clear()
                     for method, amount in methods.items():
                         self.invoice_payments[inv_ref][method] += amount
-
-                # Invoices absent from the payment file fall back to their AR amount as Cash
-                for inv_ref, ar_total in self.invoice_ar_total.items():
-                    if inv_ref not in self.invoice_payments and ar_total:
-                        self.invoice_payments[inv_ref]["Cash"] += ar_total
 
                 # Refresh invoice types from the real payment methods
                 for inv, methods in self.invoice_payments.items():
