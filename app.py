@@ -634,7 +634,7 @@ def view_report(filename: str):
         import re
         
         filename = os.path.basename(filename)  # Prevent directory traversal
-        if not re.match(r'^[a-zA-Z0-9_\-]+\.txt$', filename):
+        if not re.match(r'^[a-zA-Z0-9_-]+\.txt$', filename):
             return jsonify({"error": "Invalid filename"}), 400
         
         # Try to find the file in reports dir or session dirs
@@ -678,7 +678,7 @@ def download_report(filename: str):
         import re
         
         filename = os.path.basename(filename)  # Prevent directory traversal
-        if not re.match(r'^[a-zA-Z0-9_\-]+\.txt$', filename):
+        if not re.match(r'^[a-zA-Z0-9_-]+\.txt$', filename):
             return jsonify({"error": "Invalid filename"}), 400
         
         # Try to find the file
@@ -722,7 +722,7 @@ def download_report_pdf(filename: str):
         
         # Security: validate filename
         filename = os.path.basename(filename)  # Prevent directory traversal
-        if not re.match(r'^[a-zA-Z0-9_\-]+\.txt$', filename):
+        if not re.match(r'^[a-zA-Z0-9_-]+\.txt$', filename):
             return jsonify({"error": "Invalid filename"}), 400
         
         # Try to find the file

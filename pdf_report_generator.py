@@ -27,13 +27,19 @@ def generate_pdf_from_text(text_content: str, title: str = "Report") -> bytes:
     Returns:
         HTML content as UTF-8 encoded bytes (not actual PDF)
     """
+    import html
+    
+    # Escape HTML special characters to prevent XSS
+    escaped_content = html.escape(text_content)
+    escaped_title = html.escape(title)
+    
     # Create HTML wrapper for the text content
     html_content = f"""
     <!DOCTYPE html>
     <html>
     <head>
         <meta charset="UTF-8">
-        <title>{title}</title>
+        <title>{escaped_title}</title>
         <style>
             body {{
                 font-family: 'Courier New', monospace;
@@ -76,10 +82,10 @@ def generate_pdf_from_text(text_content: str, title: str = "Report") -> bytes:
     </head>
     <body>
         <div class="header">
-            <h1>{title}</h1>
+            <h1>{escaped_title}</h1>
             <p>Generated on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
         </div>
-        <pre>{text_content}</pre>
+        <pre>{escaped_content}</pre>
         <div class="footer">
             <p>Oracle Fusion Financial Integration - Report Generator</p>
         </div>

@@ -1689,7 +1689,7 @@
               </div>
             </div>
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
-              <button onclick="viewReport('${report.filename}')" 
+              <button onclick="viewReport('${escapeAttr(report.filename)}')" 
                       style="padding:6px 14px; background:var(--bg-card); border:1px solid var(--accent-blue); 
                              border-radius:6px; color:var(--accent-blue); font-size:.8rem; cursor:pointer; 
                              transition:all var(--transition);"
@@ -1697,7 +1697,7 @@
                       onmouseout="this.style.background='var(--bg-card)'">
                 <i class="fa-solid fa-eye"></i> View
               </button>
-              <button onclick="downloadReport('${report.filename}')" 
+              <button onclick="downloadReport('${escapeAttr(report.filename)}')" 
                       style="padding:6px 14px; background:var(--bg-card); border:1px solid var(--accent-green); 
                              border-radius:6px; color:var(--accent-green); font-size:.8rem; cursor:pointer; 
                              transition:all var(--transition);"
@@ -1705,7 +1705,7 @@
                       onmouseout="this.style.background='var(--bg-card)'">
                 <i class="fa-solid fa-download"></i> Download TXT
               </button>
-              <button onclick="downloadReportPDF('${report.filename}')" 
+              <button onclick="downloadReportPDF('${escapeAttr(report.filename)}')" 
                       style="padding:6px 14px; background:var(--bg-card); border:1px solid var(--accent-violet); 
                              border-radius:6px; color:var(--accent-violet); font-size:.8rem; cursor:pointer; 
                              transition:all var(--transition);"
@@ -1823,6 +1823,19 @@
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  }
+  
+  function escapeAttr(text) {
+    // Escape for use in HTML attributes
+    return text.replace(/[&<>"']/g, function(m) {
+      return {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[m];
+    });
   }
 </script>
 </body>
