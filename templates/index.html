@@ -744,6 +744,18 @@
         Generate from Odoo Exports
         <span style="font-size:.7rem;opacity:.7;display:block;margin-top:2px;">Sales Lines + Payment Lines → AR Invoice + receipts</span>
       </button>
+      <button id="mode-btn-merge" class="mode-btn"
+              onclick="setMode('merge')">
+        <i class="fa-solid fa-code-merge"></i>
+        Merge AR Invoices
+        <span style="font-size:.7rem;opacity:.7;display:block;margin-top:2px;">Combine multiple AR Invoice CSV files into one</span>
+      </button>
+      <button id="mode-btn-report" class="mode-btn"
+              onclick="setMode('report')">
+        <i class="fa-solid fa-chart-pie"></i>
+        Generate Reports
+        <span style="font-size:.7rem;opacity:.7;display:block;margin-top:2px;">Create comprehensive analysis reports</span>
+      </button>
     </div>
 
     <!-- ── AR Invoice mode uploads ── -->
@@ -863,6 +875,64 @@
       </div>
     </div><!-- /uploads-sales_payment -->
 
+    <!-- ── CSV Merge mode ── -->
+    <div id="uploads-merge" style="display:none;">
+      <div style="padding:20px; background:rgba(99,179,237,.08); border:1px solid rgba(99,179,237,.25); border-radius:12px; margin-bottom:20px;">
+        <h4 style="margin-bottom:10px; color:var(--accent-cyan);"><i class="fa-solid fa-code-merge"></i> Merge AR Invoice CSV Files</h4>
+        <p style="font-size:.85rem; color:var(--text-muted); margin-bottom:16px;">
+          Upload multiple AR Invoice CSV files to merge them into a single consolidated file. Duplicates will be automatically removed.
+        </p>
+        <input type="file" id="file-merge-csv" accept=".csv" multiple onchange="onMergeFilesSelected(this)" 
+               style="padding:10px; background:var(--bg-card); border:1px solid var(--border); border-radius:8px; color:var(--text-primary); width:100%;" />
+        <div id="merge-file-list" style="margin-top:12px;"></div>
+        <button onclick="performMerge()" id="merge-btn" disabled
+                style="margin-top:16px; padding:12px 24px; background:linear-gradient(135deg,var(--accent-cyan),var(--accent-blue)); 
+                       border:none; border-radius:8px; color:white; font-weight:600; cursor:pointer;">
+          <i class="fa-solid fa-code-merge"></i> Merge Files
+        </button>
+      </div>
+    </div>
+
+    <!-- ── Report Generation mode ── -->
+    <div id="uploads-report" style="display:none;">
+      <div style="padding:20px; background:rgba(139,92,246,.08); border:1px solid rgba(139,92,246,.25); border-radius:12px; margin-bottom:20px;">
+        <h4 style="margin-bottom:10px; color:var(--accent-violet);"><i class="fa-solid fa-chart-pie"></i> Generate Comprehensive Reports</h4>
+        <p style="font-size:.85rem; color:var(--text-muted); margin-bottom:16px;">
+          Generate detailed analysis reports including SKU breakdown, discount analysis, sub-inventory summaries, and invoice-level details.
+        </p>
+        
+        <div style="margin-bottom:16px;">
+          <label style="display:block; margin-bottom:8px; font-weight:600; font-size:.85rem;">Report Type:</label>
+          <select id="report-type" onchange="updateReportFields()"
+                  style="padding:10px; background:var(--bg-card); border:1px solid var(--border); border-radius:8px; 
+                         color:var(--text-primary); width:100%; font-size:.9rem;">
+            <option value="ar">AR Invoice Analysis</option>
+            <option value="subinv">Sub-Inventory Report</option>
+          </select>
+        </div>
+        
+        <div style="margin-bottom:12px;">
+          <label style="display:block; margin-bottom:8px; font-weight:600; font-size:.85rem;">AR Invoice CSV *</label>
+          <input type="file" id="file-report-ar" accept=".csv" 
+                 style="padding:10px; background:var(--bg-card); border:1px solid var(--border); border-radius:8px; 
+                        color:var(--text-primary); width:100%;" />
+        </div>
+        
+        <div id="report-metadata-field" style="margin-bottom:12px;">
+          <label style="display:block; margin-bottom:8px; font-weight:600; font-size:.85rem;">Metadata CSV (Optional)</label>
+          <input type="file" id="file-report-metadata" accept=".csv" 
+                 style="padding:10px; background:var(--bg-card); border:1px solid var(--border); border-radius:8px; 
+                        color:var(--text-primary); width:100%;" />
+        </div>
+        
+        <button onclick="performReportGeneration()" id="report-btn"
+                style="margin-top:16px; padding:12px 24px; background:linear-gradient(135deg,var(--accent-violet),var(--accent-blue)); 
+                       border:none; border-radius:8px; color:white; font-weight:600; cursor:pointer;">
+          <i class="fa-solid fa-chart-pie"></i> Generate Report
+        </button>
+      </div>
+    </div>
+
     <!-- Auto-loaded reference files -->
     <div style="margin-top:20px; padding:16px 20px; background:rgba(16,185,129,.06); border:1px solid rgba(16,185,129,.20); border-radius:12px;">
       <div style="font-size:.78rem; font-weight:600; color:var(--accent-green); letter-spacing:.06em; text-transform:uppercase; margin-bottom:10px;">
@@ -909,6 +979,20 @@
         </label>
         <input class="form-input" type="text" id="orgName" name="org_name"
                value="AlQurashi-KSA" placeholder="e.g. AlQurashi-KSA" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">
+          <i class="fa-solid fa-arrow-up-1-9" style="color:var(--accent-green)"></i>
+          Auto-Increment Invoice Numbers
+          <span class="tip" title="Automatically continue from last invoice number sequence">?</span>
+        </label>
+        <label style="display:flex; align-items:center; gap:10px; cursor:pointer; padding:10px; background:var(--bg-card); border:1px solid var(--border); border-radius:8px;">
+          <input type="checkbox" id="autoIncrement" name="auto_increment" 
+                 style="width:18px; height:18px; cursor:pointer;" />
+          <span style="font-size:.85rem; color:var(--text-muted);">
+            Automatically use next invoice number from previous run
+          </span>
+        </label>
       </div>
       <div class="form-group">
         <label class="form-label" for="startSeq">
@@ -1173,6 +1257,7 @@
     fd.append('start_seq',  document.getElementById('startSeq').value);
     fd.append('start_leg1', document.getElementById('legSeq1').value);
     fd.append('start_leg2', document.getElementById('legSeq2').value);
+    fd.append('auto_increment', document.getElementById('autoIncrement').checked ? 'true' : 'false');
 
     setProgress(5, 'Sending files to server…');
     const runRes = await fetch('/api/run', {method:'POST', body: fd});
@@ -1364,6 +1449,162 @@
 
     document.getElementById('runBtn').disabled = false;
     document.getElementById('runBtn').classList.remove('loading');
+  }
+
+  // ─── Mode Toggle Extended ──────────────────────────────────────────
+  function setMode(mode) {
+    currentMode = mode;
+
+    // Update button styles
+    ['ar_invoice', 'sales_payment', 'merge', 'report'].forEach(m => {
+      const btn = document.getElementById('mode-btn-' + m);
+      if (btn) btn.classList.toggle('mode-btn-active', m === mode);
+    });
+
+    // Show/hide upload panels
+    document.getElementById('uploads-ar_invoice').style.display     = mode === 'ar_invoice'    ? '' : 'none';
+    document.getElementById('uploads-sales_payment').style.display  = mode === 'sales_payment' ? '' : 'none';
+    document.getElementById('uploads-merge').style.display          = mode === 'merge'         ? '' : 'none';
+    document.getElementById('uploads-report').style.display         = mode === 'report'        ? '' : 'none';
+
+    // Show/hide pipeline
+    document.getElementById('pipeline-ar_invoice').style.display    = mode === 'ar_invoice'    ? '' : 'none';
+    document.getElementById('pipeline-sales_payment').style.display = mode === 'sales_payment' ? '' : 'none';
+
+    // Hide config section for merge and report modes
+    const configCard = document.querySelector('.card:has(#configForm)');
+    if (configCard) configCard.style.display = (mode === 'merge' || mode === 'report') ? 'none' : '';
+
+    // Show/hide AR Invoice legend badge
+    const arLegend = document.getElementById('legend-ar-invoice');
+    if (arLegend) arLegend.style.display = mode === 'sales_payment' ? '' : 'none';
+  }
+
+  // ─── CSV Merge Functions ───────────────────────────────────────────
+  let mergeFiles = [];
+
+  function onMergeFilesSelected(input) {
+    mergeFiles = Array.from(input.files);
+    const list = document.getElementById('merge-file-list');
+    const btn = document.getElementById('merge-btn');
+    
+    if (mergeFiles.length < 2) {
+      list.innerHTML = '<p style="color:var(--accent-red); font-size:.85rem;">Please select at least 2 CSV files</p>';
+      btn.disabled = true;
+      return;
+    }
+    
+    list.innerHTML = '<p style="font-size:.85rem; margin-bottom:8px; color:var(--text-muted);">Selected files:</p>';
+    mergeFiles.forEach((f, i) => {
+      list.innerHTML += `<div style="padding:6px 12px; background:var(--bg-card); border:1px solid var(--border); border-radius:6px; margin-bottom:6px; font-size:.85rem;">
+        <i class="fa-solid fa-file-csv" style="color:var(--accent-cyan);"></i> ${f.name}
+      </div>`;
+    });
+    
+    btn.disabled = false;
+  }
+
+  async function performMerge() {
+    if (mergeFiles.length < 2) {
+      showBanner('error', 'Please select at least 2 CSV files');
+      return;
+    }
+
+    const formData = new FormData();
+    mergeFiles.forEach(f => formData.append('csv_files', f));
+
+    try {
+      showBanner('info', 'Merging CSV files...');
+      const response = await fetch('/api/merge-csv', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Merge failed');
+      }
+
+      // Trigger file download
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'merged_ar_invoice.csv';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      showBanner('success', 'CSV files merged successfully!');
+    } catch (error) {
+      showBanner('error', `Merge error: ${error.message}`);
+    }
+  }
+
+  // ─── Report Generation Functions ────────────────────────────────────
+  function updateReportFields() {
+    const reportType = document.getElementById('report-type').value;
+    const metadataField = document.getElementById('report-metadata-field');
+    
+    if (reportType === 'subinv') {
+      metadataField.querySelector('label').innerHTML = 
+        '<i class="fa-solid fa-database"></i> Metadata CSV *';
+      metadataField.style.display = '';
+    } else {
+      metadataField.querySelector('label').innerHTML = 
+        '<i class="fa-solid fa-database"></i> Metadata CSV (Optional)';
+      metadataField.style.display = '';
+    }
+  }
+
+  async function performReportGeneration() {
+    const reportType = document.getElementById('report-type').value;
+    const arFile = document.getElementById('file-report-ar').files[0];
+    const metadataFile = document.getElementById('file-report-metadata').files[0];
+
+    if (!arFile) {
+      showBanner('error', 'Please select an AR Invoice CSV file');
+      return;
+    }
+
+    if (reportType === 'subinv' && !metadataFile) {
+      showBanner('error', 'Metadata CSV is required for Sub-Inventory report');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('report_type', reportType);
+    formData.append('ar_invoice', arFile);
+    if (metadataFile) formData.append('metadata', metadataFile);
+
+    try {
+      showBanner('info', 'Generating comprehensive report...');
+      const response = await fetch('/api/generate-report', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Report generation failed');
+      }
+
+      // Trigger file download
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'comprehensive_reports.zip';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      showBanner('success', 'Report generated successfully!');
+    } catch (error) {
+      showBanner('error', `Report error: ${error.message}`);
+    }
   }
 </script>
 </body>

@@ -140,11 +140,15 @@ def _run_integration(sid: str, cfg: dict):
             if cfg.get("org_name"):
                 mod.AR_STATIC["Comments"] = cfg["org_name"]
 
+            # Enable sequence manager if auto-increment is requested
+            use_seq_mgr = cfg.get("auto_increment", "false").lower() == "true"
+
             integration = mod.OracleFusionIntegration(
-                output_dir         = sess["output_dir"],
-                start_seq          = int(cfg.get("start_seq", 1)),
-                start_legacy_seq_1 = int(cfg.get("start_leg1", 1)),
-                start_legacy_seq_2 = int(cfg.get("start_leg2", 1)),
+                output_dir           = sess["output_dir"],
+                start_seq            = int(cfg.get("start_seq", 1)),
+                start_legacy_seq_1   = int(cfg.get("start_leg1", 1)),
+                start_legacy_seq_2   = int(cfg.get("start_leg2", 1)),
+                use_sequence_manager = use_seq_mgr,
             )
 
             mode = cfg.get("mode", "ar_invoice")
@@ -413,6 +417,98 @@ def download(sid: str):
         download_name="oracle_fusion_output.zip",
         mimetype="application/zip",
     )
+
+
+@app.route("/api/merge-csv", methods=["POST"])
+def merge_csv_files():
+    """Merge multiple AR Invoice CSV files"""
+    try:
+        import csv_merger
+        
+        # Create a temporary session for the merge
+        sid = _new_session()
+        sess = _session(sid)
+        work_dir = Path(sess["work_dir"])
+        
+        # Save all uploaded files
+        files = request.files.getlist("csv_files")
+        if not files or len(files) < 2:
+            return jsonify({"error": "Please upload at least 2 CSV files"}), 400
+        
+        input_paths = []
+        for f in files:
+            if f and f.filename:
+                safe_name = secure_filename(f.filename)
+                dest = work_dir / safe_name
+                f.save(str(dest))
+                input_paths.append(str(dest))
+        
+        # Merge the files
+        output_path = work_dir / "merged_ar_invoice.csv"
+        stats = csv_merger.merge_ar_invoices(input_paths, str(output_path))
+        
+        # Return the merged file
+        return send_file(
+            str(output_path),
+            as_attachment=True,
+            download_name="merged_ar_invoice.csv",
+            mimetype="text/csv",
+        )
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/generate-report", methods=["POST"])
+def generate_comprehensive_report():
+    """Generate comprehensive report for uploaded files"""
+    try:
+        import report_generator
+        
+        sid = _new_session()
+        sess = _session(sid)
+        work_dir = Path(sess["work_dir"])
+        report_dir = work_dir / "REPORTS"
+        
+        report_type = request.form.get("report_type", "ar")
+        generator = report_generator.ComprehensiveReportGenerator(str(report_dir))
+        
+        if report_type == "ar":
+            # AR Invoice report
+            ar_file = _save_upload(sid, "ar_invoice")
+            if not ar_file:
+                return jsonify({"error": "AR Invoice file required"}), 400
+            
+            metadata_file = _save_upload(sid, "metadata")
+            generator.generate_ar_invoice_report(ar_file, metadata_file)
+            
+        elif report_type == "subinv":
+            # Sub-inventory report
+            ar_file = _save_upload(sid, "ar_invoice")
+            metadata_file = _save_upload(sid, "metadata")
+            
+            if not ar_file or not metadata_file:
+                return jsonify({"error": "Both AR Invoice and Metadata files required"}), 400
+            
+            generator.generate_sub_inventory_report(ar_file, metadata_file)
+        
+        # Zip the reports
+        zip_path = work_dir / "reports.zip"
+        import zipfile
+        with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
+            for fpath in report_dir.rglob("*"):
+                if fpath.is_file():
+                    zf.write(fpath, fpath.relative_to(report_dir))
+        
+        return send_file(
+            str(zip_path),
+            as_attachment=True,
+            download_name="comprehensive_reports.zip",
+            mimetype="application/zip",
+        )
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 # ---------------------------------------------------------------------------
