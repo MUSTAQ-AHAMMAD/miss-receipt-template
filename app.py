@@ -198,6 +198,52 @@ def _run_integration(sid: str, cfg: dict):
                 diff = abs(ar_total - input_total)
                 match_flag = "✓ MATCH" if diff < _TOTAL_MATCH_THRESHOLD else f"⚠ DIFF {diff:,.2f}"
                 stat("Total Match", match_flag)
+                
+                # Date-wise breakdown comparison
+                log("Computing date-wise totals comparison...")
+                
+                # Group AR by date
+                ar_by_date = ar_df.groupby('Transaction Date')['Transaction Line Amount'].sum().to_dict()
+                
+                # Group input by date
+                import pandas as pd
+                line_items_with_date = integration.line_items.copy()
+                line_items_with_date['adjusted_amount'] = line_items_with_date.apply(calculate_adjusted_amount, axis=1)
+                
+                # Get date column from line items
+                date_col = None
+                for col in line_items_with_date.columns:
+                    if any(x in col.lower() for x in ['date', 'sale date']):
+                        date_col = col
+                        break
+                
+                if date_col:
+                    # Format dates consistently
+                    line_items_with_date['formatted_date'] = pd.to_datetime(
+                        line_items_with_date[date_col], errors='coerce'
+                    ).dt.strftime('%Y-%m-%d %H:%M:%S')
+                    
+                    input_by_date = line_items_with_date.groupby('formatted_date')['adjusted_amount'].sum().to_dict()
+                    
+                    # Build comparison stats
+                    date_comparison_text = "\n\nDATE-WISE COMPARISON:\n" + "="*80 + "\n"
+                    date_comparison_text += f"{'Date':<22} {'AR Total':>18} {'Input Total':>18} {'Difference':>18}\n"
+                    date_comparison_text += "-"*80 + "\n"
+                    
+                    all_dates = sorted(set(list(ar_by_date.keys()) + list(input_by_date.keys())))
+                    for date in all_dates:
+                        ar_amt = ar_by_date.get(date, 0)
+                        input_amt = input_by_date.get(date, 0)
+                        diff_amt = abs(ar_amt - input_amt)
+                        match_icon = "✓" if diff_amt < _TOTAL_MATCH_THRESHOLD else "⚠"
+                        date_comparison_text += f"{date:<22} {ar_amt:>18,.2f} {input_amt:>18,.2f} {diff_amt:>18,.2f} {match_icon}\n"
+                    
+                    stat("Date-wise Match", "See verification report for details")
+                    
+                    # Store for report
+                    integration._date_comparison = date_comparison_text
+                else:
+                    integration._date_comparison = None
 
                 progress(55, "Generating Standard Receipts…")
                 std_rcp = integration.generate_standard_receipts()

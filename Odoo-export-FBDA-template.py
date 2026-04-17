@@ -2018,6 +2018,11 @@ class OracleFusionIntegration:
         vl.add()
         vl.add("  ── Run complete ──")
         vl.add(f"  Finished : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        
+        # Add date-wise comparison if available
+        if hasattr(self, '_date_comparison') and self._date_comparison:
+            vl.add()
+            vl.add(self._date_comparison)
 
     # ──────────────────────────────────────────────────────────────────
     # AR INVOICE MODE — load from pre-generated AR Invoice CSV
