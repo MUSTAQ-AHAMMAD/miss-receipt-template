@@ -648,12 +648,12 @@ LINE_ITEMS_COL_MAP = {
         "Quantity",
     ],
     "Subtotal w/o Tax": [
+        "Order Lines/Subtotal",
+        "Subtotal",
         "Order Lines/Subtotal w/o Tax",
         "Order Lines/Subtotal excl tax",
         "Order Lines/Price excl. tax",
-        "Order Lines/Subtotal",
         "Subtotal w/o Tax",
-        "Subtotal",
     ],
     "Sale Date": [
         "Order Lines/Order Ref/Date",
