@@ -154,6 +154,7 @@ def _run_integration(sid: str, cfg: dict):
                 metadata_path        = cfg["metadata"],
                 receipt_methods_path = cfg.get("receipt_methods", ""),
                 bank_charges_path    = cfg.get("bank_charges", ""),
+                payment_file_path    = cfg.get("payment_file", ""),
             )
 
             progress(50, "Generating Standard Receipts…")
@@ -245,6 +246,11 @@ def run_integration():
     ar_invoice_path = _save_upload(sid, "ar_invoice")
     if ar_invoice_path:
         cfg["ar_invoice"] = ar_invoice_path
+
+    # Optional payment file (provides real payment-method breakdown for Misc Receipts)
+    payment_file_path = _save_upload(sid, "payment_file")
+    if payment_file_path:
+        cfg["payment_file"] = payment_file_path
 
     # Auto-load all reference files from the repo root directory
     repo_dir = Path(__file__).parent

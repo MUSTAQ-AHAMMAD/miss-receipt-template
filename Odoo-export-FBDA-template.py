@@ -1904,18 +1904,91 @@ class OracleFusionIntegration:
     # AR INVOICE MODE — load from pre-generated AR Invoice CSV
     # ──────────────────────────────────────────────────────────────────
 
+    # ──────────────────────────────────────────────────────────────────
+    # PAYMENT FILE LOADER (AR INVOICE MODE)
+    # ──────────────────────────────────────────────────────────────────
+
+    def _load_payment_file(
+        self,
+        payment_file_path: str,
+        inv_ref_set: set,
+    ) -> Optional[Dict[str, Dict[str, float]]]:
+        """Load an optional payment CSV and return {inv_ref: {method: amount}}.
+
+        Recognises a wide range of column names for Sales Order / Order Ref,
+        Payment Method, and Amount so that common export formats work without
+        manual column renaming.  Returns None on failure (file not found or
+        required columns missing).
+        """
+        try:
+            pf = self._read_file(payment_file_path)
+        except Exception as exc:
+            print(f"  ⚠ Payment file load error: {exc}")
+            return None
+
+        # Tolerant column discovery
+        so_col = find_col(pf, [
+            "Sales Order Number", "Sales Order", "Order Number",
+            "Order Ref", "Payments/Order Ref", "SO Number",
+            "Invoice Number", "Invoice Ref", "Reference",
+        ])
+        method_col = find_col(pf, [
+            "Payments/Payment Method", "Payment Method",
+            "Payment Type", "Method", "Pay Method",
+        ])
+        amount_col = find_col(pf, [
+            "Payments/Amount", "Amount", "Paid Amount",
+            "Payment Amount", "Total Amount",
+        ])
+
+        missing = [n for n, c in [
+            ("Sales Order / Order Ref", so_col),
+            ("Payment Method",          method_col),
+            ("Amount",                  amount_col),
+        ] if not c]
+        if missing:
+            print(f"  ⚠ Payment file missing required columns: {missing} — skipped")
+            return None
+
+        result: Dict[str, Dict[str, float]] = defaultdict(lambda: defaultdict(float))
+        unmatched = 0
+        for _, row in pf.iterrows():
+            inv    = clean_order_ref(safe_str(row.get(so_col, "")).strip())
+            method = normalise_payment(safe_str(row.get(method_col, "Cash")))
+            amount = safe_float(row.get(amount_col, 0))
+            if not inv or amount == 0:
+                continue
+            if inv in inv_ref_set:
+                result[inv][method] += amount
+            else:
+                unmatched += 1
+
+        if unmatched:
+            print(f"  ⚠ {unmatched:,} payment file row(s) did not match any "
+                  f"AR Invoice Sales Order reference")
+        print(f"  ✓ Payment file loaded: {len(result):,} matched invoice references")
+        return result
+
     def load_from_ar_invoice(
         self,
         ar_invoice_path:      str,
         metadata_path:        str,
         receipt_methods_path: str = "",
         bank_charges_path:    str = "",
+        payment_file_path:    str = "",
     ):
         """Populate invoice dictionaries from an already-generated AR Invoice CSV.
 
-        No line-items or payments file is required.  Payment method defaults to
-        Cash for all amounts (Misc Receipts will only appear for methods with a
-        non-zero bank charge rate in BANK_CHARGES.csv).
+        An optional *payment_file_path* (CSV/XLSX) can be supplied to provide
+        actual payment-method breakdowns per Sales Order.  Expected columns:
+          • Sales Order Number (or Order Ref / Invoice Number / …)
+          • Payment Method  (e.g. Cash, Mada, Visa, MasterCard)
+          • Amount
+
+        When matched by Sales Order Number the payment methods replace the
+        default Cash allocation, enabling correct Misc Receipt generation for
+        card-payment bank charges.  Invoices absent from the payment file fall
+        back to Cash.
         """
         vl = self.vlog
         vl.section("1. INPUT FILES (AR INVOICE MODE)")
@@ -1923,6 +1996,7 @@ class OracleFusionIntegration:
         vl.kv("Metadata file",    Path(metadata_path).name)
         vl.kv("Receipt Methods",  Path(receipt_methods_path).name if receipt_methods_path else "—")
         vl.kv("Bank Charges",     Path(bank_charges_path).name    if bank_charges_path    else "—")
+        vl.kv("Payment File",     Path(payment_file_path).name    if payment_file_path    else "—")
         vl.kv("Segment 1 prefix", self._seg1_prefix)
         vl.kv("Segment 2 prefix", self._seg2_prefix)
         vl.add()
@@ -1994,18 +2068,74 @@ class OracleFusionIntegration:
             # Accumulate amount as Cash (default — no payment method data in AR Invoice)
             self.invoice_payments[inv_ref]["Cash"] += amount
 
-        # Compute AR totals per invoice
+        # Compute AR totals per invoice (from the Cash-based pass, before any override)
         for inv_ref, methods in self.invoice_payments.items():
             self.invoice_ar_total[inv_ref] = sum(methods.values())
 
-        vl.kv("Unique invoices loaded",  len(self.invoice_store))
+        vl.kv("Unique invoices loaded",    len(self.invoice_store))
         vl.kv("Unique transactions (BLK)", len({v for v in self.invoice_to_ar_txn.values()}))
         total_amount = sum(self.invoice_ar_total.values())
         vl.kv("Total AR amount", f"{total_amount:,.2f} SAR")
         vl.add()
-        vl.add("  NOTE: All amounts attributed to Cash (no payment file supplied).")
-        vl.add("        Misc Receipts are generated only when BANK_CHARGES.csv has")
-        vl.add("        a non-zero charge rate for a given method.")
+
+        # ── Optional payment file: replace Cash defaults with real methods ──
+        if payment_file_path and Path(payment_file_path).exists():
+            vl.section("1b. PAYMENT FILE (AR INVOICE MODE)")
+            payment_data = self._load_payment_file(
+                payment_file_path, set(self.invoice_store.keys())
+            )
+            if payment_data is not None:
+                # Clear Cash-based payments and apply the file's method breakdown
+                self.invoice_payments.clear()
+                for inv_ref, methods in payment_data.items():
+                    for method, amount in methods.items():
+                        self.invoice_payments[inv_ref][method] += amount
+
+                # Invoices absent from the payment file fall back to their AR amount as Cash
+                for inv_ref, ar_total in self.invoice_ar_total.items():
+                    if inv_ref not in self.invoice_payments and ar_total:
+                        self.invoice_payments[inv_ref]["Cash"] += ar_total
+
+                # Refresh invoice types from the real payment methods
+                for inv, methods in self.invoice_payments.items():
+                    if "TAMARA" in methods:
+                        self.invoice_ctype[inv] = "TAMARA"
+                    elif "TABBY" in methods:
+                        self.invoice_ctype[inv] = "TABBY"
+                    else:
+                        self.invoice_ctype[inv] = "NORMAL"
+
+                # Log payment method breakdown from file
+                method_totals: Dict[str, float] = defaultdict(float)
+                method_counts: Dict[str, int]   = defaultdict(int)
+                for inv_methods in self.invoice_payments.values():
+                    for m, amt in inv_methods.items():
+                        method_totals[m] += amt
+                        method_counts[m] += 1
+                vl.table_row("Payment Method", "Invoices", "Total Amount (SAR)",
+                             widths=(25, 12, 22))
+                vl.divider()
+                for m in sorted(method_totals):
+                    vl.table_row(m, method_counts[m],
+                                 f"{method_totals[m]:,.2f}", widths=(25, 12, 22))
+                vl.divider()
+                vl.table_row("TOTAL",
+                             sum(method_counts.values()),
+                             f"{sum(method_totals.values()):,.2f}",
+                             widths=(25, 12, 22))
+                vl.add()
+                vl.add("  Payment methods sourced from the uploaded payment file.")
+                vl.add("  Misc Receipts will be generated for card-payment methods")
+                vl.add("  matched against BANK_CHARGES.csv.")
+            else:
+                vl.add("  Payment file could not be loaded — falling back to Cash.")
+                vl.add("  NOTE: All amounts attributed to Cash.")
+                vl.add("        Misc Receipts are generated only when BANK_CHARGES.csv has")
+                vl.add("        a non-zero charge rate for a given method.")
+        else:
+            vl.add("  NOTE: All amounts attributed to Cash (no payment file supplied).")
+            vl.add("        Misc Receipts are generated only when BANK_CHARGES.csv has")
+            vl.add("        a non-zero charge rate for a given method.")
 
         vl.section("2. STORE BREAKDOWN (AR INVOICE MODE)")
         store_totals: Dict[str, float] = defaultdict(float)
@@ -2044,11 +2174,13 @@ class OracleFusionIntegration:
         metadata_path:        str,
         receipt_methods_path: str = "",
         bank_charges_path:    str = "",
+        payment_file_path:    str = "",
     ):
         """Full pipeline: AR Invoice CSV → Standard Receipts + Misc Receipts."""
         self.load_from_ar_invoice(
             ar_invoice_path, metadata_path,
             receipt_methods_path, bank_charges_path,
+            payment_file_path=payment_file_path,
         )
         std_rcp  = self.generate_standard_receipts()
         self.save_standard_receipts(std_rcp)

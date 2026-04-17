@@ -659,7 +659,7 @@
       Oracle Fusion Financial Integration
     </div>
     <h2>Automate Your<br /><span>Standard &amp; Misc Receipt</span><br />Template Generation</h2>
-    <p>Upload your Oracle Fusion AR Invoice CSV, configure the sequence settings, and instantly generate Standard Receipts and Miscellaneous Receipts — ready for Oracle Fusion import.</p>
+    <p>Upload your Oracle Fusion AR Invoice CSV and an optional Payment File (with Sales Order Numbers and payment methods), configure the sequence settings, and instantly generate Standard Receipts and Miscellaneous Receipts — ready for Oracle Fusion import. When a Payment File is provided, Misc Receipts are generated using the actual payment methods and mapped to bank charges automatically.</p>
 
     <div class="pipeline">
       <div class="pipe-step s1"><i class="fa-solid fa-file-arrow-up icon"></i> Upload AR Invoice</div>
@@ -705,7 +705,42 @@
         <div class="fz-filename" id="fn-ar_invoice"><i class="fa-solid fa-check"></i><span id="fntext-ar_invoice"></span></div>
       </div>
 
+      <!-- Payment File (Optional) -->
+      <div class="file-zone" id="zone-payment_file" ondragover="onDragOver(event,'payment_file')" ondragleave="onDragLeave('payment_file')" ondrop="onDrop(event,'payment_file')">
+        <input type="file" id="file-payment_file" accept=".csv,.xlsx,.xls" onchange="onFileChange('payment_file',this)" />
+        <div class="fz-header">
+          <div class="fz-icon optional"><i class="fa-solid fa-money-bill-transfer"></i></div>
+          <div>
+            <div class="fz-title">Payment File</div>
+            <div class="fz-subtitle">CSV/XLSX with Sales Order Number, Payment Method &amp; Amount — required for Misc Receipts with correct bank charges</div>
+            <span class="fz-badge opt">Optional</span>
+          </div>
+        </div>
+        <div class="fz-drop-hint"><i class="fa-regular fa-file-csv"></i> &nbsp;CSV / XLSX</div>
+        <div class="fz-filename" id="fn-payment_file"><i class="fa-solid fa-check"></i><span id="fntext-payment_file"></span></div>
+      </div>
+
     </div><!-- /upload-grid -->
+
+    <!-- Payment file format hint -->
+    <div style="margin-top:16px; padding:14px 18px; background:rgba(139,92,246,.06); border:1px solid rgba(139,92,246,.20); border-radius:12px;">
+      <div style="font-size:.78rem; font-weight:600; color:var(--accent-violet); letter-spacing:.06em; text-transform:uppercase; margin-bottom:8px;">
+        <i class="fa-solid fa-circle-info" style="margin-right:6px;"></i>
+        Payment File — Expected Columns
+      </div>
+      <div style="font-size:.77rem; color:var(--text-muted); line-height:1.7;">
+        The payment file must contain at least these three columns (exact names are flexible):
+        <span style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Sales Order Number</span>
+        &nbsp;
+        <span style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Payment Method</span>
+        &nbsp;
+        <span style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Amount</span>
+        <br/>
+        The Sales Order Number must match the <em>Sales Order Number</em> column in the AR Invoice CSV.
+        Payment Method values are normalised (e.g. <em>MADA</em>, <em>Mada</em>, <em>mada</em> all map to Mada).
+        Each matched method is then mapped to <strong>BANK_CHARGES.csv</strong> to calculate the correct Misc Receipt amount.
+      </div>
+    </div>
 
     <!-- Auto-loaded reference files -->
     <div style="margin-top:20px; padding:16px 20px; background:rgba(16,185,129,.06); border:1px solid rgba(16,185,129,.20); border-radius:12px;">
