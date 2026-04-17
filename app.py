@@ -382,6 +382,11 @@ def run_integration():
         p = repo_dir / filename
         if p.exists():
             cfg[key] = str(p)
+    
+    # Auto-load registers file if present (supports timestamped filenames)
+    registers_files = list(repo_dir.glob("VENDHQ_REGISTERS*.csv"))
+    if registers_files:
+        cfg["registers"] = str(registers_files[0])
 
     if mode == "sales_payment":
         # New mode: Sales Lines + Payment Lines → generate AR Invoice
