@@ -1963,48 +1963,26 @@ class OracleFusionIntegration:
 
         vl.section("9. OUTPUT FILES — AR INVOICES")
         
-        # Build reverse lookup: BILL_TO_ACCOUNT → store (SUBINVENTORY)
-        account_to_store: Dict[str, str] = {}
-        if self.metadata_cache:
-            for (subinv, _ctype), meta in self.metadata_cache.primary.items():
-                acc = meta.get("BILL_TO_ACCOUNT", "")
-                if acc and acc not in account_to_store:
-                    account_to_store[acc] = subinv
+        # Save single consolidated AR Invoice file (all stores together)
+        # Filename: AR_Invoice_{org_name}_{date}.csv
+        fpath = folder / f"AR_Invoice_{org_name}_{date_part}.csv"
         
-        # Group by Bill-to Customer Account Number (store)
-        unique_stores = df["Bill-to Customer Account Number"].unique()
+        df.to_csv(fpath, index=False, encoding="utf-8-sig", quoting=1)
         
-        total_files = 0
-        total_rows = 0
-        total_amount = 0.0
+        total_rows = len(df)
+        total_amount = df['Transaction Line Amount'].sum()
+        unique_stores = df["Bill-to Customer Account Number"].nunique()
         
-        for store_account in sorted(unique_stores):
-            store_df = df[df["Bill-to Customer Account Number"] == store_account]
-            
-            # Get store name from metadata, fallback to account number
-            store_name = account_to_store.get(store_account, store_account)
-            safe_store_name = safe_filename(store_name)
-            
-            # Create subfolder for each store
-            store_folder = folder / safe_store_name
-            store_folder.mkdir(parents=True, exist_ok=True)
-            
-            # Filename: AR_Invoice_{store_name}_{org_name}_{date}.csv
-            fpath = store_folder / f"AR_Invoice_{safe_store_name}_{org_name}_{date_part}.csv"
-            
-            store_df.to_csv(fpath, index=False, encoding="utf-8-sig", quoting=1)
-            
-            store_amt = store_df['Transaction Line Amount'].sum()
-            total_files += 1
-            total_rows += len(store_df)
-            total_amount += store_amt
-            
-            print(f"  ✓ {safe_store_name:<30}  {len(store_df):>6,} rows  {store_amt:>14,.2f} SAR")
+        print(f"  ✓ Consolidated AR Invoice (all stores)")
+        print(f"    Stores:  {unique_stores:,}")
+        print(f"    Rows:    {total_rows:,}")
+        print(f"    Amount:  {total_amount:,.2f} SAR")
         
-        vl.kv("Total files",  f"{total_files:,}")
+        vl.kv("Output file",  fpath.name)
+        vl.kv("Total stores", f"{unique_stores:,}")
         vl.kv("Total rows",   f"{total_rows:,}")
         vl.kv("Total amount", f"{total_amount:,.2f} SAR")
-        print(f"\n  Summary: {total_files} file(s), {total_rows:,} rows, {total_amount:,.2f} SAR")
+        print(f"\n  Summary: 1 consolidated file, {unique_stores:,} stores, {total_rows:,} rows, {total_amount:,.2f} SAR")
 
     def save_standard_receipts(self, receipt_files: Dict[str, pd.DataFrame]):
         vl   = self.vlog
