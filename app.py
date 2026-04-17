@@ -178,14 +178,16 @@ def _run_integration(sid: str, cfg: dict):
                 # Compute input sheet total from loaded line items
                 # Apply same sign alignment logic as AR generation for consistency
                 def calculate_adjusted_amount(row):
-                    """Apply sign alignment: if qty < 0 and amt > 0, flip amount to negative"""
+                    """
+                    Apply sign alignment for discount items from Odoo.
+                    Odoo exports discount items with negative qty and positive amt.
+                    We flip the amount to negative to reduce the invoice total.
+                    """
                     qty = mod.safe_float(row.get("Quantity", 0))
                     amt = mod.safe_float(row.get("Subtotal w/o Tax", 0))
                     # Sign alignment for discount items: negative qty + positive amt → negative amt
                     if qty < 0 and amt > 0:
                         return -amt
-                    # Sign alignment for returns: positive qty + negative amt → keep amt negative, flip qty
-                    # (but we only calculate amount here, so no change needed)
                     return amt
                 
                 input_total = float(
