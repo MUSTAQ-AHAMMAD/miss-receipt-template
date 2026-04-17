@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Oracle Fusion Financial Integration</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <style>
+    /* ───────────────────────────────────────────────────────────────
+       DESIGN TOKENS & RESET
+    ─────────────────────────────────────────────────────────────── */
+    :root {
+      --bg-deep:       #050d1e;
+      --bg-dark:       #0a1628;
+      --bg-card:       rgba(14, 28, 54, 0.80);
+      --bg-card-hover: rgba(18, 36, 68, 0.90);
+      --border:        rgba(99, 179, 237, 0.15);
+      --border-bright: rgba(99, 179, 237, 0.40);
+      --accent-blue:   #3b82f6;
+      --accent-cyan:   #06b6d4;
+      --accent-violet: #8b5cf6;
+      --accent-green:  #10b981;
+      --accent-amber:  #f59e0b;
+      --accent-red:    #ef4444;
+      --text-primary:  #e2e8f0;
+      --text-muted:    #94a3b8;
+      --text-faint:    #4a5568;
+      --glow-blue:     0 0 20px rgba(59,130,246,0.35);
+      --glow-cyan:     0 0 20px rgba(6,182,212,0.35);
+      --glow-green:    0 0 20px rgba(16,185,129,0.35);
+      --radius-sm:     8px;
+      --radius-md:     14px;
+      --radius-lg:     20px;
+      --transition:    0.25s cubic-bezier(.4,0,.2,1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ───────────────────────────────────────────────────────────────
+       BACKGROUND MESH
+    ─────────────────────────────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: -1;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 10%, rgba(59,130,246,.12) 0%, transparent 55%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(139,92,246,.10) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 30% at 50% 50%, rgba(6,182,212,.06) 0%, transparent 60%);
+    }
+
+    /* ───────────────────────────────────────────────────────────────
+       SCROLLBAR
+    ─────────────────────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-deep); }
+    ::-webkit-scrollbar-thumb { background: rgba(99,179,237,.3); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(99,179,237,.5); }
+
+    /* ───────────────────────────────────────────────────────────────
+       LAYOUT
+    ─────────────────────────────────────────────────────────────── */
+    .wrapper { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+
+    /* ───────────────────────────────────────────────────────────────
+       HEADER
+    ─────────────────────────────────────────────────────────────── */
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(5,13,30,.85);
+      backdrop-filter: blur(16px) saturate(180%);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 0;
+    }
+    .header-inner {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo {
+      display: flex; align-items: center; gap: 14px;
+    }
+    .logo-icon {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; color: #fff;
+      box-shadow: var(--glow-blue);
+    }
+    .logo-text h1 {
+      font-size: 1.15rem; font-weight: 700; letter-spacing: -.02em;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .logo-text p {
+      font-size: .72rem; color: var(--text-muted); margin-top: 1px;
+      letter-spacing: .04em; text-transform: uppercase;
+    }
+    .header-badge {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.3);
+      border-radius: 20px; padding: 6px 14px;
+      font-size: .78rem; color: var(--accent-green);
+      font-weight: 500;
+    }
+    .header-badge .dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--accent-green);
+      animation: pulse-dot 2s infinite;
+    }
+    @keyframes pulse-dot {
+      0%,100% { opacity:1; transform: scale(1); }
+      50%      { opacity:.5; transform: scale(1.4); }
+    }
+
+    /* ───────────────────────────────────────────────────────────────
+       HERO SECTION
+    ─────────────────────────────────────────────────────────────── */
+    .hero {
+      padding: 60px 0 40px;
+      text-align: center;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(59,130,246,.10); border: 1px solid rgba(59,130,246,.25);
+      border-radius: 20px; padding: 6px 16px;
+      font-size: .78rem; color: var(--accent-blue); font-weight: 500;
+      margin-bottom: 24px; letter-spacing: .06em; text-transform: uppercase;
+    }
+    .hero h2 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 800; letter-spacing: -.04em; line-height: 1.15;
+      margin-bottom: 18px;
+    }
+    .hero h2 span {
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan), var(--accent-violet));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: 1.05rem; color: var(--text-muted); max-width: 600px;
+      margin: 0 auto 40px; line-height: 1.7;
+    }
+
+    /* Pipeline steps */
+    .pipeline {
+      display: flex; align-items: center; justify-content: center;
+      gap: 0; margin-bottom: 60px; flex-wrap: wrap; row-gap: 12px;
+    }
+    .pipe-step {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 20px;
+      font-size: .82rem; font-weight: 500;
+    }
+    .pipe-step .icon { font-size: 1rem; }
+    .pipe-step.s1 .icon { color: var(--accent-blue); }
+    .pipe-step.s2 .icon { color: var(--accent-cyan); }
+    .pipe-step.s3 .icon { color: var(--accent-green); }
+    .pipe-step.s4 .icon { color: var(--accent-violet); }
+    .pipe-arrow {
+      color: var(--text-faint); font-size: .85rem; padding: 0 6px;
+    }
+
+    /* ───────────────────────────────────────────────────────────────
+       SECTION LABEL
+    ─────────────────────────────────────────────────────────────── */
+    .section-label {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 20px;
+    }
+    .section-label .num {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+      display: flex; align-items: center; justify-content: center;
+      font-size: .78rem; font-weight: 700;
+      box-shadow: var(--glow-blue);
+    }
+    .section-label h3 {
+      font-size: 1.05rem; font-weight: 700;
+    }
+    .section-label p {
+      font-size: .8rem; color: var(--text-muted); margin-top: 2px;
+    }
+
+    /* ───────────────────────────────────────────────────────────────
+       GLASS CARD
+    ─────────────────────────────────────────────────────────────── */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      backdrop-filter: blur(12px);
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    .card:hover {
+      border-color: var(--border-bright);
+    }
+    .card + .card { margin-top: 24px; }
+
+    /* ───────────────────────────────────────────────────────────────
+       FILE UPLOAD GRID
+    ─────────────────────────────────────────────────────────────── */
+    .upload-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 16px;
+    }
+
+    .file-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-md);
+      padding: 22px 18px;
+      cursor: pointer;
+      transition: all var(--transition);
+      position: relative;
+      overflow: hidden;
+      background: rgba(255,255,255,.02);
+    }
+    .file-zone::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg,
+        rgba(59,130,246,.04) 0%, rgba(6,182,212,.04) 100%);
+      opacity: 0; transition: opacity var(--transition);
+    }
+    .file-zone:hover, .file-zone.drag-over {
+      border-color: var(--accent-blue);
+      background: rgba(59,130,246,.06);
+      box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+    }
+    .file-zone:hover::before, .file-zone.drag-over::before { opacity: 1; }
+    .file-zone.has-file {
+      border-color: var(--accent-green);
+      border-style: solid;
+      background: rgba(16,185,129,.06);
+    }
+    .file-zone.has-file::before {
+      background: linear-gradient(135deg,
+        rgba(16,185,129,.05) 0%, rgba(6,182,212,.05) 100%);
+      opacity: 1;
+    }
+    .file-zone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .fz-header {
+      display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;
+    }
+    .fz-icon {
+      width: 36px; height: 36px; border-radius: var(--radius-sm); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px;
+    }
+    .fz-icon.required {
+      background: rgba(59,130,246,.15); color: var(--accent-blue);
+    }
+    .fz-icon.optional {
+      background: rgba(148,163,184,.10); color: var(--text-muted);
+    }
+    .has-file .fz-icon.required,
+    .has-file .fz-icon.optional {
+      background: rgba(16,185,129,.15); color: var(--accent-green);
+    }
+    .fz-title { font-size: .88rem; font-weight: 600; }
+    .fz-subtitle { font-size: .74rem; color: var(--text-muted); margin-top: 2px; }
+    .fz-badge {
+      font-size: .62rem; padding: 2px 8px;
+      border-radius: 10px; font-weight: 600; letter-spacing: .04em;
+      text-transform: uppercase; margin-top: 4px; display: inline-block;
+    }
+    .fz-badge.req  { background: rgba(59,130,246,.15); color: var(--accent-blue); }
+    .fz-badge.opt  { background: rgba(148,163,184,.12); color: var(--text-muted); }
+    .fz-badge.auto { background: rgba(16,185,129,.15);  color: var(--accent-green); }
+    .fz-drop-hint {
+      font-size: .78rem; color: var(--text-faint); text-align: center; margin-top: 8px;
+    }
+    .fz-filename {
+      margin-top: 10px; padding: 7px 10px;
+      background: rgba(16,185,129,.10); border: 1px solid rgba(16,185,129,.25);
+      border-radius: 6px;
+      font-size: .76rem; font-family: 'JetBrains Mono', monospace;
+      color: var(--accent-green); display: none;
+      word-break: break-all;
+    }
+    .has-file .fz-filename { display: flex; align-items: center; gap: 6px; }
+    .fz-filename .fa-check { font-size: .7rem; }
+
+    /* ───────────────────────────────────────────────────────────────
+       CONFIG GRID
+    ─────────────────────────────────────────────────────────────── */
+    .config-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .form-group { display: flex; flex-direction: column; gap: 7px; }
+    .form-label {
+      font-size: .8rem; font-weight: 600; color: var(--text-muted);
+      letter-spacing: .04em; text-transform: uppercase;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .form-label .tip {
+      width: 15px; height: 15px; border-radius: 50%;
+      background: rgba(148,163,184,.15);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: .6rem; color: var(--text-muted); cursor: help;
+    }
+    .form-input {
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      color: var(--text-primary);
+      font-size: .88rem; font-family: inherit;
+      transition: all var(--transition);
+      outline: none;
+    }
+    .form-input:focus {
+      border-color: var(--accent-blue);
+      background: rgba(59,130,246,.06);
+      box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+    }
+    .form-input::placeholder { color: var(--text-faint); }
+
+    /* ───────────────────────────────────────────────────────────────
+       RUN BUTTON
+    ─────────────────────────────────────────────────────────────── */
+    .run-section {
+      display: flex; align-items: center; justify-content: center;
+      padding: 32px 0; gap: 20px; flex-wrap: wrap;
+    }
+    .btn-run {
+      display: inline-flex; align-items: center; gap: 12px;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+      border: none; border-radius: 50px;
+      padding: 16px 40px;
+      color: #fff; font-size: 1rem; font-weight: 700;
+      cursor: pointer; letter-spacing: -.01em;
+      box-shadow: 0 8px 32px rgba(59,130,246,.40);
+      transition: all var(--transition);
+      position: relative; overflow: hidden;
+    }
+    .btn-run::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet));
+      opacity: 0; transition: opacity var(--transition);
+    }
+    .btn-run:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(59,130,246,.55);
+    }
+    .btn-run:hover::before { opacity: 1; }
+    .btn-run:active:not(:disabled) { transform: translateY(0); }
+    .btn-run:disabled {
+      opacity: .5; cursor: not-allowed;
+      box-shadow: none; transform: none;
+    }
+    .btn-run span, .btn-run i { position: relative; z-index: 1; }
+    .btn-run .spinner {
+      display: none; width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    .btn-run.loading .spinner { display: block; }
+    .btn-run.loading .btn-icon { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .btn-reset {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 50px; padding: 16px 28px;
+      color: var(--text-muted); font-size: .9rem; font-weight: 500;
+      cursor: pointer; transition: all var(--transition);
+    }
+    .btn-reset:hover {
+      border-color: var(--border-bright); color: var(--text-primary);
+    }
+
+    /* ───────────────────────────────────────────────────────────────
+       PROGRESS SECTION
+    ─────────────────────────────────────────────────────────────── */
+    .progress-section { display: none; }
+    .progress-section.active { display: block; }
+
+    .progress-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .progress-label {
+      font-size: .88rem; font-weight: 600; color: var(--text-muted);
+    }
+    .progress-pct {
+      font-size: 1.4rem; font-weight: 800;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .progress-bar-track {
+      height: 8px; background: rgba(255,255,255,.06);
+      border-radius: 4px; overflow: hidden; margin-bottom: 10px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+      border-radius: 4px;
+      transition: width .5s cubic-bezier(.4,0,.2,1);
+      box-shadow: 0 0 12px rgba(59,130,246,.6);
+      width: 0%;
+    }
+    .progress-step-label {
+      font-size: .78rem; color: var(--text-muted);
+      font-style: italic; min-height: 1.2em;
+    }
+
+    /* ───────────────────────────────────────────────────────────────
+       LOG CONSOLE
+    ─────────────────────────────────────────────────────────────── */
+    .log-console {
+      background: rgba(0,0,0,.45);
+      border: 1px solid rgba(99,179,237,.10);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-top: 20px;
+    }
+    .log-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px;
+      background: rgba(255,255,255,.03);
+      border-bottom: 1px solid rgba(99,179,237,.08);
+    }
+    .log-header-left {
+      display: flex; align-items: center; gap: 8px;
+      font-size: .78rem; font-weight: 600; color: var(--text-muted);
+      letter-spacing: .06em; text-transform: uppercase;
+    }
+    .log-live-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--accent-cyan);
+      animation: pulse-dot 1.5s infinite;
+    }
+    .log-clear-btn {
+      background: none; border: none; cursor: pointer;
+      font-size: .72rem; color: var(--text-faint);
+      transition: color var(--transition);
+    }
+    .log-clear-btn:hover { color: var(--text-muted); }
+    .log-body {
+      height: 320px; overflow-y: auto; padding: 14px 18px;
+      font-family: 'JetBrains Mono', monospace; font-size: .78rem;
+      line-height: 1.7; color: var(--text-muted);
+    }
+    .log-line { padding: 1px 0; }
+    .log-line.info  { color: var(--text-muted); }
+    .log-line.ok    { color: var(--accent-green); }
+    .log-line.warn  { color: var(--accent-amber); }
+    .log-line.err   { color: var(--accent-red); }
+    .log-line.head  { color: var(--accent-cyan); font-weight: 500; }
+
+    /* ───────────────────────────────────────────────────────────────
+       STATS CARDS
+    ─────────────────────────────────────────────────────────────── */
+    .stats-section { display: none; }
+    .stats-section.active { display: block; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 14px;
+    }
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      position: relative; overflow: hidden;
+      transition: all var(--transition);
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+    }
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-bright);
+    }
+    .stat-icon {
+      font-size: 1.3rem; margin-bottom: 12px;
+    }
+    .stat-value {
+      font-size: 1.4rem; font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      line-height: 1.2;
+    }
+    .stat-label {
+      font-size: .74rem; color: var(--text-muted);
+      font-weight: 500; margin-top: 4px; text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    /* ───────────────────────────────────────────────────────────────
+       DOWNLOAD SECTION
+    ─────────────────────────────────────────────────────────────── */
+    .download-section { display: none; }
+    .download-section.active { display: block; }
+
+    .download-banner {
+      background: linear-gradient(135deg,
+        rgba(16,185,129,.12) 0%, rgba(6,182,212,.10) 100%);
+      border: 1px solid rgba(16,185,129,.30);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 24px; flex-wrap: wrap;
+    }
+    .download-banner-left {
+      display: flex; align-items: center; gap: 20px;
+    }
+    .download-icon-wrap {
+      width: 60px; height: 60px;
+      background: rgba(16,185,129,.15);
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px; color: var(--accent-green);
+      box-shadow: var(--glow-green);
+    }
+    .download-banner h3 {
+      font-size: 1.25rem; font-weight: 700;
+    }
+    .download-banner p {
+      font-size: .85rem; color: var(--text-muted); margin-top: 4px;
+    }
+    .btn-download {
+      display: inline-flex; align-items: center; gap: 12px;
+      background: linear-gradient(135deg, var(--accent-green), #059669);
+      border: none; border-radius: 50px; padding: 15px 34px;
+      color: #fff; font-size: .95rem; font-weight: 700;
+      cursor: pointer; text-decoration: none;
+      box-shadow: 0 8px 24px rgba(16,185,129,.40);
+      transition: all var(--transition);
+    }
+    .btn-download:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(16,185,129,.55);
+    }
+
+    /* Output file types legend */
+    .output-legend {
+      display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px;
+    }
+    .ol-badge {
+      display: flex; align-items: center; gap: 7px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 8px 14px;
+      font-size: .78rem; font-weight: 500;
+    }
+    .ol-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    /* ───────────────────────────────────────────────────────────────
+       STATUS BANNER
+    ─────────────────────────────────────────────────────────────── */
+    .status-banner {
+      display: none;
+      border-radius: var(--radius-md); padding: 14px 20px;
+      font-size: .88rem; font-weight: 500;
+      align-items: center; gap: 12px; margin-bottom: 24px;
+    }
+    .status-banner.show { display: flex; }
+    .status-banner.error {
+      background: rgba(239,68,68,.10); border: 1px solid rgba(239,68,68,.30);
+      color: var(--accent-red);
+    }
+    .status-banner.success {
+      background: rgba(16,185,129,.10); border: 1px solid rgba(16,185,129,.30);
+      color: var(--accent-green);
+    }
+
+    /* ───────────────────────────────────────────────────────────────
+       FOOTER
+    ─────────────────────────────────────────────────────────────── */
+    footer {
+      margin-top: 80px; padding: 32px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: .78rem; color: var(--text-faint);
+    }
+    footer a { color: var(--accent-blue); text-decoration: none; }
+
+    /* ───────────────────────────────────────────────────────────────
+       DIVIDER
+    ─────────────────────────────────────────────────────────────── */
+    .section-divider {
+      height: 1px; background: var(--border);
+      margin: 40px 0;
+    }
+
+    /* ───────────────────────────────────────────────────────────────
+       RESPONSIVE
+    ─────────────────────────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      .wrapper { padding: 0 16px; }
+      .pipeline { gap: 8px; }
+      .pipe-arrow { display: none; }
+      .download-banner { flex-direction: column; }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- ═══════════════════════════════════════════ HEADER ══ -->
+<header>
+  <div class="wrapper">
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-icon"><i class="fa-solid fa-layer-group"></i></div>
+        <div class="logo-text">
+          <h1>Oracle Fusion Integration</h1>
+          <p>Financial Template Generator · AR · Receipts</p>
+        </div>
+      </div>
+      <div class="header-badge">
+        <span class="dot"></span>
+        System Ready
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════ HERO ══ -->
+<main>
+<div class="wrapper">
+
+  <section class="hero">
+    <div class="hero-eyebrow">
+      <i class="fa-solid fa-bolt"></i>
+      Oracle Fusion Financial Integration
+    </div>
+    <h2>Automate Your<br /><span>Standard &amp; Misc Receipt</span><br />Template Generation</h2>
+    <p>Upload your Oracle Fusion AR Invoice CSV, configure the sequence settings, and instantly generate Standard Receipts and Miscellaneous Receipts — ready for Oracle Fusion import.</p>
+
+    <div class="pipeline">
+      <div class="pipe-step s1"><i class="fa-solid fa-file-arrow-up icon"></i> Upload AR Invoice</div>
+      <div class="pipe-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+      <div class="pipe-step s2"><i class="fa-solid fa-sliders icon"></i> Configure</div>
+      <div class="pipe-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+      <div class="pipe-step s3"><i class="fa-solid fa-gears icon"></i> Generate</div>
+      <div class="pipe-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+      <div class="pipe-step s4"><i class="fa-solid fa-file-zipper icon"></i> Download ZIP</div>
+    </div>
+  </section>
+
+  <!-- ── Status Banner ── -->
+  <div class="status-banner" id="statusBanner">
+    <i class="fa-solid fa-circle-exclamation"></i>
+    <span id="statusMsg"></span>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ STEP 1: UPLOAD ══ -->
+  <div class="card">
+    <div class="section-label">
+      <div class="num">1</div>
+      <div>
+        <h3>Upload AR Invoice CSV</h3>
+        <p>Drag &amp; drop or click to select your Oracle Fusion AR Invoice CSV file</p>
+      </div>
+    </div>
+
+    <div class="upload-grid" id="uploadGrid">
+
+      <!-- AR Invoice -->
+      <div class="file-zone" id="zone-ar_invoice" ondragover="onDragOver(event,'ar_invoice')" ondragleave="onDragLeave('ar_invoice')" ondrop="onDrop(event,'ar_invoice')">
+        <input type="file" id="file-ar_invoice" accept=".csv" onchange="onFileChange('ar_invoice',this)" />
+        <div class="fz-header">
+          <div class="fz-icon required"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+          <div>
+            <div class="fz-title">AR Invoice CSV</div>
+            <div class="fz-subtitle">Oracle Fusion AR Invoice export (e.g. AR_Invoice__AJAWEED_05_31_Mar2026.csv)</div>
+            <span class="fz-badge req">Required</span>
+          </div>
+        </div>
+        <div class="fz-drop-hint"><i class="fa-regular fa-file-csv"></i> &nbsp;CSV</div>
+        <div class="fz-filename" id="fn-ar_invoice"><i class="fa-solid fa-check"></i><span id="fntext-ar_invoice"></span></div>
+      </div>
+
+    </div><!-- /upload-grid -->
+
+    <!-- Auto-loaded reference files -->
+    <div style="margin-top:20px; padding:16px 20px; background:rgba(16,185,129,.06); border:1px solid rgba(16,185,129,.20); border-radius:12px;">
+      <div style="font-size:.78rem; font-weight:600; color:var(--accent-green); letter-spacing:.06em; text-transform:uppercase; margin-bottom:10px;">
+        <i class="fa-solid fa-circle-check" style="margin-right:6px;"></i>
+        Auto-loaded from server root
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex;align-items:center;gap:8px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:.78rem;">
+          <i class="fa-solid fa-database" style="color:var(--accent-cyan);"></i>
+          <span>RCPT_Mapping_DATA.csv</span>
+          <span style="font-size:.65rem;padding:2px 7px;border-radius:8px;background:rgba(16,185,129,.15);color:var(--accent-green);font-weight:600;">Customer Metadata</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:.78rem;">
+          <i class="fa-solid fa-credit-card" style="color:var(--accent-cyan);"></i>
+          <span>Receipt_Methods.csv</span>
+          <span style="font-size:.65rem;padding:2px 7px;border-radius:8px;background:rgba(16,185,129,.15);color:var(--accent-green);font-weight:600;">Receipt Methods</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:.78rem;">
+          <i class="fa-solid fa-percent" style="color:var(--accent-cyan);"></i>
+          <span>BANK_CHARGES.csv</span>
+          <span style="font-size:.65rem;padding:2px 7px;border-radius:8px;background:rgba(16,185,129,.15);color:var(--accent-green);font-weight:600;">Bank Charges</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /card -->
+
+  <!-- ═══════════════════════════════════════════ STEP 2: CONFIG ══ -->
+  <div class="card">
+    <div class="section-label">
+      <div class="num">2</div>
+      <div>
+        <h3>Configuration Settings</h3>
+        <p>Set transaction sequence numbers and organisation name</p>
+      </div>
+    </div>
+
+    <div class="config-grid">
+      <div class="form-group">
+        <label class="form-label" for="orgName">
+          <i class="fa-solid fa-building" style="color:var(--accent-blue)"></i>
+          Organisation Name
+          <span class="tip" title="Used in AR Invoice Comments field">?</span>
+        </label>
+        <input class="form-input" type="text" id="orgName" name="org_name"
+               value="AlQurashi-KSA" placeholder="e.g. AlQurashi-KSA" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="startSeq">
+          <i class="fa-solid fa-hashtag" style="color:var(--accent-cyan)"></i>
+          Transaction Start Seq
+          <span class="tip" title="Starting BLK- number for this run. Increment from last report.">?</span>
+        </label>
+        <input class="form-input" type="number" id="startSeq" name="start_seq"
+               value="1" min="1" placeholder="e.g. 587" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="legSeq1">
+          <i class="fa-solid fa-1" style="color:var(--accent-violet)"></i>
+          Legacy Segment 1 Start
+          <span class="tip" title="Flexfield Segment 1 counter (prefix is auto-randomised)">?</span>
+        </label>
+        <input class="form-input" type="number" id="legSeq1" name="start_leg1"
+               value="1" min="1" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="legSeq2">
+          <i class="fa-solid fa-2" style="color:var(--accent-amber)"></i>
+          Legacy Segment 2 Start
+          <span class="tip" title="Flexfield Segment 2 counter (prefix is auto-randomised)">?</span>
+        </label>
+        <input class="form-input" type="number" id="legSeq2" name="start_leg2"
+               value="1" min="1" />
+      </div>
+    </div>
+  </div><!-- /card -->
+
+  <!-- ═══════════════════════════════════════════ STEP 3: RUN ══ -->
+  <div class="run-section">
+    <button class="btn-reset" id="resetBtn" onclick="resetForm()">
+      <i class="fa-solid fa-rotate-left"></i> Reset
+    </button>
+    <button class="btn-run" id="runBtn" onclick="startProcessing()">
+      <div class="spinner"></div>
+      <i class="fa-solid fa-play btn-icon"></i>
+      <span>Generate Templates</span>
+    </button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ STEP 4: PROGRESS ══ -->
+  <div class="progress-section" id="progressSection">
+    <div class="card">
+      <div class="section-label">
+        <div class="num">3</div>
+        <div>
+          <h3>Processing</h3>
+          <p>Real-time pipeline execution log</p>
+        </div>
+      </div>
+
+      <div class="progress-header">
+        <div class="progress-label">Overall Progress</div>
+        <div class="progress-pct" id="progressPct">0%</div>
+      </div>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="progressBar"></div>
+      </div>
+      <div class="progress-step-label" id="progressStep">Initialising…</div>
+
+      <!-- Log Console -->
+      <div class="log-console">
+        <div class="log-header">
+          <div class="log-header-left">
+            <span class="log-live-dot"></span>
+            Live Console Output
+          </div>
+          <button class="log-clear-btn" onclick="clearLog()">
+            <i class="fa-solid fa-trash-can"></i> Clear
+          </button>
+        </div>
+        <div class="log-body" id="logBody">
+          <div class="log-line head">── Oracle Fusion Integration Engine ──</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ STEP 5: STATS ══ -->
+  <div class="stats-section" id="statsSection">
+    <div class="section-divider"></div>
+    <div class="section-label">
+      <div class="num" style="background:linear-gradient(135deg,var(--accent-green),var(--accent-cyan));">
+        <i class="fa-solid fa-chart-bar" style="font-size:.65rem;"></i>
+      </div>
+      <div>
+        <h3>Run Summary</h3>
+        <p>Key metrics from this integration run</p>
+      </div>
+    </div>
+    <div class="stats-grid" id="statsGrid">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ DOWNLOAD ══ -->
+  <div class="download-section" id="downloadSection">
+    <div class="section-divider"></div>
+    <div class="section-label">
+      <div class="num" style="background:linear-gradient(135deg,var(--accent-violet),var(--accent-blue));">
+        <i class="fa-solid fa-download" style="font-size:.65rem;"></i>
+      </div>
+      <div>
+        <h3>Download Results</h3>
+        <p>All generated files packaged as a single ZIP archive</p>
+      </div>
+    </div>
+
+    <div class="download-banner">
+      <div class="download-banner-left">
+        <div class="download-icon-wrap">
+          <i class="fa-solid fa-file-zipper"></i>
+        </div>
+        <div>
+          <h3>oracle_fusion_output.zip</h3>
+          <p>Standard Receipts · Misc Receipts · Verification Report</p>
+        </div>
+      </div>
+      <a class="btn-download" id="downloadBtn" href="#" onclick="triggerDownload()">
+        <i class="fa-solid fa-download"></i>
+        Download ZIP
+      </a>
+    </div>
+
+    <div class="output-legend">
+      <div class="ol-badge"><span class="ol-dot" style="background:var(--accent-cyan);"></span> Standard Receipts (CSV)</div>
+      <div class="ol-badge"><span class="ol-dot" style="background:var(--accent-violet);"></span> Misc Receipts (CSV)</div>
+      <div class="ol-badge"><span class="ol-dot" style="background:var(--accent-amber);"></span> Verification Report (TXT)</div>
+    </div>
+  </div>
+
+</div><!-- /wrapper -->
+</main>
+
+<!-- ═══════════════════════════════════════════ FOOTER ══ -->
+<footer>
+  <div class="wrapper">
+    <p>Oracle Fusion Financial Integration · AR &amp; Receipt Template Generator</p>
+    <p style="margin-top:6px;">Powered by Python · Flask · Pandas</p>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════ JAVASCRIPT ══ -->
+<script>
+  // ─── State ────────────────────────────────────────────────────────
+  let sessionId   = null;
+  let fileMap     = {};   // field → File object
+  let statsData   = {};   // key → value
+  let eventSource = null;
+
+  // ─── File Upload Handlers ─────────────────────────────────────────
+  function onDragOver(e, field) {
+    e.preventDefault();
+    document.getElementById('zone-' + field).classList.add('drag-over');
+  }
+  function onDragLeave(field) {
+    document.getElementById('zone-' + field).classList.remove('drag-over');
+  }
+  function onDrop(e, field) {
+    e.preventDefault();
+    const zone = document.getElementById('zone-' + field);
+    zone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) setFile(field, file);
+  }
+  function onFileChange(field, input) {
+    const file = input.files[0];
+    if (file) setFile(field, file);
+  }
+  function setFile(field, file) {
+    fileMap[field] = file;
+    const zone  = document.getElementById('zone-' + field);
+    const fnEl  = document.getElementById('fn-' + field);
+    const txtEl = document.getElementById('fntext-' + field);
+    zone.classList.add('has-file');
+    txtEl.textContent = file.name;
+    const ab = document.getElementById('autobadge-' + field);
+    if (ab) ab.style.display = 'none';
+  }
+
+  // Initialise session on page load
+  (function initSession() {
+    fetch('/api/session', {method:'POST'}).then(r=>r.json()).then(d=>{
+      sessionId = d.session_id;
+    });
+  })();
+
+  // ─── Processing ───────────────────────────────────────────────────
+  async function startProcessing() {
+    hideBanner();
+
+    if (!fileMap['ar_invoice']) {
+      showBanner('error', 'Please upload your AR Invoice CSV file.');
+      return;
+    }
+
+    const runBtn = document.getElementById('runBtn');
+    runBtn.disabled = true;
+    runBtn.classList.add('loading');
+
+    // Reset UI
+    statsData = {};
+    document.getElementById('statsGrid').innerHTML = '';
+    document.getElementById('logBody').innerHTML =
+      '<div class="log-line head">── Oracle Fusion Integration Engine ──</div>';
+    setProgress(0, 'Uploading files…');
+    showSection('progressSection');
+
+    // Create session
+    const sessRes  = await fetch('/api/session', {method:'POST'});
+    const sessData = await sessRes.json();
+    sessionId = sessData.session_id;
+
+    // Build FormData
+    const fd = new FormData();
+    fd.append('session_id', sessionId);
+    for (const [field, file] of Object.entries(fileMap)) {
+      fd.append(field, file);
+    }
+    fd.append('org_name',   document.getElementById('orgName').value);
+    fd.append('start_seq',  document.getElementById('startSeq').value);
+    fd.append('start_leg1', document.getElementById('legSeq1').value);
+    fd.append('start_leg2', document.getElementById('legSeq2').value);
+
+    setProgress(5, 'Sending files to server…');
+    const runRes = await fetch('/api/run', {method:'POST', body: fd});
+
+    if (!runRes.ok) {
+      const err = await runRes.json();
+      showBanner('error', err.error || 'Failed to start processing.');
+      runBtn.disabled = false;
+      runBtn.classList.remove('loading');
+      return;
+    }
+
+    // Subscribe to SSE stream
+    if (eventSource) eventSource.close();
+    eventSource = new EventSource('/api/stream/' + sessionId);
+
+    eventSource.onmessage = (e) => {
+      const msg = JSON.parse(e.data);
+      handleMessage(msg);
+    };
+    eventSource.onerror = () => {
+      appendLog('⚠ Stream connection lost.', 'warn');
+      eventSource.close();
+      runBtn.disabled = false;
+      runBtn.classList.remove('loading');
+    };
+  }
+
+  function handleMessage(msg) {
+    switch(msg.type) {
+      case 'log':
+        const cls = classifyLog(msg.msg);
+        appendLog(msg.msg, cls);
+        break;
+      case 'progress':
+        setProgress(msg.pct, msg.label);
+        break;
+      case 'stat':
+        statsData[msg.key] = msg.value;
+        renderStats();
+        break;
+      case 'done':
+        setProgress(100, '✅ Processing complete!');
+        eventSource.close();
+        document.getElementById('runBtn').disabled = false;
+        document.getElementById('runBtn').classList.remove('loading');
+        showSection('statsSection');
+        showSection('downloadSection');
+        showBanner('success', 'Integration complete! Your files are ready to download.');
+        break;
+      case 'error':
+        appendLog('❌ ' + msg.msg, 'err');
+        setProgress(0, 'Error — see log above');
+        eventSource.close();
+        document.getElementById('runBtn').disabled = false;
+        document.getElementById('runBtn').classList.remove('loading');
+        showBanner('error', 'Processing failed: ' + msg.msg);
+        break;
+      case 'ping':
+        break;
+    }
+  }
+
+  function classifyLog(msg) {
+    if (!msg) return 'info';
+    if (msg.startsWith('❌') || msg.includes('Error') || msg.includes('ERROR')) return 'err';
+    if (msg.startsWith('✓') || msg.startsWith('✅')) return 'ok';
+    if (msg.startsWith('⚠') || msg.includes('WARNING')) return 'warn';
+    if (msg.startsWith('─') || msg.startsWith('═') || msg.startsWith('  ──')) return 'head';
+    return 'info';
+  }
+
+  function appendLog(text, cls) {
+    const body = document.getElementById('logBody');
+    const line = document.createElement('div');
+    line.className = 'log-line ' + (cls || 'info');
+    line.textContent = text;
+    body.appendChild(line);
+    body.scrollTop = body.scrollHeight;
+  }
+
+  function clearLog() {
+    document.getElementById('logBody').innerHTML =
+      '<div class="log-line head">── Log cleared ──</div>';
+  }
+
+  // ─── Progress ─────────────────────────────────────────────────────
+  function setProgress(pct, label) {
+    document.getElementById('progressPct').textContent = pct + '%';
+    document.getElementById('progressBar').style.width = pct + '%';
+    if (label) document.getElementById('progressStep').textContent = label;
+  }
+
+  // ─── Stats ────────────────────────────────────────────────────────
+  const STAT_ICONS = {
+    'Standard Receipts':   'fa-receipt',
+    'Misc Receipts':       'fa-file-invoice-dollar',
+  };
+
+  function renderStats() {
+    const grid = document.getElementById('statsGrid');
+    grid.innerHTML = '';
+    for (const [key, val] of Object.entries(statsData)) {
+      const icon = STAT_ICONS[key] || 'fa-chart-simple';
+      const card = document.createElement('div');
+      card.className = 'stat-card';
+      card.innerHTML = `
+        <div class="stat-icon"><i class="fa-solid ${icon}" style="color:var(--accent-cyan);"></i></div>
+        <div class="stat-value">${val}</div>
+        <div class="stat-label">${key}</div>
+      `;
+      grid.appendChild(card);
+    }
+  }
+
+  // ─── Download ─────────────────────────────────────────────────────
+  function triggerDownload() {
+    if (!sessionId) return;
+    const url = '/api/download/' + sessionId;
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'oracle_fusion_output.zip';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  // ─── UI Helpers ──────────────────────────────────────────────────
+  function showSection(id) {
+    document.getElementById(id).classList.add('active');
+    document.getElementById(id).scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  function showBanner(type, msg) {
+    const b = document.getElementById('statusBanner');
+    b.className = 'status-banner show ' + type;
+    b.querySelector('i').className = type === 'error'
+      ? 'fa-solid fa-circle-exclamation' : 'fa-solid fa-circle-check';
+    document.getElementById('statusMsg').textContent = msg;
+    b.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+
+  function hideBanner() {
+    document.getElementById('statusBanner').className = 'status-banner';
+  }
+
+  function resetForm() {
+    fileMap = {};
+    statsData = {};
+    sessionId = null;
+    if (eventSource) { eventSource.close(); eventSource = null; }
+
+    // Reset file zones
+    ['ar_invoice'].forEach(field => {
+        const zone = document.getElementById('zone-' + field);
+        if (zone) zone.classList.remove('has-file');
+        const input = document.getElementById('file-' + field);
+        if (input) input.value = '';
+      });
+
+    // Reset progress
+    setProgress(0, 'Initialising…');
+    document.getElementById('logBody').innerHTML =
+      '<div class="log-line head">── Oracle Fusion Integration Engine ──</div>';
+
+    // Hide sections
+    document.getElementById('progressSection').classList.remove('active');
+    document.getElementById('statsSection').classList.remove('active');
+    document.getElementById('downloadSection').classList.remove('active');
+    hideBanner();
+
+    document.getElementById('runBtn').disabled = false;
+    document.getElementById('runBtn').classList.remove('loading');
+  }
+</script>
+</body>
+</html>
