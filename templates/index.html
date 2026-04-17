@@ -756,6 +756,12 @@
         Generate Reports
         <span style="font-size:.7rem;opacity:.7;display:block;margin-top:2px;">Create comprehensive analysis reports</span>
       </button>
+      <button id="mode-btn-view-reports" class="mode-btn"
+              onclick="setMode('view-reports')">
+        <i class="fa-solid fa-file-lines"></i>
+        View Reports
+        <span style="font-size:.7rem;opacity:.7;display:block;margin-top:2px;">Browse and download previous verification reports</span>
+      </button>
     </div>
 
     <!-- ── AR Invoice mode uploads ── -->
@@ -930,6 +936,30 @@
                        border:none; border-radius:8px; color:white; font-weight:600; cursor:pointer;">
           <i class="fa-solid fa-chart-pie"></i> Generate Report
         </button>
+      </div>
+    </div>
+
+    <!-- ── Reports Viewing Section ── -->
+    <div id="view-reports-section" style="display:none; margin-top:24px;">
+      <div style="padding:20px; background:rgba(16,185,129,.08); border:1px solid rgba(16,185,129,.25); border-radius:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <h4 style="color:var(--accent-green); margin:0;">
+            <i class="fa-solid fa-file-lines"></i> Previous Reports
+          </h4>
+          <button onclick="refreshReportsList()" 
+                  style="padding:8px 16px; background:var(--bg-card); border:1px solid var(--border); 
+                         border-radius:8px; color:var(--text-primary); font-size:.85rem; cursor:pointer;">
+            <i class="fa-solid fa-rotate"></i> Refresh
+          </button>
+        </div>
+        <p style="font-size:.85rem; color:var(--text-muted); margin-bottom:16px;">
+          View and download previously generated verification reports. Reports are saved automatically after each generation.
+        </p>
+        <div id="reports-list" style="max-height:400px; overflow-y:auto;">
+          <p style="text-align:center; padding:20px; color:var(--text-muted);">
+            <i class="fa-solid fa-spinner fa-spin"></i> Loading reports...
+          </p>
+        </div>
       </div>
     </div>
 
@@ -1458,7 +1488,7 @@
     currentMode = mode;
 
     // Update button styles
-    ['ar_invoice', 'sales_payment', 'merge', 'report'].forEach(m => {
+    ['ar_invoice', 'sales_payment', 'merge', 'report', 'view-reports'].forEach(m => {
       const btn = document.getElementById('mode-btn-' + m);
       if (btn) btn.classList.toggle('mode-btn-active', m === mode);
     });
@@ -1468,14 +1498,23 @@
     document.getElementById('uploads-sales_payment').style.display  = mode === 'sales_payment' ? '' : 'none';
     document.getElementById('uploads-merge').style.display          = mode === 'merge'         ? '' : 'none';
     document.getElementById('uploads-report').style.display         = mode === 'report'        ? '' : 'none';
+    
+    // Show/hide view reports section
+    const viewReportsSection = document.getElementById('view-reports-section');
+    if (viewReportsSection) {
+      viewReportsSection.style.display = mode === 'view-reports' ? '' : 'none';
+      if (mode === 'view-reports') {
+        loadReportsList();
+      }
+    }
 
     // Show/hide pipeline
     document.getElementById('pipeline-ar_invoice').style.display    = mode === 'ar_invoice'    ? '' : 'none';
     document.getElementById('pipeline-sales_payment').style.display = mode === 'sales_payment' ? '' : 'none';
 
-    // Hide config section for merge and report modes
+    // Hide config section for merge, report, and view-reports modes
     const configCard = document.querySelector('.card:has(#configForm)');
-    if (configCard) configCard.style.display = (mode === 'merge' || mode === 'report') ? 'none' : '';
+    if (configCard) configCard.style.display = (mode === 'merge' || mode === 'report' || mode === 'view-reports') ? 'none' : '';
 
     // Show/hide AR Invoice legend badge
     const arLegend = document.getElementById('legend-ar-invoice');
@@ -1607,6 +1646,194 @@
     } catch (error) {
       showBanner('error', `Report error: ${error.message}`);
     }
+  }
+
+  // ─── Reports Viewing Functions ──────────────────────────────────────
+  async function loadReportsList() {
+    const listDiv = document.getElementById('reports-list');
+    listDiv.innerHTML = '<p style="text-align:center; padding:20px; color:var(--text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> Loading reports...</p>';
+    
+    try {
+      const response = await fetch('/api/reports/list');
+      if (!response.ok) {
+        throw new Error('Failed to load reports');
+      }
+      
+      const data = await response.json();
+      const reports = data.reports || [];
+      
+      if (reports.length === 0) {
+        listDiv.innerHTML = '<p style="text-align:center; padding:20px; color:var(--text-muted);"><i class="fa-solid fa-inbox"></i> No reports found. Generate some reports first!</p>';
+        return;
+      }
+      
+      let html = '';
+      reports.forEach((report, index) => {
+        const sizeKB = (report.size / 1024).toFixed(2);
+        html += `
+          <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:10px; 
+                      padding:16px; margin-bottom:12px; transition:all var(--transition);"
+               onmouseover="this.style.borderColor='var(--border-bright)'" 
+               onmouseout="this.style.borderColor='var(--border)'">
+            <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:12px;">
+              <div style="flex:1;">
+                <div style="font-weight:600; color:var(--text-primary); margin-bottom:4px; display:flex; align-items:center; gap:8px;">
+                  <i class="fa-solid fa-file-lines" style="color:var(--accent-cyan);"></i>
+                  ${report.filename}
+                </div>
+                <div style="font-size:.75rem; color:var(--text-muted);">
+                  <i class="fa-solid fa-calendar"></i> ${report.created}
+                  &nbsp;&nbsp;|&nbsp;&nbsp;
+                  <i class="fa-solid fa-hard-drive"></i> ${sizeKB} KB
+                </div>
+              </div>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button onclick="viewReport('${report.filename}')" 
+                      style="padding:6px 14px; background:var(--bg-card); border:1px solid var(--accent-blue); 
+                             border-radius:6px; color:var(--accent-blue); font-size:.8rem; cursor:pointer; 
+                             transition:all var(--transition);"
+                      onmouseover="this.style.background='rgba(59,130,246,.1)'"
+                      onmouseout="this.style.background='var(--bg-card)'">
+                <i class="fa-solid fa-eye"></i> View
+              </button>
+              <button onclick="downloadReport('${report.filename}')" 
+                      style="padding:6px 14px; background:var(--bg-card); border:1px solid var(--accent-green); 
+                             border-radius:6px; color:var(--accent-green); font-size:.8rem; cursor:pointer; 
+                             transition:all var(--transition);"
+                      onmouseover="this.style.background='rgba(16,185,129,.1)'"
+                      onmouseout="this.style.background='var(--bg-card)'">
+                <i class="fa-solid fa-download"></i> Download TXT
+              </button>
+              <button onclick="downloadReportPDF('${report.filename}')" 
+                      style="padding:6px 14px; background:var(--bg-card); border:1px solid var(--accent-violet); 
+                             border-radius:6px; color:var(--accent-violet); font-size:.8rem; cursor:pointer; 
+                             transition:all var(--transition);"
+                      onmouseover="this.style.background='rgba(139,92,246,.1)'"
+                      onmouseout="this.style.background='var(--bg-card)'">
+                <i class="fa-solid fa-file-pdf"></i> Download PDF
+              </button>
+            </div>
+          </div>
+        `;
+      });
+      
+      listDiv.innerHTML = html;
+    } catch (error) {
+      listDiv.innerHTML = `<p style="text-align:center; padding:20px; color:var(--accent-red);"><i class="fa-solid fa-exclamation-triangle"></i> Error loading reports: ${error.message}</p>`;
+    }
+  }
+
+  function refreshReportsList() {
+    loadReportsList();
+  }
+
+  async function viewReport(filename) {
+    try {
+      showBanner('info', 'Loading report...');
+      const response = await fetch(`/api/reports/view/${encodeURIComponent(filename)}`);
+      if (!response.ok) {
+        throw new Error('Failed to load report');
+      }
+      
+      const data = await response.json();
+      
+      // Create modal to display report
+      const modal = document.createElement('div');
+      modal.style.cssText = `
+        position: fixed; inset: 0; background: rgba(0,0,0,0.85); 
+        display: flex; align-items: center; justify-content: center; 
+        z-index: 1000; padding: 20px;
+      `;
+      
+      const content = document.createElement('div');
+      content.style.cssText = `
+        background: var(--bg-card); border: 2px solid var(--border-bright); 
+        border-radius: var(--radius-lg); padding: 24px; max-width: 900px; 
+        max-height: 80vh; overflow: auto; width: 100%;
+      `;
+      
+      content.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:2px solid var(--border); padding-bottom:16px;">
+          <h3 style="color:var(--text-primary); margin:0;">
+            <i class="fa-solid fa-file-lines"></i> ${filename}
+          </h3>
+          <button onclick="this.closest('[style*=fixed]').remove()" 
+                  style="background:transparent; border:1px solid var(--border); border-radius:6px; 
+                         padding:6px 12px; color:var(--text-muted); cursor:pointer;">
+            <i class="fa-solid fa-times"></i> Close
+          </button>
+        </div>
+        <pre style="white-space:pre-wrap; font-family:'JetBrains Mono',monospace; font-size:.8rem; 
+                    line-height:1.5; color:var(--text-primary); background:rgba(0,0,0,0.3); 
+                    padding:16px; border-radius:8px; max-height:60vh; overflow:auto;">${escapeHtml(data.content)}</pre>
+      `;
+      
+      modal.appendChild(content);
+      document.body.appendChild(modal);
+      
+      // Close on background click
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+      });
+      
+      hideBanner();
+    } catch (error) {
+      showBanner('error', `Error viewing report: ${error.message}`);
+    }
+  }
+
+  async function downloadReport(filename) {
+    try {
+      const response = await fetch(`/api/reports/download/${encodeURIComponent(filename)}`);
+      if (!response.ok) {
+        throw new Error('Failed to download report');
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      showBanner('success', 'Report downloaded successfully!');
+    } catch (error) {
+      showBanner('error', `Download error: ${error.message}`);
+    }
+  }
+
+  async function downloadReportPDF(filename) {
+    try {
+      showBanner('info', 'Generating PDF...');
+      const response = await fetch(`/api/reports/download-pdf/${encodeURIComponent(filename)}`);
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF');
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename.replace('.txt', '.pdf');
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      showBanner('success', 'PDF downloaded successfully!');
+    } catch (error) {
+      showBanner('error', `PDF error: ${error.message}`);
+    }
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 </script>
 </body>

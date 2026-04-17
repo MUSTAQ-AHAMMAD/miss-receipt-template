@@ -215,6 +215,11 @@ def _run_integration(sid: str, cfg: dict):
                 ts       = datetime.now().strftime("%Y%m%d_%H%M%S")
                 log_path = Path(sess["output_dir"]) / f"Verification_Report_{ts}.txt"
                 integration.vlog.write(log_path)
+                
+                # Copy report to persistent reports directory
+                import shutil
+                reports_copy = REPORTS_DIR / f"Verification_Report_{ts}.txt"
+                shutil.copy2(str(log_path), str(reports_copy))
 
             else:
                 # ── AR INVOICE MODE (default) ──
@@ -244,6 +249,11 @@ def _run_integration(sid: str, cfg: dict):
                 ts       = datetime.now().strftime("%Y%m%d_%H%M%S")
                 log_path = Path(sess["output_dir"]) / f"Verification_Report_{ts}.txt"
                 integration.vlog.write(log_path)
+                
+                # Copy report to persistent reports directory
+                import shutil
+                reports_copy = REPORTS_DIR / f"Verification_Report_{ts}.txt"
+                shutil.copy2(str(log_path), str(reports_copy))
 
             progress(95, "Creating download ZIP…")
             zip_path = str(Path(sess["work_dir"]) / "oracle_fusion_output.zip")
@@ -517,6 +527,208 @@ def generate_comprehensive_report():
             as_attachment=True,
             download_name="comprehensive_reports.zip",
             mimetype="application/zip",
+        )
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# Directory to store persistent reports
+REPORTS_DIR = Path(os.environ.get("REPORTS_DIR", "/tmp/oracle_fusion_reports"))
+REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+
+
+@app.route("/api/reports/list", methods=["GET"])
+def list_reports():
+    """List all generated reports with metadata"""
+    try:
+        reports = []
+        
+        # Scan for verification reports in the reports directory
+        for report_file in REPORTS_DIR.glob("*.txt"):
+            stat = report_file.stat()
+            reports.append({
+                "filename": report_file.name,
+                "path": str(report_file),
+                "size": stat.st_size,
+                "created": datetime.fromtimestamp(stat.st_ctime).strftime("%Y-%m-%d %H:%M:%S"),
+                "type": "verification"
+            })
+        
+        # Also scan for any previous session outputs
+        for session_dir in UPLOAD_BASE.glob("*"):
+            if session_dir.is_dir():
+                output_dir = session_dir / "ORACLE_FUSION_OUTPUT"
+                if output_dir.exists():
+                    for report_file in output_dir.glob("Verification_Report_*.txt"):
+                        stat = report_file.stat()
+                        reports.append({
+                            "filename": report_file.name,
+                            "path": str(report_file),
+                            "size": stat.st_size,
+                            "created": datetime.fromtimestamp(stat.st_ctime).strftime("%Y-%m-%d %H:%M:%S"),
+                            "type": "verification",
+                            "session": session_dir.name
+                        })
+        
+        # Sort by creation time, newest first
+        reports.sort(key=lambda x: x["created"], reverse=True)
+        
+        return jsonify({"reports": reports})
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/reports/view/<path:filename>", methods=["GET"])
+def view_report(filename: str):
+    """View a report as text"""
+    try:
+        # Security: only allow accessing .txt files
+        if not filename.endswith('.txt'):
+            return jsonify({"error": "Invalid file type"}), 400
+        
+        # Try to find the file in reports dir or session dirs
+        report_path = None
+        
+        # Check reports directory
+        candidate = REPORTS_DIR / filename
+        if candidate.exists():
+            report_path = candidate
+        else:
+            # Check session directories
+            for session_dir in UPLOAD_BASE.glob("*"):
+                candidate = session_dir / "ORACLE_FUSION_OUTPUT" / filename
+                if candidate.exists():
+                    report_path = candidate
+                    break
+        
+        if not report_path or not report_path.exists():
+            return jsonify({"error": "Report not found"}), 404
+        
+        content = report_path.read_text(encoding="utf-8")
+        return jsonify({
+            "filename": filename,
+            "content": content,
+            "size": len(content)
+        })
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/reports/download/<path:filename>", methods=["GET"])
+def download_report(filename: str):
+    """Download a report file"""
+    try:
+        # Security: only allow accessing .txt files
+        if not filename.endswith('.txt'):
+            return jsonify({"error": "Invalid file type"}), 400
+        
+        # Try to find the file
+        report_path = None
+        
+        # Check reports directory
+        candidate = REPORTS_DIR / filename
+        if candidate.exists():
+            report_path = candidate
+        else:
+            # Check session directories
+            for session_dir in UPLOAD_BASE.glob("*"):
+                candidate = session_dir / "ORACLE_FUSION_OUTPUT" / filename
+                if candidate.exists():
+                    report_path = candidate
+                    break
+        
+        if not report_path or not report_path.exists():
+            return jsonify({"error": "Report not found"}), 404
+        
+        return send_file(
+            str(report_path),
+            as_attachment=True,
+            download_name=filename,
+            mimetype="text/plain"
+        )
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/reports/download-pdf/<path:filename>", methods=["GET"])
+def download_report_pdf(filename: str):
+    """Download a report as PDF"""
+    try:
+        import pdf_report_generator
+        
+        # Security: only allow accessing .txt files
+        if not filename.endswith('.txt'):
+            return jsonify({"error": "Invalid file type"}), 400
+        
+        # Try to find the file
+        report_path = None
+        
+        # Check reports directory
+        candidate = REPORTS_DIR / filename
+        if candidate.exists():
+            report_path = candidate
+        else:
+            # Check session directories
+            for session_dir in UPLOAD_BASE.glob("*"):
+                candidate = session_dir / "ORACLE_FUSION_OUTPUT" / filename
+                if candidate.exists():
+                    report_path = candidate
+                    break
+        
+        if not report_path or not report_path.exists():
+            return jsonify({"error": "Report not found"}), 404
+        
+        # Read the text content
+        text_content = report_path.read_text(encoding="utf-8")
+        
+        # Generate PDF
+        pdf_content = pdf_report_generator.generate_pdf_from_text(
+            text_content,
+            title=f"Verification Report - {filename}"
+        )
+        
+        # Return PDF
+        pdf_filename = filename.replace('.txt', '.pdf')
+        return Response(
+            pdf_content,
+            mimetype='application/pdf',
+            headers={
+                'Content-Disposition': f'attachment; filename="{pdf_filename}"'
+            }
+        )
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/reports/summary-pdf", methods=["POST"])
+def generate_summary_pdf():
+    """Generate a PDF summary from AR Invoice data"""
+    try:
+        import pdf_report_generator
+        
+        sid = _new_session()
+        sess = _session(sid)
+        
+        # Get the uploaded AR Invoice file
+        ar_file = _save_upload(sid, "ar_invoice")
+        if not ar_file:
+            return jsonify({"error": "AR Invoice file required"}), 400
+        
+        # Generate PDF
+        pdf_content = pdf_report_generator.generate_invoice_summary_pdf(ar_file)
+        
+        # Return PDF
+        return Response(
+            pdf_content,
+            mimetype='application/pdf',
+            headers={
+                'Content-Disposition': 'attachment; filename="ar_invoice_summary.pdf"'
+            }
         )
     
     except Exception as e:
