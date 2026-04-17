@@ -832,8 +832,8 @@ class VerificationLog:
                 for label, value, status in self._summary_items:
                     icon = {"PASS": "✓", "FAIL": "✗", "WARN": "⚠", "INFO": "ℹ"}.get(status, "•")
                     # Truncate label and value to fit in the box
-                    label_truncated = (label[:38] + "..") if len(label) > 40 else label
-                    value_truncated = (value[:18] + "..") if len(value) > 20 else value
+                    label_truncated = (label[:37] + "...") if len(label) > 40 else label
+                    value_truncated = (value[:17] + "...") if len(value) > 20 else value
                     f.write(f"║  {icon} {label_truncated:<40} {value_truncated:<20} ║\n")
                 
                 f.write("╚" + "═" * 70 + "╝\n\n")
@@ -2111,8 +2111,16 @@ class OracleFusionIntegration:
 
         vl.add()
         vl.add("  ══════════════════════════════════════════════════════════════════════")
-        vl.add("  ✓  VERIFICATION COMPLETE")
-        vl.add("  ✓  All major verification points passed successfully")
+        
+        # Conditional completion message based on all checks
+        all_checks_passed = lines_match and amounts_match and seg1_ok and seg2_ok
+        if all_checks_passed:
+            vl.add("  ✓  VERIFICATION COMPLETE")
+            vl.add("  ✓  All major verification points passed successfully")
+        else:
+            vl.add("  ⚠  VERIFICATION COMPLETE WITH WARNINGS")
+            vl.add("  ⚠  Please review the verification points above")
+        
         vl.add(f"  ✓  Finished : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         vl.add("  ══════════════════════════════════════════════════════════════════════")
         
@@ -2411,8 +2419,15 @@ class OracleFusionIntegration:
                f"{diff:,.2f} SAR  " + ("✓ MATCH" if amounts_match else "⚠ CHECK"))
         vl.add()
         vl.add("  ══════════════════════════════════════════════════════════════════════")
-        vl.add("  ✓  VERIFICATION COMPLETE")
-        vl.add("  ✓  All major verification points passed successfully")
+        
+        # Conditional completion message based on verification result
+        if amounts_match:
+            vl.add("  ✓  VERIFICATION COMPLETE")
+            vl.add("  ✓  All major verification points passed successfully")
+        else:
+            vl.add("  ⚠  VERIFICATION COMPLETE WITH WARNINGS")
+            vl.add("  ⚠  Please review the amount discrepancies above")
+        
         vl.add(f"  ✓  Finished : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         vl.add("  ══════════════════════════════════════════════════════════════════════")
 
