@@ -1,0 +1,7 @@
+{
+  "last_transaction_number": 0,
+  "last_segment_1": 0,
+  "last_segment_2": 0,
+  "last_updated": "",
+  "notes": "This file stores the last used invoice sequence numbers for automatic continuation"
+}
