@@ -128,11 +128,18 @@ def test_ar_invoice_generation():
         ar_total = float(ar_df["Transaction Line Amount"].sum())
         print(f"✓ AR Invoice Total: {ar_total:,.2f} SAR")
         
-        # Calculate input total
+        # Calculate input total with sign alignment (same logic as AR generation)
+        def calculate_adjusted_amount(row):
+            """Apply sign alignment: if qty < 0 and amt > 0, flip amount to negative"""
+            qty = mod.safe_float(row.get("Quantity", 0))
+            amt = mod.safe_float(row.get("Subtotal w/o Tax", 0))
+            # Sign alignment for discount items: negative qty + positive amt → negative amt
+            if qty < 0 and amt > 0:
+                return -amt
+            return amt
+        
         input_total = float(
-            integration.line_items["Subtotal w/o Tax"]
-            .apply(mod.safe_float)
-            .sum()
+            integration.line_items.apply(calculate_adjusted_amount, axis=1).sum()
         )
         print(f"✓ Input Sheet Total: {input_total:,.2f} SAR")
         
