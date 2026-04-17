@@ -198,6 +198,51 @@ def _run_integration(sid: str, cfg: dict):
                 diff = abs(ar_total - input_total)
                 match_flag = "✓ MATCH" if diff < _TOTAL_MATCH_THRESHOLD else f"⚠ DIFF {diff:,.2f}"
                 stat("Total Match", match_flag)
+                
+                # Date-wise breakdown comparison
+                log("Computing date-wise totals comparison...")
+                
+                # Group AR by date
+                ar_by_date = ar_df.groupby('Transaction Date')['Transaction Line Amount'].sum().to_dict()
+                
+                # Group input by date
+                line_items_with_date = integration.line_items.copy()
+                line_items_with_date['adjusted_amount'] = line_items_with_date.apply(calculate_adjusted_amount, axis=1)
+                
+                # Get date column from line items
+                date_col = None
+                for col in line_items_with_date.columns:
+                    if any(x in col.lower() for x in ['date', 'sale date']):
+                        date_col = col
+                        break
+                
+                if date_col:
+                    # Format dates consistently
+                    line_items_with_date['formatted_date'] = pd.to_datetime(
+                        line_items_with_date[date_col], errors='coerce'
+                    ).dt.strftime('%Y-%m-%d %H:%M:%S')
+                    
+                    input_by_date = line_items_with_date.groupby('formatted_date')['adjusted_amount'].sum().to_dict()
+                    
+                    # Build comparison stats
+                    date_comparison_text = "\n\nDATE-WISE COMPARISON:\n" + "="*80 + "\n"
+                    date_comparison_text += f"{'Date':<22} {'AR Total':>18} {'Input Total':>18} {'Difference':>18}\n"
+                    date_comparison_text += "-"*80 + "\n"
+                    
+                    all_dates = sorted(set(list(ar_by_date.keys()) + list(input_by_date.keys())))
+                    for date in all_dates:
+                        ar_amt = ar_by_date.get(date, 0)
+                        input_amt = input_by_date.get(date, 0)
+                        diff_amt = abs(ar_amt - input_amt)
+                        match_icon = "✓" if diff_amt < _TOTAL_MATCH_THRESHOLD else "⚠"
+                        date_comparison_text += f"{date:<22} {ar_amt:>18,.2f} {input_amt:>18,.2f} {diff_amt:>18,.2f} {match_icon}\n"
+                    
+                    stat("Date-wise Match", "See verification report for details")
+                    
+                    # Store for report
+                    integration._date_comparison = date_comparison_text
+                else:
+                    integration._date_comparison = None
 
                 progress(55, "Generating Standard Receipts…")
                 std_rcp = integration.generate_standard_receipts()
@@ -215,6 +260,11 @@ def _run_integration(sid: str, cfg: dict):
                 ts       = datetime.now().strftime("%Y%m%d_%H%M%S")
                 log_path = Path(sess["output_dir"]) / f"Verification_Report_{ts}.txt"
                 integration.vlog.write(log_path)
+                
+                # Copy report to persistent reports directory
+                import shutil
+                reports_copy = REPORTS_DIR / f"Verification_Report_{ts}.txt"
+                shutil.copy2(str(log_path), str(reports_copy))
 
             else:
                 # ── AR INVOICE MODE (default) ──
@@ -244,6 +294,11 @@ def _run_integration(sid: str, cfg: dict):
                 ts       = datetime.now().strftime("%Y%m%d_%H%M%S")
                 log_path = Path(sess["output_dir"]) / f"Verification_Report_{ts}.txt"
                 integration.vlog.write(log_path)
+                
+                # Copy report to persistent reports directory
+                import shutil
+                reports_copy = REPORTS_DIR / f"Verification_Report_{ts}.txt"
+                shutil.copy2(str(log_path), str(reports_copy))
 
             progress(95, "Creating download ZIP…")
             zip_path = str(Path(sess["work_dir"]) / "oracle_fusion_output.zip")
@@ -521,6 +576,228 @@ def generate_comprehensive_report():
     
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+# Directory to store persistent reports
+REPORTS_DIR = Path(os.environ.get("REPORTS_DIR", "/tmp/oracle_fusion_reports"))
+REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+
+
+@app.route("/api/reports/list", methods=["GET"])
+def list_reports():
+    """List all generated reports with metadata"""
+    try:
+        reports = []
+        
+        # Scan for verification reports in the reports directory
+        for report_file in REPORTS_DIR.glob("*.txt"):
+            stat = report_file.stat()
+            reports.append({
+                "filename": report_file.name,
+                "path": str(report_file),
+                "size": stat.st_size,
+                "created": datetime.fromtimestamp(stat.st_ctime).strftime("%Y-%m-%d %H:%M:%S"),
+                "type": "verification"
+            })
+        
+        # Also scan for any previous session outputs
+        for session_dir in UPLOAD_BASE.glob("*"):
+            if session_dir.is_dir():
+                output_dir = session_dir / "ORACLE_FUSION_OUTPUT"
+                if output_dir.exists():
+                    for report_file in output_dir.glob("Verification_Report_*.txt"):
+                        stat = report_file.stat()
+                        reports.append({
+                            "filename": report_file.name,
+                            "path": str(report_file),
+                            "size": stat.st_size,
+                            "created": datetime.fromtimestamp(stat.st_ctime).strftime("%Y-%m-%d %H:%M:%S"),
+                            "type": "verification",
+                            "session": session_dir.name
+                        })
+        
+        # Sort by creation time, newest first
+        reports.sort(key=lambda x: x["created"], reverse=True)
+        
+        return jsonify({"reports": reports})
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/reports/view/<path:filename>", methods=["GET"])
+def view_report(filename: str):
+    """View a report as text"""
+    try:
+        # Security: validate filename - only allow alphanumeric, dash, underscore, and .txt extension
+        import os
+        import re
+        
+        filename = os.path.basename(filename)  # Prevent directory traversal
+        if not re.match(r'^[a-zA-Z0-9_-]+\.txt$', filename):
+            return jsonify({"error": "Invalid filename"}), 400
+        
+        # Try to find the file in reports dir or session dirs
+        report_path = None
+        
+        # Check reports directory
+        candidate = REPORTS_DIR / filename
+        if candidate.exists() and candidate.is_file():
+            report_path = candidate
+        else:
+            # Check session directories
+            for session_dir in UPLOAD_BASE.glob("*"):
+                candidate = session_dir / "ORACLE_FUSION_OUTPUT" / filename
+                if candidate.exists() and candidate.is_file():
+                    report_path = candidate
+                    break
+        
+        if not report_path or not report_path.exists():
+            return jsonify({"error": "Report not found"}), 404
+        
+        content = report_path.read_text(encoding="utf-8")
+        return jsonify({
+            "filename": filename,
+            "content": content,
+            "size": len(content)
+        })
+    
+    except Exception as e:
+        # Don't expose stack trace to user
+        import logging
+        logging.error(f"Error viewing report: {e}", exc_info=True)
+        return jsonify({"error": "Failed to load report"}), 500
+
+
+@app.route("/api/reports/download/<path:filename>", methods=["GET"])
+def download_report(filename: str):
+    """Download a report file"""
+    try:
+        # Security: validate filename
+        import os
+        import re
+        
+        filename = os.path.basename(filename)  # Prevent directory traversal
+        if not re.match(r'^[a-zA-Z0-9_-]+\.txt$', filename):
+            return jsonify({"error": "Invalid filename"}), 400
+        
+        # Try to find the file
+        report_path = None
+        
+        # Check reports directory
+        candidate = REPORTS_DIR / filename
+        if candidate.exists() and candidate.is_file():
+            report_path = candidate
+        else:
+            # Check session directories
+            for session_dir in UPLOAD_BASE.glob("*"):
+                candidate = session_dir / "ORACLE_FUSION_OUTPUT" / filename
+                if candidate.exists() and candidate.is_file():
+                    report_path = candidate
+                    break
+        
+        if not report_path or not report_path.exists():
+            return jsonify({"error": "Report not found"}), 404
+        
+        return send_file(
+            str(report_path),
+            as_attachment=True,
+            download_name=filename,
+            mimetype="text/plain"
+        )
+    
+    except Exception as e:
+        import logging
+        logging.error(f"Error downloading report: {e}", exc_info=True)
+        return jsonify({"error": "Failed to download report"}), 500
+
+
+@app.route("/api/reports/download-pdf/<path:filename>", methods=["GET"])
+def download_report_pdf(filename: str):
+    """Download a report as HTML for browser PDF conversion"""
+    try:
+        import pdf_report_generator
+        import os
+        import re
+        
+        # Security: validate filename
+        filename = os.path.basename(filename)  # Prevent directory traversal
+        if not re.match(r'^[a-zA-Z0-9_-]+\.txt$', filename):
+            return jsonify({"error": "Invalid filename"}), 400
+        
+        # Try to find the file
+        report_path = None
+        
+        # Check reports directory
+        candidate = REPORTS_DIR / filename
+        if candidate.exists() and candidate.is_file():
+            report_path = candidate
+        else:
+            # Check session directories
+            for session_dir in UPLOAD_BASE.glob("*"):
+                candidate = session_dir / "ORACLE_FUSION_OUTPUT" / filename
+                if candidate.exists() and candidate.is_file():
+                    report_path = candidate
+                    break
+        
+        if not report_path or not report_path.exists():
+            return jsonify({"error": "Report not found"}), 404
+        
+        # Read the text content
+        text_content = report_path.read_text(encoding="utf-8")
+        
+        # Generate HTML for browser-based PDF conversion
+        html_content = pdf_report_generator.generate_pdf_from_text(
+            text_content,
+            title=f"Verification Report - {filename}"
+        )
+        
+        # Return HTML for browser to convert to PDF via print dialog
+        pdf_filename = filename.replace('.txt', '.html')
+        return Response(
+            html_content,
+            mimetype='text/html',
+            headers={
+                'Content-Disposition': f'inline; filename="{pdf_filename}"'
+            }
+        )
+    
+    except Exception as e:
+        import logging
+        logging.error(f"Error generating report HTML: {e}", exc_info=True)
+        return jsonify({"error": "Failed to generate report"}), 500
+
+
+@app.route("/api/reports/summary-pdf", methods=["POST"])
+def generate_summary_pdf():
+    """Generate an HTML summary from AR Invoice data for browser-based PDF conversion"""
+    try:
+        import pdf_report_generator
+        
+        sid = _new_session()
+        sess = _session(sid)
+        
+        # Get the uploaded AR Invoice file
+        ar_file = _save_upload(sid, "ar_invoice")
+        if not ar_file:
+            return jsonify({"error": "AR Invoice file required"}), 400
+        
+        # Generate HTML (not actual PDF, for browser conversion)
+        html_content = pdf_report_generator.generate_invoice_summary_pdf(ar_file)
+        
+        # Return HTML for browser to convert to PDF
+        return Response(
+            html_content,
+            mimetype='text/html',
+            headers={
+                'Content-Disposition': 'inline; filename="ar_invoice_summary.html"'
+            }
+        )
+    
+    except Exception as e:
+        import logging
+        logging.error(f"Error generating summary: {e}", exc_info=True)
+        return jsonify({"error": "Failed to generate summary"}), 500
 
 
 # ---------------------------------------------------------------------------

@@ -504,8 +504,8 @@ def get_ar_columns() -> List[str]:
 # ============================================================================
 
 def _generate_run_prefix(length: int = 8) -> str:
-    """Generate a unique alphanumeric run prefix to avoid cross-run conflicts."""
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
+    """Generate a unique numeric run prefix to avoid cross-run conflicts."""
+    return ''.join(random.choices(string.digits, k=length))
 
 
 def safe_str(val) -> str:
@@ -709,7 +709,7 @@ class InvoiceSequenceManager:
             try:
                 with open(self.sequence_file, "r", encoding="utf-8") as f:
                     data = json.load(f)
-                print(f"  ✓ Loaded invoice sequence: BLK-{data.get('last_transaction_number', 0):07d}")
+                print(f"  ✓ Loaded invoice sequence: BLKU-{data.get('last_transaction_number', 0):07d}")
                 return data
             except Exception as e:
                 print(f"  ⚠ Error loading sequence file: {e} — starting fresh")
@@ -747,7 +747,7 @@ class InvoiceSequenceManager:
         try:
             with open(self.sequence_file, "w", encoding="utf-8") as f:
                 json.dump(self.data, f, indent=2)
-            print(f"  ✓ Invoice sequence saved: BLK-{self.data['last_transaction_number']:07d}")
+            print(f"  ✓ Invoice sequence saved: BLKU-{self.data['last_transaction_number']:07d}")
         except Exception as e:
             print(f"  ⚠ Error saving sequence file: {e}")
 
@@ -1098,7 +1098,7 @@ class TxnNumberGenerator:
         ds  = format_date(sale_date)
         key = (store_name.upper().strip(), ds)
         if key not in self._normal_cache:
-            self._normal_cache[key] = f"BLK-{self._normal_seq:07d}"
+            self._normal_cache[key] = f"BLKU-{self._normal_seq:07d}"
             self._normal_seq += 1
         return self._normal_cache[key]
 
@@ -1107,7 +1107,7 @@ class TxnNumberGenerator:
         ct  = customer_type.upper()
         key = (store_name.upper().strip(), ds, ct)
         if key not in self._bnpl_cache:
-            self._bnpl_cache[key] = f"BLK-{self._bnpl_seq:04d}"
+            self._bnpl_cache[key] = f"BLKU-{self._bnpl_seq:04d}"
             self._bnpl_seq += 1
         return self._bnpl_cache[key]
 
@@ -1196,9 +1196,9 @@ class OracleFusionIntegration:
         vl.section("1. INPUT FILES & SEQUENCE SETTINGS")
 
         vl.kv("Transaction number start seq",  str(self.start_seq))
-        vl.kv("  NORMAL  first number",        f"BLK-{self.start_seq:07d}")
-        vl.kv("  TABBY   first number",        f"BLK-{self.start_seq:04d}")
-        vl.kv("  TAMARA  first number",        f"BLK-{self.start_seq:04d}")
+        vl.kv("  NORMAL  first number",        f"BLKU-{self.start_seq:07d}")
+        vl.kv("  TABBY   first number",        f"BLKU-{self.start_seq:04d}")
+        vl.kv("  TAMARA  first number",        f"BLKU-{self.start_seq:04d}")
         vl.kv("Segment 1 prefix (this run)",   self._seg1_prefix)
         vl.kv("Segment 2 prefix (this run)",   self._seg2_prefix)
         vl.kv("LEGACY Segment 1 start seq",    str(self.start_legacy_seq_1))
@@ -1618,12 +1618,12 @@ class OracleFusionIntegration:
                f"{df['Sales Order Number'].nunique():,}")
         vl.add()
         all_txn_nums = [
-            int(t.replace("BLK-", ""))
+            int(t.replace("BLKU-", ""))
             for t in df["Transaction Number"].unique()
-            if t.startswith("BLK-") and t.replace("BLK-", "").isdigit()
+            if t.startswith("BLKU-") and t.replace("BLKU-", "").isdigit()
         ]
         max_txn = max(all_txn_nums) if all_txn_nums else 0
-        vl.kv("Max Transaction Number used",         f"BLK-{max_txn:07d}")
+        vl.kv("Max Transaction Number used",         f"BLKU-{max_txn:07d}")
         vl.kv(">>> Next run START_TXN_SEQUENCE =",   f"{max_txn + 1}  ← set this next run")
         
         # Update sequence manager if enabled
@@ -2018,6 +2018,11 @@ class OracleFusionIntegration:
         vl.add()
         vl.add("  ── Run complete ──")
         vl.add(f"  Finished : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        
+        # Add date-wise comparison if available
+        if hasattr(self, '_date_comparison') and self._date_comparison:
+            vl.add()
+            vl.add(self._date_comparison)
 
     # ──────────────────────────────────────────────────────────────────
     # AR INVOICE MODE — load from pre-generated AR Invoice CSV
