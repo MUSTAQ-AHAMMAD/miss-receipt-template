@@ -1,0 +1,85 @@
+========================================================================
+  ORACLE FUSION INTEGRATION — VERIFICATION REPORT
+  Generated : 2026-04-17 22:07:14
+========================================================================
+
+╔══════════════════════════════════════════════════════════════════════╗
+║                  VERIFICATION SUMMARY                                ║
+╠══════════════════════════════════════════════════════════════════════╣
+║  Overall Status: ✓ ALL CHECKS PASSED                                ║
+║  Passed: 4    |  Failed: 0    |  Warnings: 0                            ║
+╠══════════════════════════════════════════════════════════════════════╣
+║  ✓ Line Count Verification                  12,344 rows          ║
+║  ✓ Amount Reconciliation                    700,974.00 SAR       ║
+║  ✓ Segment 1 Uniqueness                     12,344 unique        ║
+║  ✓ Segment 2 Uniqueness                     12,344 unique        ║
+║  ℹ Total Invoices Processed                 3,145                ║
+║  ℹ Receipt Files Generated                  85                   ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+────────────────────────────────────────────────────────────────────────
+  1. INPUT FILES (AR INVOICE MODE)
+────────────────────────────────────────────────────────────────────────
+  AR Invoice file                          AR_Invoice_ZAHRAN_ALQURASHIKSA_04_17_Apr2026.csv
+  Metadata file                            FUSION_SALES_METADATA_202604121703.csv
+  Total rows loaded                        12,344
+  Unique invoices                          3,145
+
+────────────────────────────────────────────────────────────────────────
+  2. PAYMENT METHOD BREAKDOWN
+────────────────────────────────────────────────────────────────────────
+  ----------------------------------------------------------------------
+  Payment Method                  Invoices         Total Amount (SAR)       
+  ----------------------------------------------------------------------
+  Cash                            558              89,251.00                
+  Mada                            1,786            382,433.00               
+  Visa                            519              116,380.00               
+  MasterCard                      207              57,085.00                
+  TABBY                           89               28,139.00                
+  TAMARA                          99               27,686.00                
+  ----------------------------------------------------------------------
+  TOTAL                           3,258            700,974.00               
+
+────────────────────────────────────────────────────────────────────────
+  3. STORE BREAKDOWN
+────────────────────────────────────────────────────────────────────────
+  ZAHRAN invoices                          3,138
+  AMWAJ invoices                           2
+  KHOQOSAIBI invoices                      3
+  Other stores                             2
+
+╔══════════════════════════════════════════════════════════════════════╗
+║  FINAL CROSS-CHECK — MAJOR VERIFICATION POINTS                       ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+  ██████████████████████████████████████████████████████████████████████
+  █  CRITICAL VERIFICATION CHECKS                                      █
+  ██████████████████████████████████████████████████████████████████████
+  █  Input line item rows                     12,344                 █
+  █  Output AR rows                           12,344                 █
+  █  Line count match                         ✓ OK                   █
+  █                                                                  █
+  █  AR total amount                          580,048.68 SAR         █
+  █  Payment file total                       645,149.00 SAR         █
+  █  Receipt total                            645,149.00 SAR         █
+  █  Receipt vs payment diff                  0.00 SAR ✓ MATCH       █
+  █                                                                  █
+  █  Segment 1 unique values                  12,344 ✓ OK            █
+  █  Segment 2 unique values                  12,344 ✓ OK            █
+  ██████████████████████████████████████████████████████████████████████
+
+  Input line item rows                     12,344
+  Output AR rows                           12,344
+  Difference                               +0  ✓ OK
+
+  AR total                                 580,048.68 SAR
+  Payment file total (NORMAL)              645,149.00 SAR
+  Receipt total                            645,149.00 SAR
+  Receipt vs payment diff                  0.00 SAR  ✓ MATCH
+
+  ══════════════════════════════════════════════════════════════════════
+  ✓  VERIFICATION COMPLETE
+  ✓  All major verification points passed successfully
+  ✓  Finished : 2026-04-17 22:07:14
+  ══════════════════════════════════════════════════════════════════════
+
