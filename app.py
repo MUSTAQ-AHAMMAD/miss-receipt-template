@@ -33,9 +33,9 @@ from flask import (
 )
 from werkzeug.utils import secure_filename
 
-# ---------------------------------------------------------------------------
-# App setup
-# ---------------------------------------------------------------------------
+# Tolerance used when comparing AR Invoice total to input sheet total
+_TOTAL_MATCH_THRESHOLD = 0.01
+
 
 app = Flask(__name__)
 # Use a fixed secret key from the environment for session stability across restarts;
@@ -180,7 +180,7 @@ def _run_integration(sid: str, cfg: dict):
                 stat("Input Sheet Total", f"{input_total:,.2f} SAR")
 
                 diff = abs(ar_total - input_total)
-                match_flag = "✓ MATCH" if diff < 0.01 else f"⚠ DIFF {diff:,.2f}"
+                match_flag = "✓ MATCH" if diff < _TOTAL_MATCH_THRESHOLD else f"⚠ DIFF {diff:,.2f}"
                 stat("Total Match", match_flag)
 
                 progress(55, "Generating Standard Receipts…")

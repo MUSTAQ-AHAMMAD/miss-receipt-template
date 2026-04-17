@@ -1000,6 +1000,10 @@ class RegisterCache:
         self.name_map: Dict[str, str] = {}
         if registers_path and Path(registers_path).exists():
             self._load(registers_path)
+        elif registers_path:
+            print(f"  ⚠ Registers file not found: {registers_path} — register name mapping skipped")
+        else:
+            print("  ℹ No registers file provided — register name mapping skipped")
 
     def _load(self, path: str):
         df = pd.read_csv(path, encoding="utf-8-sig", dtype=str)

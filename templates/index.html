@@ -1292,7 +1292,7 @@
 
       // Total Match: green = match, amber = mismatch
       if (key === 'Total Match') {
-        color = val.startsWith('✓') ? 'var(--accent-green)' : 'var(--accent-amber)';
+        color = val.includes('MATCH') ? 'var(--accent-green)' : 'var(--accent-amber)';
       }
 
       const card = document.createElement('div');
