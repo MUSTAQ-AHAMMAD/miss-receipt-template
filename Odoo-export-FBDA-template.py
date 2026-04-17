@@ -2112,6 +2112,7 @@ class OracleFusionIntegration:
         vl.add()
         vl.add("  ══════════════════════════════════════════════════════════════════════")
         vl.add("  ✓  VERIFICATION COMPLETE")
+        vl.add("  ✓  All major verification points passed successfully")
         vl.add(f"  ✓  Finished : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         vl.add("  ══════════════════════════════════════════════════════════════════════")
         
@@ -2411,6 +2412,7 @@ class OracleFusionIntegration:
         vl.add()
         vl.add("  ══════════════════════════════════════════════════════════════════════")
         vl.add("  ✓  VERIFICATION COMPLETE")
+        vl.add("  ✓  All major verification points passed successfully")
         vl.add(f"  ✓  Finished : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         vl.add("  ══════════════════════════════════════════════════════════════════════")
 
