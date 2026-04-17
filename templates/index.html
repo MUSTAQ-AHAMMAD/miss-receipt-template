@@ -658,11 +658,11 @@
       <i class="fa-solid fa-bolt"></i>
       Oracle Fusion Financial Integration
     </div>
-    <h2>Automate Your<br /><span>AR Invoice &amp; Receipt</span><br />Template Generation</h2>
-    <p>Upload your Odoo export files, configure the sequence settings, and instantly generate AR Invoices, Standard Receipts, and Miscellaneous Receipts — ready for Oracle Fusion import.</p>
+    <h2>Automate Your<br /><span>Standard &amp; Misc Receipt</span><br />Template Generation</h2>
+    <p>Upload your Oracle Fusion AR Invoice CSV, configure the sequence settings, and instantly generate Standard Receipts and Miscellaneous Receipts — ready for Oracle Fusion import.</p>
 
     <div class="pipeline">
-      <div class="pipe-step s1"><i class="fa-solid fa-file-arrow-up icon"></i> Upload Files</div>
+      <div class="pipe-step s1"><i class="fa-solid fa-file-arrow-up icon"></i> Upload AR Invoice</div>
       <div class="pipe-arrow"><i class="fa-solid fa-chevron-right"></i></div>
       <div class="pipe-step s2"><i class="fa-solid fa-sliders icon"></i> Configure</div>
       <div class="pipe-arrow"><i class="fa-solid fa-chevron-right"></i></div>
@@ -683,106 +683,55 @@
     <div class="section-label">
       <div class="num">1</div>
       <div>
-        <h3>Upload Input Files</h3>
-        <p>Drag &amp; drop or click to select your Odoo export and reference files</p>
+        <h3>Upload AR Invoice CSV</h3>
+        <p>Drag &amp; drop or click to select your Oracle Fusion AR Invoice CSV file</p>
       </div>
     </div>
 
     <div class="upload-grid" id="uploadGrid">
 
-      <!-- Line Items -->
-      <div class="file-zone" id="zone-line_items" ondragover="onDragOver(event,'line_items')" ondragleave="onDragLeave('line_items')" ondrop="onDrop(event,'line_items')">
-        <input type="file" id="file-line_items" accept=".xlsx,.xls,.csv" onchange="onFileChange('line_items',this)" />
+      <!-- AR Invoice -->
+      <div class="file-zone" id="zone-ar_invoice" ondragover="onDragOver(event,'ar_invoice')" ondragleave="onDragLeave('ar_invoice')" ondrop="onDrop(event,'ar_invoice')">
+        <input type="file" id="file-ar_invoice" accept=".csv" onchange="onFileChange('ar_invoice',this)" />
         <div class="fz-header">
-          <div class="fz-icon required"><i class="fa-solid fa-table"></i></div>
+          <div class="fz-icon required"><i class="fa-solid fa-file-invoice-dollar"></i></div>
           <div>
-            <div class="fz-title">Line Items (Sales)</div>
-            <div class="fz-subtitle">POS order line items export</div>
-            <span class="fz-badge req">Required</span>
-          </div>
-        </div>
-        <div class="fz-drop-hint"><i class="fa-regular fa-file-excel"></i> &nbsp;XLSX / CSV</div>
-        <div class="fz-filename" id="fn-line_items"><i class="fa-solid fa-check"></i><span id="fntext-line_items"></span></div>
-      </div>
-
-      <!-- Payments -->
-      <div class="file-zone" id="zone-payments" ondragover="onDragOver(event,'payments')" ondragleave="onDragLeave('payments')" ondrop="onDrop(event,'payments')">
-        <input type="file" id="file-payments" accept=".xlsx,.xls,.csv" onchange="onFileChange('payments',this)" />
-        <div class="fz-header">
-          <div class="fz-icon required"><i class="fa-solid fa-money-bill-wave"></i></div>
-          <div>
-            <div class="fz-title">Payments</div>
-            <div class="fz-subtitle">POS payment methods export</div>
-            <span class="fz-badge req">Required</span>
-          </div>
-        </div>
-        <div class="fz-drop-hint"><i class="fa-regular fa-file-excel"></i> &nbsp;XLSX / CSV</div>
-        <div class="fz-filename" id="fn-payments"><i class="fa-solid fa-check"></i><span id="fntext-payments"></span></div>
-      </div>
-
-      <!-- Metadata -->
-      <div class="file-zone" id="zone-metadata" ondragover="onDragOver(event,'metadata')" ondragleave="onDragLeave('metadata')" ondrop="onDrop(event,'metadata')">
-        <input type="file" id="file-metadata" accept=".csv" onchange="onFileChange('metadata',this)" />
-        <div class="fz-header">
-          <div class="fz-icon required"><i class="fa-solid fa-database"></i></div>
-          <div>
-            <div class="fz-title">Customer Metadata</div>
-            <div class="fz-subtitle">RCPT Mapping / Customer data</div>
+            <div class="fz-title">AR Invoice CSV</div>
+            <div class="fz-subtitle">Oracle Fusion AR Invoice export (e.g. AR_Invoice__AJAWEED_05_31_Mar2026.csv)</div>
             <span class="fz-badge req">Required</span>
           </div>
         </div>
         <div class="fz-drop-hint"><i class="fa-regular fa-file-csv"></i> &nbsp;CSV</div>
-        <div class="fz-filename" id="fn-metadata"><i class="fa-solid fa-check"></i><span id="fntext-metadata"></span></div>
-      </div>
-
-      <!-- Registers -->
-      <div class="file-zone" id="zone-registers" ondragover="onDragOver(event,'registers')" ondragleave="onDragLeave('registers')" ondrop="onDrop(event,'registers')">
-        <input type="file" id="file-registers" accept=".csv,.xlsx" onchange="onFileChange('registers',this)" />
-        <div class="fz-header">
-          <div class="fz-icon required"><i class="fa-solid fa-store"></i></div>
-          <div>
-            <div class="fz-title">Registers / Stores</div>
-            <div class="fz-subtitle">VendHQ register names map</div>
-            <span class="fz-badge req">Required</span>
-          </div>
-        </div>
-        <div class="fz-drop-hint"><i class="fa-regular fa-file-csv"></i> &nbsp;CSV / XLSX</div>
-        <div class="fz-filename" id="fn-registers"><i class="fa-solid fa-check"></i><span id="fntext-registers"></span></div>
-      </div>
-
-      <!-- Receipt Methods -->
-      <div class="file-zone" id="zone-receipt_methods" ondragover="onDragOver(event,'receipt_methods')" ondragleave="onDragLeave('receipt_methods')" ondrop="onDrop(event,'receipt_methods')">
-        <input type="file" id="file-receipt_methods" accept=".csv" onchange="onFileChange('receipt_methods',this)" />
-        <div class="fz-header">
-          <div class="fz-icon optional"><i class="fa-solid fa-credit-card"></i></div>
-          <div>
-            <div class="fz-title">Receipt Methods</div>
-            <div class="fz-subtitle">Bank account / receipt method map</div>
-            <span class="fz-badge opt">Optional</span>
-            <span class="fz-badge auto" id="autobadge-receipt_methods" style="display:none;">Auto-loaded</span>
-          </div>
-        </div>
-        <div class="fz-drop-hint"><i class="fa-regular fa-file-csv"></i> &nbsp;CSV</div>
-        <div class="fz-filename" id="fn-receipt_methods"><i class="fa-solid fa-check"></i><span id="fntext-receipt_methods"></span></div>
-      </div>
-
-      <!-- Bank Charges -->
-      <div class="file-zone" id="zone-bank_charges" ondragover="onDragOver(event,'bank_charges')" ondragleave="onDragLeave('bank_charges')" ondrop="onDrop(event,'bank_charges')">
-        <input type="file" id="file-bank_charges" accept=".csv" onchange="onFileChange('bank_charges',this)" />
-        <div class="fz-header">
-          <div class="fz-icon optional"><i class="fa-solid fa-percent"></i></div>
-          <div>
-            <div class="fz-title">Bank Charges</div>
-            <div class="fz-subtitle">Card charge rates for misc receipts</div>
-            <span class="fz-badge opt">Optional</span>
-            <span class="fz-badge auto" id="autobadge-bank_charges" style="display:none;">Auto-loaded</span>
-          </div>
-        </div>
-        <div class="fz-drop-hint"><i class="fa-regular fa-file-csv"></i> &nbsp;CSV</div>
-        <div class="fz-filename" id="fn-bank_charges"><i class="fa-solid fa-check"></i><span id="fntext-bank_charges"></span></div>
+        <div class="fz-filename" id="fn-ar_invoice"><i class="fa-solid fa-check"></i><span id="fntext-ar_invoice"></span></div>
       </div>
 
     </div><!-- /upload-grid -->
+
+    <!-- Auto-loaded reference files -->
+    <div style="margin-top:20px; padding:16px 20px; background:rgba(16,185,129,.06); border:1px solid rgba(16,185,129,.20); border-radius:12px;">
+      <div style="font-size:.78rem; font-weight:600; color:var(--accent-green); letter-spacing:.06em; text-transform:uppercase; margin-bottom:10px;">
+        <i class="fa-solid fa-circle-check" style="margin-right:6px;"></i>
+        Auto-loaded from server root
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex;align-items:center;gap:8px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:.78rem;">
+          <i class="fa-solid fa-database" style="color:var(--accent-cyan);"></i>
+          <span>RCPT_Mapping_DATA.csv</span>
+          <span style="font-size:.65rem;padding:2px 7px;border-radius:8px;background:rgba(16,185,129,.15);color:var(--accent-green);font-weight:600;">Customer Metadata</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:.78rem;">
+          <i class="fa-solid fa-credit-card" style="color:var(--accent-cyan);"></i>
+          <span>Receipt_Methods.csv</span>
+          <span style="font-size:.65rem;padding:2px 7px;border-radius:8px;background:rgba(16,185,129,.15);color:var(--accent-green);font-weight:600;">Receipt Methods</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:.78rem;">
+          <i class="fa-solid fa-percent" style="color:var(--accent-cyan);"></i>
+          <span>BANK_CHARGES.csv</span>
+          <span style="font-size:.65rem;padding:2px 7px;border-radius:8px;background:rgba(16,185,129,.15);color:var(--accent-green);font-weight:600;">Bank Charges</span>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /card -->
 
   <!-- ═══════════════════════════════════════════ STEP 2: CONFIG ══ -->
@@ -922,7 +871,7 @@
         </div>
         <div>
           <h3>oracle_fusion_output.zip</h3>
-          <p>AR Invoices · Standard Receipts · Misc Receipts · Verification Report</p>
+          <p>Standard Receipts · Misc Receipts · Verification Report</p>
         </div>
       </div>
       <a class="btn-download" id="downloadBtn" href="#" onclick="triggerDownload()">
@@ -932,7 +881,6 @@
     </div>
 
     <div class="output-legend">
-      <div class="ol-badge"><span class="ol-dot" style="background:var(--accent-blue);"></span> AR Invoices (CSV)</div>
       <div class="ol-badge"><span class="ol-dot" style="background:var(--accent-cyan);"></span> Standard Receipts (CSV)</div>
       <div class="ol-badge"><span class="ol-dot" style="background:var(--accent-violet);"></span> Misc Receipts (CSV)</div>
       <div class="ol-badge"><span class="ol-dot" style="background:var(--accent-amber);"></span> Verification Report (TXT)</div>
@@ -988,14 +936,8 @@
     if (ab) ab.style.display = 'none';
   }
 
-  // Indicate auto-loaded reference files
-  function markAutoLoaded(field) {
-    const ab = document.getElementById('autobadge-' + field);
-    if (ab) ab.style.display = 'inline-block';
-  }
-  // Check if server has these optional files available
-  (function checkAutoFiles() {
-    // We just hint the user; actual auto-loading happens server-side
+  // Initialise session on page load
+  (function initSession() {
     fetch('/api/session', {method:'POST'}).then(r=>r.json()).then(d=>{
       sessionId = d.session_id;
     });
@@ -1005,11 +947,8 @@
   async function startProcessing() {
     hideBanner();
 
-    const required = ['line_items','payments','metadata','registers'];
-    const missing  = required.filter(f => !fileMap[f]);
-    if (missing.length > 0) {
-      showBanner('error',
-        `Please upload all required files: ${missing.map(f=>f.replace('_',' ')).join(', ')}`);
+    if (!fileMap['ar_invoice']) {
+      showBanner('error', 'Please upload your AR Invoice CSV file.');
       return;
     }
 
@@ -1135,9 +1074,6 @@
 
   // ─── Stats ────────────────────────────────────────────────────────
   const STAT_ICONS = {
-    'AR Rows':             'fa-table-list',
-    'AR Amount':           'fa-sack-dollar',
-    'Unique TXNs':         'fa-hashtag',
     'Standard Receipts':   'fa-receipt',
     'Misc Receipts':       'fa-file-invoice-dollar',
   };
@@ -1196,8 +1132,7 @@
     if (eventSource) { eventSource.close(); eventSource = null; }
 
     // Reset file zones
-    ['line_items','payments','metadata','registers','receipt_methods','bank_charges']
-      .forEach(field => {
+    ['ar_invoice'].forEach(field => {
         const zone = document.getElementById('zone-' + field);
         if (zone) zone.classList.remove('has-file');
         const input = document.getElementById('file-' + field);

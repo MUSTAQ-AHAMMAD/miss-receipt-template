@@ -910,7 +910,8 @@ class BankChargesCache:
 
 class MetadataCache:
 
-    _SITE_COL_ALIASES = ("BILL_TO_SITE_NUMBER", "SITE_NUMBER")
+    _SITE_COL_ALIASES = ("BILL_TO_SITE_NUMBER", "SITE_NUMBER",
+                          "Address_SITE_NUMBER", "ADDRESS_SITE_NUMBER")
 
     def __init__(self, metadata_path: str):
         self.path            = metadata_path
@@ -1898,6 +1899,172 @@ class OracleFusionIntegration:
         vl.add()
         vl.add("  ── Run complete ──")
         vl.add(f"  Finished : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+
+    # ──────────────────────────────────────────────────────────────────
+    # AR INVOICE MODE — load from pre-generated AR Invoice CSV
+    # ──────────────────────────────────────────────────────────────────
+
+    def load_from_ar_invoice(
+        self,
+        ar_invoice_path:      str,
+        metadata_path:        str,
+        receipt_methods_path: str = "",
+        bank_charges_path:    str = "",
+    ):
+        """Populate invoice dictionaries from an already-generated AR Invoice CSV.
+
+        No line-items or payments file is required.  Payment method defaults to
+        Cash for all amounts (Misc Receipts will only appear for methods with a
+        non-zero bank charge rate in BANK_CHARGES.csv).
+        """
+        vl = self.vlog
+        vl.section("1. INPUT FILES (AR INVOICE MODE)")
+        vl.kv("AR Invoice file",  Path(ar_invoice_path).name)
+        vl.kv("Metadata file",    Path(metadata_path).name)
+        vl.kv("Receipt Methods",  Path(receipt_methods_path).name if receipt_methods_path else "—")
+        vl.kv("Bank Charges",     Path(bank_charges_path).name    if bank_charges_path    else "—")
+        vl.kv("Segment 1 prefix", self._seg1_prefix)
+        vl.kv("Segment 2 prefix", self._seg2_prefix)
+        vl.add()
+
+        self.metadata_cache  = MetadataCache(metadata_path)
+        self.receipt_methods = ReceiptMethodsCache(receipt_methods_path)
+        self.bank_charges    = BankChargesCache(bank_charges_path)
+
+        # Build reverse lookup: BILL_TO_ACCOUNT → store (SUBINVENTORY)
+        account_to_store: Dict[str, str] = {}
+        for (subinv, _ctype), meta in self.metadata_cache.primary.items():
+            acc = meta["BILL_TO_ACCOUNT"]
+            if acc and acc not in account_to_store:
+                account_to_store[acc] = subinv
+
+        # Read AR Invoice CSV
+        ar_df = self._read_file(ar_invoice_path)
+        vl.kv("AR rows read", len(ar_df))
+
+        # Needed columns (resolve tolerantly)
+        COL_TXN   = find_col(ar_df, ["Transaction Number"])
+        COL_DATE  = find_col(ar_df, ["Transaction Date", "Accounting Date"])
+        COL_ACCT  = find_col(ar_df, ["Bill-to Customer Account Number"])
+        COL_SITE  = find_col(ar_df, ["Bill-to Customer Site Number"])
+        COL_AMT   = find_col(ar_df, ["Transaction Line Amount"])
+        COL_SO    = find_col(ar_df, ["Sales Order Number"])
+
+        if not COL_TXN or not COL_DATE or not COL_AMT:
+            raise ValueError(
+                "AR Invoice CSV is missing required columns: "
+                "Transaction Number / Transaction Date / Transaction Line Amount"
+            )
+
+        for _, row in ar_df.iterrows():
+            txn_num = safe_str(row.get(COL_TXN, "")).strip()
+            inv_ref = safe_str(row.get(COL_SO,  "")).strip() if COL_SO else ""
+            amount  = safe_float(row.get(COL_AMT, 0))
+
+            if not txn_num:
+                continue
+            # Fall back to txn_num as the invoice reference if SO is blank
+            if not inv_ref:
+                inv_ref = txn_num
+
+            # Date
+            try:
+                date_parsed = pd.to_datetime(row.get(COL_DATE), errors="coerce")
+                if pd.isna(date_parsed):
+                    date_parsed = datetime.now()
+            except Exception:
+                date_parsed = datetime.now()
+
+            # Resolve store: prefer account-number lookup, then SO prefix
+            account = safe_str(row.get(COL_ACCT, "")).strip() if COL_ACCT else ""
+            if account and account in account_to_store:
+                store = account_to_store[account]
+            elif "/" in inv_ref:
+                store = inv_ref.split("/")[0].upper().strip()
+            else:
+                store = txn_num
+
+            # Register this invoice
+            if inv_ref not in self.invoice_store:
+                self.invoice_store[inv_ref]     = store
+                self.invoice_date[inv_ref]      = date_parsed
+                self.invoice_ctype[inv_ref]     = "NORMAL"
+                self.invoice_to_ar_txn[inv_ref] = txn_num
+
+            # Accumulate amount as Cash (default — no payment method data in AR Invoice)
+            self.invoice_payments[inv_ref]["Cash"] += amount
+
+        # Compute AR totals per invoice
+        for inv_ref, methods in self.invoice_payments.items():
+            self.invoice_ar_total[inv_ref] = sum(methods.values())
+
+        vl.kv("Unique invoices loaded",  len(self.invoice_store))
+        vl.kv("Unique transactions (BLK)", len({v for v in self.invoice_to_ar_txn.values()}))
+        total_amount = sum(self.invoice_ar_total.values())
+        vl.kv("Total AR amount", f"{total_amount:,.2f} SAR")
+        vl.add()
+        vl.add("  NOTE: All amounts attributed to Cash (no payment file supplied).")
+        vl.add("        Misc Receipts are generated only when BANK_CHARGES.csv has")
+        vl.add("        a non-zero charge rate for a given method.")
+
+        vl.section("2. STORE BREAKDOWN (AR INVOICE MODE)")
+        store_totals: Dict[str, float] = defaultdict(float)
+        store_counts: Dict[str, int]   = defaultdict(int)
+        for inv, methods in self.invoice_payments.items():
+            st = self.invoice_store.get(inv, "?")
+            store_totals[st] += sum(methods.values())
+            store_counts[st] += 1
+        vl.table_row("Store", "Invoices", "Amount (SAR)", widths=(30, 10, 20))
+        vl.divider()
+        for st in sorted(store_totals.keys()):
+            vl.table_row(st, store_counts[st], f"{store_totals[st]:,.2f}", widths=(30, 10, 20))
+
+    def _write_ar_invoice_crosscheck(
+        self,
+        receipt_files: Dict[str, pd.DataFrame],
+    ):
+        vl = self.vlog
+        vl.section("11. FINAL CROSS-CHECK (AR INVOICE MODE)")
+
+        ar_total   = sum(self.invoice_ar_total.values())
+        rcpt_total = sum(df["Amount"].sum() for df in receipt_files.values())
+
+        vl.kv("Total AR Invoice amount",    f"{ar_total:,.2f} SAR")
+        vl.kv("Total Standard Receipt amt", f"{rcpt_total:,.2f} SAR")
+        diff = abs(rcpt_total - ar_total)
+        vl.kv("Difference",
+               f"{diff:,.2f} SAR  " + ("✓ MATCH" if diff < 0.01 else "⚠ CHECK"))
+        vl.add()
+        vl.add("  ── Run complete ──")
+        vl.add(f"  Finished : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+
+    def run_from_ar_invoice(
+        self,
+        ar_invoice_path:      str,
+        metadata_path:        str,
+        receipt_methods_path: str = "",
+        bank_charges_path:    str = "",
+    ):
+        """Full pipeline: AR Invoice CSV → Standard Receipts + Misc Receipts."""
+        self.load_from_ar_invoice(
+            ar_invoice_path, metadata_path,
+            receipt_methods_path, bank_charges_path,
+        )
+        std_rcp  = self.generate_standard_receipts()
+        self.save_standard_receipts(std_rcp)
+        misc_rcp = self.generate_misc_receipts()
+        self.save_misc_receipts(misc_rcp)
+        self._write_ar_invoice_crosscheck(std_rcp)
+
+        self.vlog.close()
+        ts       = datetime.now().strftime("%Y%m%d_%H%M%S")
+        log_path = self.output_dir / f"Verification_Report_{ts}.txt"
+        self.vlog.write(log_path)
+        self.vlog.print_summary()
+
+        print("\n" + "=" * 72)
+        print("✅  ORACLE FUSION INTEGRATION (AR INVOICE MODE) COMPLETE")
+        print("=" * 72)
 
     # ──────────────────────────────────────────────────────────────────
     # PIPELINE
