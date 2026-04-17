@@ -32,6 +32,7 @@ from flask import (
     stream_with_context,
 )
 from werkzeug.utils import secure_filename
+import pandas as pd
 
 # Tolerance used when comparing AR Invoice total to input sheet total
 _TOTAL_MATCH_THRESHOLD = 0.01
