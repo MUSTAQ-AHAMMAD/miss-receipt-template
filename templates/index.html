@@ -617,6 +617,34 @@
     }
 
     /* ───────────────────────────────────────────────────────────────
+       MODE TOGGLE BUTTONS
+    ─────────────────────────────────────────────────────────────── */
+    .mode-btn {
+      flex: 1; min-width: 220px;
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      color: var(--text-muted);
+      font-size: .88rem; font-weight: 600;
+      cursor: pointer; text-align: left;
+      transition: all var(--transition);
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .mode-btn i { font-size: 1.1rem; margin-bottom: 4px; }
+    .mode-btn:hover {
+      border-color: var(--border-bright);
+      color: var(--text-primary);
+    }
+    .mode-btn-active {
+      border-color: var(--accent-blue);
+      background: rgba(59,130,246,.08);
+      color: var(--text-primary);
+      box-shadow: 0 0 0 2px rgba(59,130,246,.15);
+    }
+    .mode-btn-active i { color: var(--accent-blue); }
+
+    /* ───────────────────────────────────────────────────────────────
        RESPONSIVE
     ─────────────────────────────────────────────────────────────── */
     @media (max-width: 640px) {
@@ -658,15 +686,29 @@
       <i class="fa-solid fa-bolt"></i>
       Oracle Fusion Financial Integration
     </div>
-    <h2>Automate Your<br /><span>Standard &amp; Misc Receipt</span><br />Template Generation</h2>
-    <p>Upload your Oracle Fusion AR Invoice CSV and an optional Payment File (with Sales Order Numbers and payment methods), configure the sequence settings, and instantly generate Standard Receipts and Miscellaneous Receipts — ready for Oracle Fusion import. When a Payment File is provided, Misc Receipts are generated using the actual payment methods and mapped to bank charges automatically.</p>
+    <h2>Automate Your<br /><span>AR Invoice &amp; Receipt</span><br />Template Generation</h2>
+    <p id="heroDesc">Choose a workflow mode below, configure the sequence settings, and instantly generate your Oracle Fusion import files — AR Invoices, Standard Receipts and Miscellaneous Receipts.</p>
 
-    <div class="pipeline">
+    <!-- Pipeline for AR Invoice mode -->
+    <div class="pipeline" id="pipeline-ar_invoice">
       <div class="pipe-step s1"><i class="fa-solid fa-file-arrow-up icon"></i> Upload AR Invoice</div>
       <div class="pipe-arrow"><i class="fa-solid fa-chevron-right"></i></div>
       <div class="pipe-step s2"><i class="fa-solid fa-sliders icon"></i> Configure</div>
       <div class="pipe-arrow"><i class="fa-solid fa-chevron-right"></i></div>
-      <div class="pipe-step s3"><i class="fa-solid fa-gears icon"></i> Generate</div>
+      <div class="pipe-step s3"><i class="fa-solid fa-gears icon"></i> Generate Receipts</div>
+      <div class="pipe-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+      <div class="pipe-step s4"><i class="fa-solid fa-file-zipper icon"></i> Download ZIP</div>
+    </div>
+
+    <!-- Pipeline for Sales/Payment Lines mode -->
+    <div class="pipeline" id="pipeline-sales_payment" style="display:none;">
+      <div class="pipe-step s1"><i class="fa-solid fa-table icon"></i> Sales Lines</div>
+      <div class="pipe-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+      <div class="pipe-step s1"><i class="fa-solid fa-money-bill-transfer icon"></i> Payment Lines</div>
+      <div class="pipe-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+      <div class="pipe-step s2"><i class="fa-solid fa-sliders icon"></i> Configure</div>
+      <div class="pipe-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+      <div class="pipe-step s3"><i class="fa-solid fa-file-invoice-dollar icon"></i> AR Invoice + Receipts</div>
       <div class="pipe-arrow"><i class="fa-solid fa-chevron-right"></i></div>
       <div class="pipe-step s4"><i class="fa-solid fa-file-zipper icon"></i> Download ZIP</div>
     </div>
@@ -683,64 +725,143 @@
     <div class="section-label">
       <div class="num">1</div>
       <div>
-        <h3>Upload AR Invoice CSV</h3>
-        <p>Drag &amp; drop or click to select your Oracle Fusion AR Invoice CSV file</p>
+        <h3>Workflow Mode &amp; File Upload</h3>
+        <p>Select a mode then upload the required files</p>
       </div>
     </div>
 
-    <div class="upload-grid" id="uploadGrid">
-
-      <!-- AR Invoice -->
-      <div class="file-zone" id="zone-ar_invoice" ondragover="onDragOver(event,'ar_invoice')" ondragleave="onDragLeave('ar_invoice')" ondrop="onDrop(event,'ar_invoice')">
-        <input type="file" id="file-ar_invoice" accept=".csv" onchange="onFileChange('ar_invoice',this)" />
-        <div class="fz-header">
-          <div class="fz-icon required"><i class="fa-solid fa-file-invoice-dollar"></i></div>
-          <div>
-            <div class="fz-title">AR Invoice CSV</div>
-            <div class="fz-subtitle">Oracle Fusion AR Invoice export (e.g. AR_Invoice__AJAWEED_05_31_Mar2026.csv)</div>
-            <span class="fz-badge req">Required</span>
-          </div>
-        </div>
-        <div class="fz-drop-hint"><i class="fa-regular fa-file-csv"></i> &nbsp;CSV</div>
-        <div class="fz-filename" id="fn-ar_invoice"><i class="fa-solid fa-check"></i><span id="fntext-ar_invoice"></span></div>
-      </div>
-
-      <!-- Payment File (Optional) -->
-      <div class="file-zone" id="zone-payment_file" ondragover="onDragOver(event,'payment_file')" ondragleave="onDragLeave('payment_file')" ondrop="onDrop(event,'payment_file')">
-        <input type="file" id="file-payment_file" accept=".csv,.xlsx,.xls" onchange="onFileChange('payment_file',this)" />
-        <div class="fz-header">
-          <div class="fz-icon optional"><i class="fa-solid fa-money-bill-transfer"></i></div>
-          <div>
-            <div class="fz-title">Payment File</div>
-            <div class="fz-subtitle">CSV/XLSX with Sales Order Number, Payment Method &amp; Amount — required for Misc Receipts with correct bank charges</div>
-            <span class="fz-badge opt">Optional</span>
-          </div>
-        </div>
-        <div class="fz-drop-hint"><i class="fa-regular fa-file-csv"></i> &nbsp;CSV / XLSX</div>
-        <div class="fz-filename" id="fn-payment_file"><i class="fa-solid fa-check"></i><span id="fntext-payment_file"></span></div>
-      </div>
-
-    </div><!-- /upload-grid -->
-
-    <!-- Payment file format hint -->
-    <div style="margin-top:16px; padding:14px 18px; background:rgba(139,92,246,.06); border:1px solid rgba(139,92,246,.20); border-radius:12px;">
-      <div style="font-size:.78rem; font-weight:600; color:var(--accent-violet); letter-spacing:.06em; text-transform:uppercase; margin-bottom:8px;">
-        <i class="fa-solid fa-circle-info" style="margin-right:6px;"></i>
-        Payment File — Expected Columns
-      </div>
-      <div style="font-size:.77rem; color:var(--text-muted); line-height:1.7;">
-        The payment file must contain at least these three columns (exact names are flexible):
-        <span style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Sales Order Number</span>
-        &nbsp;
-        <span style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Payment Method</span>
-        &nbsp;
-        <span style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Amount</span>
-        <br/>
-        The Sales Order Number must match the <em>Sales Order Number</em> column in the AR Invoice CSV.
-        Payment Method values are normalised (e.g. <em>MADA</em>, <em>Mada</em>, <em>mada</em> all map to Mada).
-        Each matched method is then mapped to <strong>BANK_CHARGES.csv</strong> to calculate the correct Misc Receipt amount.
-      </div>
+    <!-- Mode Toggle -->
+    <div style="display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap;">
+      <button id="mode-btn-ar_invoice" class="mode-btn mode-btn-active"
+              onclick="setMode('ar_invoice')">
+        <i class="fa-solid fa-file-invoice-dollar"></i>
+        AR Invoice Mode
+        <span style="font-size:.7rem;opacity:.7;display:block;margin-top:2px;">Upload existing AR Invoice CSV → generate receipts</span>
+      </button>
+      <button id="mode-btn-sales_payment" class="mode-btn"
+              onclick="setMode('sales_payment')">
+        <i class="fa-solid fa-table-list"></i>
+        Generate from Odoo Exports
+        <span style="font-size:.7rem;opacity:.7;display:block;margin-top:2px;">Sales Lines + Payment Lines → AR Invoice + receipts</span>
+      </button>
     </div>
+
+    <!-- ── AR Invoice mode uploads ── -->
+    <div id="uploads-ar_invoice">
+      <div class="upload-grid" id="uploadGrid">
+
+        <!-- AR Invoice -->
+        <div class="file-zone" id="zone-ar_invoice" ondragover="onDragOver(event,'ar_invoice')" ondragleave="onDragLeave('ar_invoice')" ondrop="onDrop(event,'ar_invoice')">
+          <input type="file" id="file-ar_invoice" accept=".csv" onchange="onFileChange('ar_invoice',this)" />
+          <div class="fz-header">
+            <div class="fz-icon required"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+            <div>
+              <div class="fz-title">AR Invoice CSV</div>
+              <div class="fz-subtitle">Oracle Fusion AR Invoice export (e.g. AR_Invoice__AJAWEED_05_31_Mar2026.csv)</div>
+              <span class="fz-badge req">Required</span>
+            </div>
+          </div>
+          <div class="fz-drop-hint"><i class="fa-regular fa-file-csv"></i> &nbsp;CSV</div>
+          <div class="fz-filename" id="fn-ar_invoice"><i class="fa-solid fa-check"></i><span id="fntext-ar_invoice"></span></div>
+        </div>
+
+        <!-- Payment File (Optional) -->
+        <div class="file-zone" id="zone-payment_file" ondragover="onDragOver(event,'payment_file')" ondragleave="onDragLeave('payment_file')" ondrop="onDrop(event,'payment_file')">
+          <input type="file" id="file-payment_file" accept=".csv,.xlsx,.xls" onchange="onFileChange('payment_file',this)" />
+          <div class="fz-header">
+            <div class="fz-icon optional"><i class="fa-solid fa-money-bill-transfer"></i></div>
+            <div>
+              <div class="fz-title">Payment File</div>
+              <div class="fz-subtitle">CSV/XLSX with Sales Order Number, Payment Method &amp; Amount — required for Misc Receipts with correct bank charges</div>
+              <span class="fz-badge opt">Optional</span>
+            </div>
+          </div>
+          <div class="fz-drop-hint"><i class="fa-regular fa-file-csv"></i> &nbsp;CSV / XLSX</div>
+          <div class="fz-filename" id="fn-payment_file"><i class="fa-solid fa-check"></i><span id="fntext-payment_file"></span></div>
+        </div>
+
+      </div><!-- /upload-grid -->
+
+      <!-- Payment file format hint -->
+      <div style="margin-top:16px; padding:14px 18px; background:rgba(139,92,246,.06); border:1px solid rgba(139,92,246,.20); border-radius:12px;">
+        <div style="font-size:.78rem; font-weight:600; color:var(--accent-violet); letter-spacing:.06em; text-transform:uppercase; margin-bottom:8px;">
+          <i class="fa-solid fa-circle-info" style="margin-right:6px;"></i>
+          Payment File — Expected Columns
+        </div>
+        <div style="font-size:.77rem; color:var(--text-muted); line-height:1.7;">
+          The payment file must contain at least these three columns (exact names are flexible):
+          <span style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Sales Order Number</span>
+          &nbsp;
+          <span style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Payment Method</span>
+          &nbsp;
+          <span style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Amount</span>
+          <br/>
+          The Sales Order Number must match the <em>Sales Order Number</em> column in the AR Invoice CSV.
+          Payment Method values are normalised (e.g. <em>MADA</em>, <em>Mada</em>, <em>mada</em> all map to Mada).
+          Each matched method is then mapped to <strong>BANK_CHARGES.csv</strong> to calculate the correct Misc Receipt amount.
+        </div>
+      </div>
+    </div><!-- /uploads-ar_invoice -->
+
+    <!-- ── Sales/Payment Lines mode uploads ── -->
+    <div id="uploads-sales_payment" style="display:none;">
+      <div class="upload-grid">
+
+        <!-- Sales Lines -->
+        <div class="file-zone" id="zone-sales_lines" ondragover="onDragOver(event,'sales_lines')" ondragleave="onDragLeave('sales_lines')" ondrop="onDrop(event,'sales_lines')">
+          <input type="file" id="file-sales_lines" accept=".csv,.xlsx,.xls" onchange="onFileChange('sales_lines',this)" />
+          <div class="fz-header">
+            <div class="fz-icon required"><i class="fa-solid fa-table"></i></div>
+            <div>
+              <div class="fz-title">Sales Lines</div>
+              <div class="fz-subtitle">Odoo POS order lines export — product name, barcode, quantity, subtotal, order ref (CSV or XLSX)</div>
+              <span class="fz-badge req">Required</span>
+            </div>
+          </div>
+          <div class="fz-drop-hint"><i class="fa-regular fa-file-csv"></i> &nbsp;CSV / XLSX</div>
+          <div class="fz-filename" id="fn-sales_lines"><i class="fa-solid fa-check"></i><span id="fntext-sales_lines"></span></div>
+        </div>
+
+        <!-- Payment Lines -->
+        <div class="file-zone" id="zone-payment_lines" ondragover="onDragOver(event,'payment_lines')" ondragleave="onDragLeave('payment_lines')" ondrop="onDrop(event,'payment_lines')">
+          <input type="file" id="file-payment_lines" accept=".csv,.xlsx,.xls" onchange="onFileChange('payment_lines',this)" />
+          <div class="fz-header">
+            <div class="fz-icon required"><i class="fa-solid fa-money-bill-transfer"></i></div>
+            <div>
+              <div class="fz-title">Payment Lines</div>
+              <div class="fz-subtitle">Odoo POS payments export — order ref, payment method, amount (CSV or XLSX)</div>
+              <span class="fz-badge req">Required</span>
+            </div>
+          </div>
+          <div class="fz-drop-hint"><i class="fa-regular fa-file-csv"></i> &nbsp;CSV / XLSX</div>
+          <div class="fz-filename" id="fn-payment_lines"><i class="fa-solid fa-check"></i><span id="fntext-payment_lines"></span></div>
+        </div>
+
+      </div><!-- /upload-grid -->
+
+      <!-- Expected columns hint -->
+      <div style="margin-top:16px; padding:14px 18px; background:rgba(139,92,246,.06); border:1px solid rgba(139,92,246,.20); border-radius:12px;">
+        <div style="font-size:.78rem; font-weight:600; color:var(--accent-violet); letter-spacing:.06em; text-transform:uppercase; margin-bottom:8px;">
+          <i class="fa-solid fa-circle-info" style="margin-right:6px;"></i>
+          Expected Column Names
+        </div>
+        <div style="font-size:.77rem; color:var(--text-muted); line-height:1.9;">
+          <strong>Sales Lines:</strong>
+          <span style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Order Lines/Order Ref</span>
+          <span style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Order Lines/Product/Name</span>
+          <span style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Order Lines/Product/Barcode</span>
+          <span style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Order Lines/Base Quantity</span>
+          <span style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Order Lines/Subtotal w/o Tax</span>
+          <br/>
+          <strong>Payment Lines:</strong>
+          <span style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Order Ref</span>
+          <span style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Payments/Payment Method</span>
+          <span style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Payments/Amount</span>
+          <br/>Column names are matched flexibly — alternative names are also accepted.
+          The AR Invoice total is matched against the uploaded Sales Lines sheet total automatically.
+        </div>
+      </div>
+    </div><!-- /uploads-sales_payment -->
 
     <!-- Auto-loaded reference files -->
     <div style="margin-top:20px; padding:16px 20px; background:rgba(16,185,129,.06); border:1px solid rgba(16,185,129,.20); border-radius:12px;">
@@ -915,7 +1036,8 @@
       </a>
     </div>
 
-    <div class="output-legend">
+    <div class="output-legend" id="outputLegend">
+      <div class="ol-badge" id="legend-ar-invoice" style="display:none;"><span class="ol-dot" style="background:var(--accent-blue);"></span> AR Invoice (CSV)</div>
       <div class="ol-badge"><span class="ol-dot" style="background:var(--accent-cyan);"></span> Standard Receipts (CSV)</div>
       <div class="ol-badge"><span class="ol-dot" style="background:var(--accent-violet);"></span> Misc Receipts (CSV)</div>
       <div class="ol-badge"><span class="ol-dot" style="background:var(--accent-amber);"></span> Verification Report (TXT)</div>
@@ -940,6 +1062,30 @@
   let fileMap     = {};   // field → File object
   let statsData   = {};   // key → value
   let eventSource = null;
+  let currentMode = 'ar_invoice';  // 'ar_invoice' | 'sales_payment'
+
+  // ─── Mode Toggle ──────────────────────────────────────────────────
+  function setMode(mode) {
+    currentMode = mode;
+
+    // Update button styles
+    ['ar_invoice', 'sales_payment'].forEach(m => {
+      const btn = document.getElementById('mode-btn-' + m);
+      if (btn) btn.classList.toggle('mode-btn-active', m === mode);
+    });
+
+    // Show/hide upload panels
+    document.getElementById('uploads-ar_invoice').style.display  = mode === 'ar_invoice'    ? '' : 'none';
+    document.getElementById('uploads-sales_payment').style.display = mode === 'sales_payment' ? '' : 'none';
+
+    // Show/hide pipeline
+    document.getElementById('pipeline-ar_invoice').style.display    = mode === 'ar_invoice'    ? '' : 'none';
+    document.getElementById('pipeline-sales_payment').style.display = mode === 'sales_payment' ? '' : 'none';
+
+    // Show/hide AR Invoice legend badge
+    const arLegend = document.getElementById('legend-ar-invoice');
+    if (arLegend) arLegend.style.display = mode === 'sales_payment' ? '' : 'none';
+  }
 
   // ─── File Upload Handlers ─────────────────────────────────────────
   function onDragOver(e, field) {
@@ -982,9 +1128,21 @@
   async function startProcessing() {
     hideBanner();
 
-    if (!fileMap['ar_invoice']) {
-      showBanner('error', 'Please upload your AR Invoice CSV file.');
-      return;
+    // Validate required files based on mode
+    if (currentMode === 'ar_invoice') {
+      if (!fileMap['ar_invoice']) {
+        showBanner('error', 'Please upload your AR Invoice CSV file.');
+        return;
+      }
+    } else {
+      if (!fileMap['sales_lines']) {
+        showBanner('error', 'Please upload your Sales Lines CSV/XLSX file.');
+        return;
+      }
+      if (!fileMap['payment_lines']) {
+        showBanner('error', 'Please upload your Payment Lines CSV/XLSX file.');
+        return;
+      }
     }
 
     const runBtn = document.getElementById('runBtn');
@@ -1007,6 +1165,7 @@
     // Build FormData
     const fd = new FormData();
     fd.append('session_id', sessionId);
+    fd.append('mode', currentMode);
     for (const [field, file] of Object.entries(fileMap)) {
       fd.append(field, file);
     }
@@ -1111,18 +1270,36 @@
   const STAT_ICONS = {
     'Standard Receipts':   'fa-receipt',
     'Misc Receipts':       'fa-file-invoice-dollar',
+    'AR Invoice Lines':    'fa-list-ol',
+    'AR Invoice Total':    'fa-coins',
+    'Input Sheet Total':   'fa-table',
+    'Total Match':         'fa-scale-balanced',
+  };
+
+  const STAT_COLORS = {
+    'AR Invoice Total':  'var(--accent-blue)',
+    'Input Sheet Total': 'var(--accent-cyan)',
+    'Total Match':       '',  // determined dynamically
+    'AR Invoice Lines':  'var(--accent-violet)',
   };
 
   function renderStats() {
     const grid = document.getElementById('statsGrid');
     grid.innerHTML = '';
     for (const [key, val] of Object.entries(statsData)) {
-      const icon = STAT_ICONS[key] || 'fa-chart-simple';
+      const icon  = STAT_ICONS[key]  || 'fa-chart-simple';
+      let   color = STAT_COLORS[key] || 'var(--accent-cyan)';
+
+      // Total Match: green = match, amber = mismatch
+      if (key === 'Total Match') {
+        color = val.includes('MATCH') ? 'var(--accent-green)' : 'var(--accent-amber)';
+      }
+
       const card = document.createElement('div');
       card.className = 'stat-card';
       card.innerHTML = `
-        <div class="stat-icon"><i class="fa-solid ${icon}" style="color:var(--accent-cyan);"></i></div>
-        <div class="stat-value">${val}</div>
+        <div class="stat-icon"><i class="fa-solid ${icon}" style="color:${color};"></i></div>
+        <div class="stat-value" style="background:none;-webkit-text-fill-color:${color};color:${color};">${val}</div>
         <div class="stat-label">${key}</div>
       `;
       grid.appendChild(card);
@@ -1167,7 +1344,7 @@
     if (eventSource) { eventSource.close(); eventSource = null; }
 
     // Reset file zones
-    ['ar_invoice'].forEach(field => {
+    ['ar_invoice', 'payment_file', 'sales_lines', 'payment_lines'].forEach(field => {
         const zone = document.getElementById('zone-' + field);
         if (zone) zone.classList.remove('has-file');
         const input = document.getElementById('file-' + field);
