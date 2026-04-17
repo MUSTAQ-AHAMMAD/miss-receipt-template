@@ -762,6 +762,7 @@ class VerificationLog:
         self.run_ts    = datetime.now()
         self.sections: List[Tuple[str, List[str]]] = []
         self._current: Optional[Tuple[str, List[str]]] = None
+        self._summary_items: List[Tuple[str, str, str]] = []  # (label, value, status)
 
     def section(self, title: str):
         self._flush()
@@ -782,6 +783,10 @@ class VerificationLog:
 
     def kv(self, label: str, value, width: int = 40):
         self.add(f"  {label:<{width}} {value}")
+    
+    def add_summary(self, label: str, value: str, status: str = "INFO"):
+        """Add item to verification summary (status: PASS, FAIL, WARN, INFO)"""
+        self._summary_items.append((label, value, status))
 
     def table_row(self, *cols, widths=(30, 12, 12, 12, 20)):
         parts = [f"{str(c):<{w}}" for c, w in zip(cols, widths)]
@@ -789,17 +794,65 @@ class VerificationLog:
 
     def divider(self, char: str = "-", width: int = 70):
         self.add("  " + char * width)
+    
+    def highlight_box(self, title: str, items: List[Tuple[str, str]], box_char: str = "█"):
+        """Add a highlighted box for important information"""
+        self.add()
+        self.add(f"  {box_char * 70}")
+        self.add(f"  {box_char}  {title.upper():<64}  {box_char}")
+        self.add(f"  {box_char * 70}")
+        for label, value in items:
+            self.add(f"  {box_char}  {label:<40} {value:<21}  {box_char}")
+        self.add(f"  {box_char * 70}")
+        self.add()
 
     def write(self, path: Path):
         with open(path, "w", encoding="utf-8") as f:
+            # Header
             f.write("=" * 72 + "\n")
             f.write("  ORACLE FUSION INTEGRATION — VERIFICATION REPORT\n")
             f.write(f"  Generated : {self.run_ts.strftime('%Y-%m-%d %H:%M:%S')}\n")
             f.write("=" * 72 + "\n\n")
+            
+            # Executive Summary Section (if we have summary items)
+            if self._summary_items:
+                f.write("╔" + "═" * 70 + "╗\n")
+                f.write("║" + " " * 18 + "VERIFICATION SUMMARY" + " " * 32 + "║\n")
+                f.write("╠" + "═" * 70 + "╣\n")
+                
+                pass_count = sum(1 for _, _, s in self._summary_items if s == "PASS")
+                fail_count = sum(1 for _, _, s in self._summary_items if s == "FAIL")
+                warn_count = sum(1 for _, _, s in self._summary_items if s == "WARN")
+                
+                overall_status = "✓ ALL CHECKS PASSED" if fail_count == 0 else "⚠ ISSUES DETECTED"
+                f.write(f"║  Overall Status: {overall_status:<51}║\n")
+                f.write(f"║  Passed: {pass_count:<3}  |  Failed: {fail_count:<3}  |  Warnings: {warn_count:<3}{' ' * 26}║\n")
+                f.write("╠" + "═" * 70 + "╣\n")
+                
+                for label, value, status in self._summary_items:
+                    icon = {"PASS": "✓", "FAIL": "✗", "WARN": "⚠", "INFO": "ℹ"}.get(status, "•")
+                    # Truncate label and value to fit in the box
+                    label_truncated = (label[:38] + "..") if len(label) > 40 else label
+                    value_truncated = (value[:18] + "..") if len(value) > 20 else value
+                    f.write(f"║  {icon} {label_truncated:<40} {value_truncated:<20} ║\n")
+                
+                f.write("╚" + "═" * 70 + "╝\n\n")
+            
+            # Detailed Sections
             for title, lines in self.sections:
-                f.write(f"{'─'*72}\n")
-                f.write(f"  {title}\n")
-                f.write(f"{'─'*72}\n")
+                # Highlight major verification sections
+                is_major = any(kw in title.upper() for kw in 
+                             ["FINAL CROSS-CHECK", "VERIFICATION", "VALIDATION", "SUMMARY"])
+                
+                if is_major:
+                    f.write("╔" + "═" * 70 + "╗\n")
+                    f.write(f"║  {title:<67} ║\n")
+                    f.write("╚" + "═" * 70 + "╝\n")
+                else:
+                    f.write(f"{'─'*72}\n")
+                    f.write(f"  {title}\n")
+                    f.write(f"{'─'*72}\n")
+                
                 for line in lines:
                     f.write(line + "\n")
                 f.write("\n")
@@ -1979,15 +2032,13 @@ class OracleFusionIntegration:
         receipt_files: Dict[str, pd.DataFrame],
     ):
         vl = self.vlog
-        vl.section("11. FINAL CROSS-CHECK")
+        vl.section("FINAL CROSS-CHECK — MAJOR VERIFICATION POINTS")
 
         input_lines  = len(self.line_items)
         output_lines = len(ar_df)
-        match_flag   = "✓ OK" if output_lines == input_lines else "⚠ MISMATCH"
-        vl.kv("Input line item rows", f"{input_lines:,}")
-        vl.kv("Output AR rows",       f"{output_lines:,}")
-        vl.kv("Difference",           f"{output_lines - input_lines:+,}  {match_flag}")
-
+        lines_match  = output_lines == input_lines
+        match_flag   = "✓ OK" if lines_match else "⚠ MISMATCH"
+        
         ar_total       = ar_df["Transaction Line Amount"].sum()
         rcpt_total     = sum(df["Amount"].sum() for df in receipt_files.values())
         pay_norm_total = sum(
@@ -1998,26 +2049,71 @@ class OracleFusionIntegration:
             and m in RECEIPT_PAYMENT_METHODS
         )
 
+        diff = abs(rcpt_total - pay_norm_total)
+        amounts_match = diff < 0.01
+        
+        seg1_unique = ar_df["Line Transactions Flexfield Segment 1"].nunique()
+        seg2_unique = ar_df["Line Transactions Flexfield Segment 2"].nunique()
+        seg1_ok = len(ar_df) == seg1_unique
+        seg2_ok = len(ar_df) == seg2_unique
+        
+        # Add to summary
+        vl.add_summary("Line Count Verification", 
+                      f"{output_lines:,} rows", 
+                      "PASS" if lines_match else "FAIL")
+        vl.add_summary("Amount Reconciliation", 
+                      f"{rcpt_total:,.2f} SAR", 
+                      "PASS" if amounts_match else "FAIL")
+        vl.add_summary("Segment 1 Uniqueness", 
+                      f"{seg1_unique:,} unique", 
+                      "PASS" if seg1_ok else "FAIL")
+        vl.add_summary("Segment 2 Uniqueness", 
+                      f"{seg2_unique:,} unique", 
+                      "PASS" if seg2_ok else "FAIL")
+        vl.add_summary("Total Invoices Processed", 
+                      f"{len(self.invoice_payments):,}", 
+                      "INFO")
+        
+        # Detailed verification in highlighted box
+        vl.highlight_box("CRITICAL VERIFICATION CHECKS", [
+            ("Input line item rows", f"{input_lines:,}"),
+            ("Output AR rows", f"{output_lines:,}"),
+            ("Line count match", match_flag),
+            ("", ""),
+            ("AR total amount", f"{ar_total:,.2f} SAR"),
+            ("Payment file total", f"{pay_norm_total:,.2f} SAR"),
+            ("Receipt total", f"{rcpt_total:,.2f} SAR"),
+            ("Receipt vs payment diff", f"{diff:,.2f} SAR " + ("✓ MATCH" if amounts_match else "⚠ CHECK")),
+            ("", ""),
+            ("Segment 1 unique values", f"{seg1_unique:,} " + ("✓ OK" if seg1_ok else "⚠ duplicates")),
+            ("Segment 2 unique values", f"{seg2_unique:,} " + ("✓ OK" if seg2_ok else "⚠ duplicates")),
+        ])
+        
+        # Additional details
+        vl.kv("Input line item rows", f"{input_lines:,}")
+        vl.kv("Output AR rows",       f"{output_lines:,}")
+        vl.kv("Difference",           f"{output_lines - input_lines:+,}  {match_flag}")
+
+        vl.add()
         vl.kv("AR total",                    f"{ar_total:,.2f} SAR")
         vl.kv("Payment file total (NORMAL)", f"{pay_norm_total:,.2f} SAR")
         vl.kv("Receipt total",               f"{rcpt_total:,.2f} SAR")
-        diff = abs(rcpt_total - pay_norm_total)
         vl.kv("Receipt vs payment diff",
-               f"{diff:,.2f} SAR  " + ("✓ MATCH" if diff < 0.01 else "⚠ CHECK"))
+               f"{diff:,.2f} SAR  " + ("✓ MATCH" if amounts_match else "⚠ CHECK"))
 
         vl.add()
-        seg1_unique = ar_df["Line Transactions Flexfield Segment 1"].nunique()
-        seg2_unique = ar_df["Line Transactions Flexfield Segment 2"].nunique()
         vl.kv("Segment 1 unique",
                f"{seg1_unique:,}  "
-               + ("✓" if len(ar_df) == seg1_unique else "⚠ duplicates"))
+               + ("✓" if seg1_ok else "⚠ duplicates"))
         vl.kv("Segment 2 unique",
                f"{seg2_unique:,}  "
-               + ("✓" if len(ar_df) == seg2_unique else "⚠ duplicates"))
+               + ("✓" if seg2_ok else "⚠ duplicates"))
 
         vl.add()
-        vl.add("  ── Run complete ──")
-        vl.add(f"  Finished : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        vl.add("  ══════════════════════════════════════════════════════════════════════")
+        vl.add("  ✓  VERIFICATION COMPLETE")
+        vl.add(f"  ✓  Finished : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        vl.add("  ══════════════════════════════════════════════════════════════════════")
         
         # Add date-wise comparison if available
         if hasattr(self, '_date_comparison') and self._date_comparison:
@@ -2275,19 +2371,48 @@ class OracleFusionIntegration:
         receipt_files: Dict[str, pd.DataFrame],
     ):
         vl = self.vlog
-        vl.section("11. FINAL CROSS-CHECK (AR INVOICE MODE)")
+        vl.section("FINAL CROSS-CHECK — MAJOR VERIFICATION POINTS (AR INVOICE MODE)")
 
         ar_total   = sum(self.invoice_ar_total.values())
         rcpt_total = sum(df["Amount"].sum() for df in receipt_files.values())
+        diff = abs(rcpt_total - ar_total)
+        amounts_match = diff < 0.01
+
+        # Add to summary
+        vl.add_summary("AR Invoice Total", 
+                      f"{ar_total:,.2f} SAR", 
+                      "INFO")
+        vl.add_summary("Standard Receipt Total", 
+                      f"{rcpt_total:,.2f} SAR", 
+                      "INFO")
+        vl.add_summary("Amount Reconciliation", 
+                      f"Diff: {diff:,.2f} SAR", 
+                      "PASS" if amounts_match else "FAIL")
+        vl.add_summary("Total Invoices", 
+                      f"{len(self.invoice_ar_total):,}", 
+                      "INFO")
+        vl.add_summary("Receipt Files Generated", 
+                      f"{len(receipt_files):,}", 
+                      "INFO")
+        
+        # Detailed verification in highlighted box
+        vl.highlight_box("CRITICAL VERIFICATION CHECKS", [
+            ("Total AR Invoice amount", f"{ar_total:,.2f} SAR"),
+            ("Total Standard Receipt amt", f"{rcpt_total:,.2f} SAR"),
+            ("Difference", f"{diff:,.2f} SAR " + ("✓ MATCH" if amounts_match else "⚠ CHECK")),
+            ("", ""),
+            ("Status", "✓ VERIFIED" if amounts_match else "⚠ REVIEW REQUIRED"),
+        ])
 
         vl.kv("Total AR Invoice amount",    f"{ar_total:,.2f} SAR")
         vl.kv("Total Standard Receipt amt", f"{rcpt_total:,.2f} SAR")
-        diff = abs(rcpt_total - ar_total)
         vl.kv("Difference",
-               f"{diff:,.2f} SAR  " + ("✓ MATCH" if diff < 0.01 else "⚠ CHECK"))
+               f"{diff:,.2f} SAR  " + ("✓ MATCH" if amounts_match else "⚠ CHECK"))
         vl.add()
-        vl.add("  ── Run complete ──")
-        vl.add(f"  Finished : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        vl.add("  ══════════════════════════════════════════════════════════════════════")
+        vl.add("  ✓  VERIFICATION COMPLETE")
+        vl.add(f"  ✓  Finished : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        vl.add("  ══════════════════════════════════════════════════════════════════════")
 
     def run_from_ar_invoice(
         self,
