@@ -26,6 +26,7 @@ FIXES IN THIS VERSION:
 
 from __future__ import annotations
 
+import json
 import random
 import re
 import string
@@ -692,6 +693,66 @@ PAYMENTS_COL_MAP = {
 
 
 # ============================================================================
+# INVOICE SEQUENCE MANAGER
+# ============================================================================
+
+class InvoiceSequenceManager:
+    """Manage invoice sequence numbers with persistence"""
+    
+    def __init__(self, sequence_file: str = "invoice_sequence.json"):
+        self.sequence_file = Path(sequence_file)
+        self.data = self._load()
+    
+    def _load(self) -> dict:
+        """Load sequence data from file"""
+        if self.sequence_file.exists():
+            try:
+                with open(self.sequence_file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                print(f"  ✓ Loaded invoice sequence: BLK-{data.get('last_transaction_number', 0):07d}")
+                return data
+            except Exception as e:
+                print(f"  ⚠ Error loading sequence file: {e} — starting fresh")
+        
+        return {
+            "last_transaction_number": 0,
+            "last_segment_1": 0,
+            "last_segment_2": 0,
+            "last_updated": "",
+            "notes": "Auto-generated invoice sequence tracking"
+        }
+    
+    def get_next_transaction_number(self) -> int:
+        """Get the next transaction number to use"""
+        return self.data["last_transaction_number"] + 1
+    
+    def get_next_segment_1(self) -> int:
+        """Get the next segment 1 value"""
+        return self.data["last_segment_1"] + 1
+    
+    def get_next_segment_2(self) -> int:
+        """Get the next segment 2 value"""
+        return self.data["last_segment_2"] + 1
+    
+    def update(self, transaction_number: int, segment_1: int, segment_2: int):
+        """Update sequence numbers and persist to file"""
+        self.data["last_transaction_number"] = transaction_number
+        self.data["last_segment_1"] = segment_1
+        self.data["last_segment_2"] = segment_2
+        self.data["last_updated"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self._save()
+    
+    def _save(self):
+        """Save sequence data to file"""
+        try:
+            with open(self.sequence_file, "w", encoding="utf-8") as f:
+                json.dump(self.data, f, indent=2)
+            print(f"  ✓ Invoice sequence saved: BLK-{self.data['last_transaction_number']:07d}")
+        except Exception as e:
+            print(f"  ⚠ Error saving sequence file: {e}")
+
+
+# ============================================================================
 # VERIFICATION LOGGER
 # ============================================================================
 
@@ -1070,9 +1131,22 @@ class OracleFusionIntegration:
         start_seq:          int = 1,
         start_legacy_seq_1: int = 1,
         start_legacy_seq_2: int = 1,
+        use_sequence_manager: bool = False,
     ):
         self.output_dir         = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Invoice sequence manager for auto-incrementing
+        self.seq_manager = None
+        if use_sequence_manager:
+            self.seq_manager = InvoiceSequenceManager()
+            # Override start sequences with saved values
+            if start_seq == 1:  # Only use saved if not explicitly provided
+                start_seq = self.seq_manager.get_next_transaction_number()
+            if start_legacy_seq_1 == 1:
+                start_legacy_seq_1 = self.seq_manager.get_next_segment_1()
+            if start_legacy_seq_2 == 1:
+                start_legacy_seq_2 = self.seq_manager.get_next_segment_2()
 
         self.start_seq          = max(1, int(start_seq))
         self.start_legacy_seq_1 = max(1, int(start_legacy_seq_1))
@@ -1551,6 +1625,13 @@ class OracleFusionIntegration:
         max_txn = max(all_txn_nums) if all_txn_nums else 0
         vl.kv("Max Transaction Number used",         f"BLK-{max_txn:07d}")
         vl.kv(">>> Next run START_TXN_SEQUENCE =",   f"{max_txn + 1}  ← set this next run")
+        
+        # Update sequence manager if enabled
+        if self.seq_manager:
+            self.seq_manager.update(max_txn, self.segment_seq_1 - 1, self.segment_seq_2 - 1)
+            vl.add()
+            vl.kv("✓ Invoice sequence persisted", "Ready for next run")
+        
         vl.add()
         vl.kv("Rows with EMPTY Bill-to Account",
                f"{(df['Bill-to Customer Account Number'] == '').sum():,}")
