@@ -194,12 +194,17 @@ No configuration changes required. The system automatically:
 - **SALES_COLUMN_FIX_SUMMARY.md** - Column mapping fix (phase 1)
 - **DISCOUNT_ITEM_FIX_SUMMARY.md** - Discount item handling
 - **README.md** - Updated with payment-based total explanation
+- **BUGFIX_OBSOLETE_FUNCTION.md** - Bug fix for removed calculate_adjusted_amount function
 
 ## Summary
 
 This fix ensures **perfect accuracy** by making payment totals (actual cash collected) the authoritative source for AR Invoice amounts, rather than sales totals (what was originally invoiced). This aligns with standard accounting practices and ensures seamless bank reconciliation.
 
 **Result**: AR Invoice total now matches payment total **exactly** - **0.00 SAR difference** instead of 76.87 SAR.
+
+## Follow-up Fix
+
+A subsequent bug was found and fixed where the date-wise breakdown code still referenced the removed `calculate_adjusted_amount` function. This has been fixed to use payment data for date-wise breakdowns as well. See **BUGFIX_OBSOLETE_FUNCTION.md** for details.
 
 ---
 
