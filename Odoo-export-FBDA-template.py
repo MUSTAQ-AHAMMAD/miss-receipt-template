@@ -1970,7 +1970,7 @@ class OracleFusionIntegration:
         df.to_csv(fpath, index=False, encoding="utf-8-sig", quoting=1)
         
         total_rows = len(df)
-        total_amount = df['Transaction Line Amount'].sum()
+        total_amount = df["Transaction Line Amount"].sum()
         unique_stores = df["Bill-to Customer Account Number"].nunique()
         
         print(f"  ✓ Consolidated AR Invoice (all stores)")
