@@ -1,0 +1,1091 @@
+﻿ROW_ID,BILL_TO_NAME,BILL_TO_ACCOUNT,BILL_TO_SITE_NUMBER,BUSINESS_UNIT,TXN_SOURCE,TXN_TYPE,RATE_IS_CORPORATE,REC_ACTIVITY_NAME_BANK,SUBINVENTORY,INTEGRATION_SOURCE,DISTRIBUTION_ACC_ID,REC_ACTIVITY_NAME_CASH,REGION,CUSTOMER_TYPE,COST_CENTER_CODE
+677,Hungerstation,45014,210040,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,EXBSA,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,113
+678,Exhibition-SA,55012,338045,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,EXBSA,Vend HQ,,Cash Rounding,SA,NORMAL,113
+679,Exhibition-OMN,55016,338049,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,EXBOMN,Vend HQ,,Cash Rounding OMN,OM,NORMAL,
+680,Fujairah City Center,55017,338050,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,FUJAIRAHCC,Vend HQ,,Cash Rounding UAE,AE,NORMAL,3402
+681,Mrsool,45015,210082,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,GRMALLHAIL,Vend HQ,,Cash Rounding,SA,MRSOOL,113
+682,Hungerstation,45014,210040,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,GRMALLHAIL,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,113
+683,AlOthaim Mall Hail,57013,347083,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,GRMALLHAIL,Vend HQ,,Cash Rounding,SA,NORMAL,113
+684,Mrsool,45015,210082,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RABWA,Vend HQ,,Cash Rounding,SA,MRSOOL,113
+685,Hungerstation,45014,210040,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RABWA,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,113
+686,AlOthaim Mall Rabwa,57014,347084,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RABWA,Vend HQ,,Cash Rounding,SA,NORMAL,113
+687,Mrsool,45015,210082,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ARARMALL,Vend HQ,,Cash Rounding,SA,MRSOOL,113
+688,Hungerstation,45014,210040,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ARARMALL,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,113
+689,Arar Mall,57015,347085,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ARARMALL,Vend HQ,,Cash Rounding,SA,NORMAL,113
+690,Mrsool,45015,210082,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,EXBSA02,Vend HQ,,Cash Rounding,SA,MRSOOL,113
+691,Hungerstation,45014,210040,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,EXBSA02,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,113
+692,Exhibition Jed,57012,347082,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,EXBSA02,Vend HQ,,Cash Rounding,SA,NORMAL,113
+693,Sohar City,14004,56009,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,SOHARCITY,Vend HQ,,Cash Rounding OMN,OM,NORMAL,
+694,Granada Mall,30011,118039,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,GRANADA,Vend HQ,,Cash Rounding,SA,NORMAL,110
+695,Hungerstation,45014,210051,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DANA,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1701
+696,Hungerstation,45014,210066,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,FLAMINGO,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,205
+697,Hungerstation,45014,210059,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,GRANADA,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,110
+698,Hungerstation,45014,210069,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAIFAA,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,209
+699,Hungerstation,45014,210033,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JURIMALL,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1001
+700,Hungerstation,45014,210036,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KADI,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1301
+701,Hungerstation,45014,210039,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHERAIS,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,107
+702,Hungerstation,45014,210065,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAHMAL,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,204
+703,Hungerstation,45014,210038,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKKAH,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1401
+704,Hungerstation,45014,210061,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDAD,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,103
+705,Hungerstation,45014,210050,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NOUR,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,302
+706,Hungerstation,45014,210034,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TABOUK,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1501
+707,Hungerstation,45014,210063,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,REDSEA,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,202
+708,Hungerstation,45014,210060,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDGALLER,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,102
+709,Hungerstation,45014,210042,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SALAMAH,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1201
+710,Hungerstation,45014,210068,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SALAMJED,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,208
+711,Hungerstation,45014,210044,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TAHLIA,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,201
+712,Hungerstation,45014,210053,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TALAMALL,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,106
+713,Hungerstation,45014,210037,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TAWAREN,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,101
+714,Hungerstation,45014,210055,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,WESTAVENUE,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,702
+715,Hungerstation,45014,210045,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,YASMEEN,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,207
+716,Mirdif City Center,57011,347081,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,MIRDIFFCC,Vend HQ,,Cash Rounding UAE,AE,NORMAL,3104
+717,Avenues Kiosk,64011,377042,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,AVENUKIOSK,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,NORMAL,7004
+718,Ryd Wadi Laban,68011,407042,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,WADILABAN,Vend HQ,,Cash Rounding,SA,NORMAL,115
+719,Rashid Abha,68012,407043,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RASHIDABHA,Vend HQ,,Cash Rounding,SA,NORMAL,502
+720,Rashid Jizan,68013,407044,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RASHIDJZN,Vend HQ,,Cash Rounding,SA,NORMAL,1302
+721,Rashid Madinah,68014,407045,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RASHIDMAD,Vend HQ,,Cash Rounding,SA,NORMAL,303
+722,Khafji Othaim,68015,407046,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHAFOTHAIM,Vend HQ,,Cash Rounding,SA,NORMAL,802
+723,Hafral Batin,68016,407047,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAFRBATIN,Vend HQ,,Cash Rounding,SA,NORMAL,803
+724,Buraida Othaim,68017,407048,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,BUROTHAIM,Vend HQ,,Cash Rounding,SA,NORMAL,1103
+725,Dam Othaim,68018,407049,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DAMMOTHAIM,Vend HQ,,Cash Rounding,SA,NORMAL,703
+726,Village Hamat,68019,407050,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,VILLAGEHMT,Vend HQ,,Cash Rounding,SA,NORMAL,215
+727,Park Hamat,68020,407051,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,PARKHMT,Vend HQ,,Cash Rounding,SA,NORMAL,1002
+728,NAKHDMM,68021,407052,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAKHDMM,Vend HQ,,Cash Rounding,SA,NORMAL,704
+1644,Tabby Saudi For communication and IT,50011,3000066,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDGALLER,Vend HQ,,Cash Rounding,SA,TABBY,104
+1645,Nakhla IT Systems (LLC) Tamara,69011,3000024,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDGALLER,Vend HQ,,Cash Rounding,SA,TAMARA,0
+3645,Tabby Saudi For communication and IT,50011,3000043,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAYAT,Vend HQ,,Cash Rounding,SA,TABBY,104
+2645,Nakhla IT Systems (LLC) Tamara,69011,300001,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAYAT,Vend HQ,,Cash Rounding,SA,TAMARA,104
+1629,Tabby Saudi For communication and IT,50011,3000062,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ZAHRAN,Vend HQ,,Cash Rounding,SA,TABBY,601
+2629,Nakhla IT Systems (LLC) Tamara,69011,3000020,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ZAHRAN,Vend HQ,,Cash Rounding,SA,TAMARA,601
+1621,Tabby Saudi For communication and IT,50011,3000052,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAMRAA,Vend HQ,,Cash Rounding,SA,TABBY,108
+2621,Nakhla IT Systems (LLC) Tamara,69011,3000010,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAMRAA,Vend HQ,,Cash Rounding,SA,TAMARA,108
+1630,Tabby Saudi For communication and IT,50011,3000045,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,EHSAA,Vend HQ,,Cash Rounding,SA,TABBY,801
+2630,Nakhla IT Systems (LLC) Tamara,69011,3000003,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,EHSAA,Vend HQ,,Cash Rounding,SA,TAMARA,801
+1628,Tabby Saudi For communication and IT,50011,3000061,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBAIL,Vend HQ,,Cash Rounding,SA,TABBY,901
+2628,Nakhla IT Systems (LLC) Tamara,69011,3000019,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBAIL,Vend HQ,,Cash Rounding,SA,TAMARA,901
+1624,Tabby Saudi For communication and IT,50011,3000044,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MANAR,Vend HQ,,Cash Rounding,SA,TABBY,301
+2624,Nakhla IT Systems (LLC) Tamara,69011,3000002,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MANAR,Vend HQ,,Cash Rounding,SA,TAMARA,301
+1618,Tabby Saudi For communication and IT,50011,3000057,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAKHELMALL,Vend HQ,,Cash Rounding,SA,TABBY,105
+2618,Nakhla IT Systems (LLC) Tamara,69011,3000015,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAKHELMALL,Vend HQ,,Cash Rounding,SA,TAMARA,105
+2631,Nakhla IT Systems (LLC) Tamara,69011,3000021,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAKJPLAZA,Vend HQ,,Cash Rounding,SA,TAMARA,1101
+1622,Tabby Saudi For communication and IT,50011,3000054,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SALAMRYD,Vend HQ,,Cash Rounding,SA,TABBY,109
+2622,Nakhla IT Systems (LLC) Tamara,69011,3000012,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SALAMRYD,Vend HQ,,Cash Rounding,SA,TAMARA,109
+1668,Tabby Saudi For communication and IT,50011,3000047,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALULA,Vend HQ,,Cash Rounding,SA,TABBY,1502
+2668,Nakhla IT Systems (LLC) Tamara,69011,3000005,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALULA,Vend HQ,,Cash Rounding,SA,TAMARA,1502
+2653,Nakhla IT Systems (LLC) Tamara,69011,3000037,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,AMWAJ,Vend HQ,,Cash Rounding,SA,TAMARA,401
+2648,Nakhla IT Systems (LLC) Tamara,69011,3000028,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ANDLUS,Vend HQ,,Cash Rounding,SA,TAMARA,203
+1665,Tabby Saudi For communication and IT,50011,3000051,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ARABMALL,Vend HQ,,Cash Rounding,SA,TABBY,210
+2665,Nakhla IT Systems (LLC) Tamara,69011,3000009,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ARABMALL,Vend HQ,,Cash Rounding,SA,TAMARA,210
+1635,Tabby Saudi For communication and IT,50011,3000080,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ASEER,Vend HQ,,Cash Rounding,SA,TABBY,501
+2635,Nakhla IT Systems (LLC) Tamara,69011,3000038,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ASEER,Vend HQ,,Cash Rounding,SA,TAMARA,501
+1654,Tabby Saudi For communication and IT,50011,3000073,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,AZIZMALL,Vend HQ,,Cash Rounding,SA,TABBY,206
+2654,Nakhla IT Systems (LLC) Tamara,69011,3000031,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,AZIZMALL,Vend HQ,,Cash Rounding,SA,TAMARA,206
+1662,Tabby Saudi For communication and IT,50011,3000056,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DANA,Vend HQ,,Cash Rounding,SA,TABBY,1701
+2662,Nakhla IT Systems (LLC) Tamara,69011,3000014,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DANA,Vend HQ,,Cash Rounding,SA,TAMARA,1701
+1626,Tabby Saudi For communication and IT,50011,3000059,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DAREEN,Vend HQ,,Cash Rounding,SA,TABBY,701
+2626,Nakhla IT Systems (LLC) Tamara,69011,3000017,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DAREEN,Vend HQ,,Cash Rounding,SA,TAMARA,701
+1650,Tabby Saudi For communication and IT,50011,3000072,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,FLAMINGO,Vend HQ,,Cash Rounding,SA,TABBY,205
+2650,Nakhla IT Systems (LLC) Tamara,69011,3000030,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,FLAMINGO,Vend HQ,,Cash Rounding,SA,TAMARA,205
+1694,Tabby Saudi For communication and IT,50011,3000064,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,GRANADA,Vend HQ,,Cash Rounding,SA,TABBY,110
+2694,Nakhla IT Systems (LLC) Tamara,69011,3000022,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,GRANADA,Vend HQ,,Cash Rounding,SA,TAMARA,110
+1655,Tabby Saudi For communication and IT,50011,3000075,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAIFAA,Vend HQ,,Cash Rounding,SA,TABBY,209
+2655,Nakhla IT Systems (LLC) Tamara,69011,3000033,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAIFAA,Vend HQ,,Cash Rounding,SA,TAMARA,209
+1632,Tabby Saudi For communication and IT,50011,3000081,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KADI,Vend HQ,,Cash Rounding,SA,TABBY,1301
+2632,Nakhla IT Systems (LLC) Tamara,69011,3000039,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KADI,Vend HQ,,Cash Rounding,SA,TAMARA,1301
+1625,Tabby Saudi For communication and IT,50011,3000065,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JURIMALL,Vend HQ,,Cash Rounding,SA,TABBY,1001
+2625,Nakhla IT Systems (LLC) Tamara,69011,3000023,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JURIMALL,Vend HQ,,Cash Rounding,SA,TAMARA,1001
+1620,Tabby Saudi For communication and IT,50011,3000084,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHERAIS,Vend HQ,,Cash Rounding,SA,TABBY,107
+2620,Nakhla IT Systems (LLC) Tamara,69011,3000042,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHERAIS,Vend HQ,,Cash Rounding,SA,TAMARA,107
+1649,Tabby Saudi For communication and IT,50011,3000071,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAHMAL,Vend HQ,,Cash Rounding,SA,TABBY,204
+2649,Nakhla IT Systems (LLC) Tamara,69011,3000029,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAHMAL,Vend HQ,,Cash Rounding,SA,TAMARA,204
+2667,Nakhla IT Systems (LLC) Tamara,69011,3000041,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKKAH,Vend HQ,,Cash Rounding,SA,TAMARA,1401
+1652,Tabby Saudi For communication and IT,50011,3000067,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDAD,Vend HQ,,Cash Rounding,SA,TABBY,103
+2652,Nakhla IT Systems (LLC) Tamara,69011,3000025,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDAD,Vend HQ,,Cash Rounding,SA,TAMARA,103
+1623,Tabby Saudi For communication and IT,50011,3000055,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NOUR,Vend HQ,,Cash Rounding,SA,TABBY,302
+2623,Nakhla IT Systems (LLC) Tamara,69011,3000013,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NOUR,Vend HQ,,Cash Rounding,SA,TAMARA,302
+1634,Tabby Saudi For communication and IT,50011,3000076,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TABOUK,Vend HQ,,Cash Rounding,SA,TABBY,1501
+2634,Nakhla IT Systems (LLC) Tamara,69011,3000034,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TABOUK,Vend HQ,,Cash Rounding,SA,TAMARA,1501
+1647,Tabby Saudi For communication and IT,50011,3000069,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,REDSEA,Vend HQ,,Cash Rounding,SA,TABBY,202
+2647,Nakhla IT Systems (LLC) Tamara,69011,3000027,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,REDSEA,Vend HQ,,Cash Rounding,SA,TAMARA,202
+1651,Tabby Saudi For communication and IT,50011,3000074,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SALAMJED,Vend HQ,,Cash Rounding,SA,TABBY,208
+2651,Nakhla IT Systems (LLC) Tamara,69011,3000032,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SALAMJED,Vend HQ,,Cash Rounding,SA,TAMARA,208
+1633,Tabby Saudi For communication and IT,50011,3000046,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SALAMAH,Vend HQ,,Cash Rounding,SA,TABBY,1201
+2633,Nakhla IT Systems (LLC) Tamara,69011,3000004,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SALAMAH,Vend HQ,,Cash Rounding,SA,TAMARA,1201
+1646,Tabby Saudi For communication and IT,50011,3000048,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TAHLIA,Vend HQ,,Cash Rounding,SA,TABBY,201
+2646,Nakhla IT Systems (LLC) Tamara,69011,3000006,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TAHLIA,Vend HQ,,Cash Rounding,SA,TAMARA,201
+1619,Tabby Saudi For communication and IT,50011,3000058,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TALAMALL,Vend HQ,,Cash Rounding,SA,TABBY,106
+2619,Nakhla IT Systems (LLC) Tamara,69011,3000016,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TALAMALL,Vend HQ,,Cash Rounding,SA,TAMARA,106
+1643,Tabby Saudi For communication and IT,50011,3000082,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TAWAREN,Vend HQ,,Cash Rounding,SA,TABBY,101
+2643,Nakhla IT Systems (LLC) Tamara,69011,3000040,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TAWAREN,Vend HQ,,Cash Rounding,SA,TAMARA,101
+1627,Tabby Saudi For communication and IT,50011,3000060,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,WESTAVENUE,Vend HQ,,Cash Rounding,SA,TABBY,702
+2627,Nakhla IT Systems (LLC) Tamara,69011,3000018,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,WESTAVENUE,Vend HQ,,Cash Rounding,SA,TAMARA,702
+1666,Tabby Saudi For communication and IT,50011,3000049,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,YASMEEN,Vend HQ,,Cash Rounding,SA,TABBY,207
+2666,Nakhla IT Systems (LLC) Tamara,69011,3000007,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,YASMEEN,Vend HQ,,Cash Rounding,SA,TAMARA,207
+1631,Tabby Saudi For communication and IT,50011,3000063,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAKJPLAZA,Vend HQ,,Cash Rounding,SA,TABBY,1101
+1648,Tabby Saudi For communication and IT,50011,3000070,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ANDLUS,Vend HQ,,Cash Rounding,SA,TABBY,203
+1653,Tabby Saudi For communication and IT,50011,3000079,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,AMWAJ,Vend HQ,,Cash Rounding,SA,TABBY,401
+1667,Tabby Saudi For communication and IT,50011,3000083,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKKAH,Vend HQ,,Cash Rounding,SA,TABBY,1401
+1686,Nakhla IT Systems (LLC) Tamara,69011,30000119,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RABWA,Vend HQ,,Cash Rounding,SA,TAMARA,112
+2686,Tabby Saudi For communication and IT,50011,3000099,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RABWA,Vend HQ,,Cash Rounding,SA,TABBY,112
+1720,Tabby Saudi For communication and IT,50011,3000101,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RASHIDJZN,Vend HQ,,Cash Rounding,SA,TABBY,1302
+2720,Nakhla IT Systems (LLC) Tamara,69011,30000121,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RASHIDJZN,Vend HQ,,Cash Rounding,SA,TAMARA,1302
+1727,Tabby Saudi For communication and IT,50011,3000098,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,PARKHMT,Vend HQ,,Cash Rounding,SA,TABBY,1002
+2727,Nakhla IT Systems (LLC) Tamara,69011,30000118,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,PARKHMT,Vend HQ,,Cash Rounding,SA,TAMARA,1002
+1726,Tabby Saudi For communication and IT,50011,3000103,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,VILLAGEHMT,Vend HQ,,Cash Rounding,SA,TABBY,215
+2726,Nakhla IT Systems (LLC) Tamara,69011,30000123,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,VILLAGEHMT,Vend HQ,,Cash Rounding,SA,TAMARA,215
+1723,Tabby Saudi For communication and IT,50011,3000093,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAFRBATIN,Vend HQ,,Cash Rounding,SA,TABBY,803
+2723,Nakhla IT Systems (LLC) Tamara,69011,30000113,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAFRBATIN,Vend HQ,,Cash Rounding,SA,TAMARA,803
+1724,Tabby Saudi For communication and IT,50011,3000086,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,BUROTHAIM,Vend HQ,,Cash Rounding,SA,TABBY,1103
+2724,Nakhla IT Systems (LLC) Tamara,69011,30000106,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,BUROTHAIM,Vend HQ,,Cash Rounding,SA,TAMARA,1103
+1718,Tabby Saudi For communication and IT,50011,3000104,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,WADILABAN,Vend HQ,,Cash Rounding,SA,TABBY,115
+2718,Nakhla IT Systems (LLC) Tamara,69011,30000124,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,WADILABAN,Vend HQ,,Cash Rounding,SA,TAMARA,115
+1663,Tabby Saudi For communication and IT,50011,3000090,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,EXBSA03,Vend HQ,,Cash Rounding,SA,TABBY,110
+2663,Nakhla IT Systems (LLC) Tamara,69011,30000110,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,EXBSA03,Vend HQ,,Cash Rounding,SA,TAMARA,110
+1664,Tabby Saudi For communication and IT,50011,3000091,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,EXBSA04,Vend HQ,,Cash Rounding,SA,TABBY,110
+2664,Nakhla IT Systems (LLC) Tamara,69011,30000111,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,EXBSA04,Vend HQ,,Cash Rounding,SA,TAMARA,110
+1722,Tabby Saudi For communication and IT,50011,3000094,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHAFOTHAIM,Vend HQ,,Cash Rounding,SA,TABBY,802
+2722,Nakhla IT Systems (LLC) Tamara,69011,30000114,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHAFOTHAIM,Vend HQ,,Cash Rounding,SA,TAMARA,802
+1719,Tabby Saudi For communication and IT,50011,3000100,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RASHIDABHA,Vend HQ,,Cash Rounding,SA,TABBY,502
+2719,Nakhla IT Systems (LLC) Tamara,69011,30000120,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RASHIDABHA,Vend HQ,,Cash Rounding,SA,TAMARA,502
+1721,Tabby Saudi For communication and IT,50011,3000102,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RASHIDMAD,Vend HQ,,Cash Rounding,SA,TABBY,303
+2721,Nakhla IT Systems (LLC) Tamara,69011,30000122,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RASHIDMAD,Vend HQ,,Cash Rounding,SA,TAMARA,303
+1728,Tabby Saudi For communication and IT,50011,3000096,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAKHDMM,Vend HQ,,Cash Rounding,SA,TABBY,704
+2728,Nakhla IT Systems (LLC) Tamara,69011,30000116,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAKHDMM,Vend HQ,,Cash Rounding,SA,TAMARA,704
+1725,Tabby Saudi For communication and IT,50011,3000087,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DAMMOTHAIM,Vend HQ,,Cash Rounding,SA,TABBY,703
+2725,Nakhla IT Systems (LLC) Tamara,69011,30000107,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DAMMOTHAIM,Vend HQ,,Cash Rounding,SA,TAMARA,703
+1688,Tabby Saudi For communication and IT,50011,3000085,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ARARMALL,Vend HQ,,Cash Rounding,SA,TABBY,113
+2688,Nakhla IT Systems (LLC) Tamara,69011,30000105,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ARARMALL,Vend HQ,,Cash Rounding,SA,TAMARA,113
+1674,Tabby Saudi For communication and IT,50011,3000097,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ONAIZAH,Vend HQ,,Cash Rounding,SA,TABBY,1102
+2675,Nakhla IT Systems (LLC) Tamara,69011,30000117,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ONAIZAH,Vend HQ,,Cash Rounding,SA,TAMARA,1102
+1669,Tabby Saudi For communication and IT,50011,3000095,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKTOWER,Vend HQ,,Cash Rounding,SA,TABBY,1402
+562,Avenues,7001,26003,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,Avenues,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,NORMAL,7001
+563,City Centre Muscat,22012,104022,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,MUSCATCC,Vend HQ,,Cash Rounding OMN,OM,NORMAL,
+564,Zahia mall,22011,104021,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,ZAHIA,Vend HQ,,Cash Rounding UAE,AE,NORMAL,3202
+566,Mrsool,45015,210094,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAKHELMALL,Vend HQ,,Cash Rounding,SA,MRSOOL,105
+567,Mrsool,45015,210095,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TALAMALL,Vend HQ,,Cash Rounding,SA,MRSOOL,106
+568,Mrsool,45015,210081,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHERAIS,Vend HQ,,Cash Rounding,SA,MRSOOL,107
+569,Mrsool,45015,210090,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAMRAA,Vend HQ,,Cash Rounding,SA,MRSOOL,108
+570,Mrsool,45015,210074,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SALAMRYD,Vend HQ,,Cash Rounding,SA,MRSOOL,109
+571,Mrsool,45015,210092,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NOUR,Vend HQ,,Cash Rounding,SA,MRSOOL,302
+572,Mrsool,45015,210082,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MANAR,Vend HQ,,Cash Rounding,SA,MRSOOL,301
+573,Mrsool,45015,210075,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JURIMALL,Vend HQ,,Cash Rounding,SA,MRSOOL,1001
+574,Mrsool,45015,210096,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DAREEN,Vend HQ,,Cash Rounding,SA,MRSOOL,701
+575,Mrsool,45015,210097,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,WESTAVENUE,Vend HQ,,Cash Rounding,SA,MRSOOL,702
+576,Mrsool,45015,210098,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBAIL,Vend HQ,,Cash Rounding,SA,MRSOOL,901
+577,Mrsool,45015,210099,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ZAHRAN,Vend HQ,,Cash Rounding,SA,MRSOOL,601
+578,Mrsool,45015,210083,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,EHSAA,Vend HQ,,Cash Rounding,SA,MRSOOL,801
+579,Mrsool,45015,210100,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAKJPLAZA,Vend HQ,,Cash Rounding,SA,MRSOOL,1101
+580,Mrsool,45015,210078,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KADI,Vend HQ,,Cash Rounding,SA,MRSOOL,1301
+581,Mrsool,45015,210084,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SALAMAH,Vend HQ,,Cash Rounding,SA,MRSOOL,1201
+582,Mrsool,45015,210076,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TABOUK,Vend HQ,,Cash Rounding,SA,MRSOOL,1501
+583,Mrsool,45015,210077,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ASEER,Vend HQ,,Cash Rounding,SA,MRSOOL,501
+584,Mrsool,45015,210079,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TAWAREN,Vend HQ,,Cash Rounding,SA,MRSOOL,101
+585,Mrsool,45015,210102,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDGALLER,Vend HQ,,Cash Rounding,SA,MRSOOL,102
+586,Mrsool,45015,210073,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAYAT,Vend HQ,,Cash Rounding,SA,MRSOOL,104
+587,Mrsool,45015,210086,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TAHLIA,Vend HQ,,Cash Rounding,SA,MRSOOL,201
+588,Mrsool,45015,210105,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,REDSEA,Vend HQ,,Cash Rounding,SA,MRSOOL,202
+589,Mrsool,45015,210106,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ANDLUS,Vend HQ,,Cash Rounding,SA,MRSOOL,203
+590,Mrsool,45015,210107,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAHMAL,Vend HQ,,Cash Rounding,SA,MRSOOL,204
+591,Mrsool,45015,210108,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,FLAMINGO,Vend HQ,,Cash Rounding,SA,MRSOOL,205
+592,Mrsool,45015,210110,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SALAMJED,Vend HQ,,Cash Rounding,SA,MRSOOL,208
+593,Mrsool,45015,210103,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDAD,Vend HQ,,Cash Rounding,SA,MRSOOL,103
+594,Mrsool,45015,210114,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,AMWAJ,Vend HQ,,Cash Rounding,SA,MRSOOL,401
+595,Mrsool,45015,210109,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,AZIZMALL,Vend HQ,,Cash Rounding,SA,MRSOOL,206
+596,Mrsool,45015,210111,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAIFAA,Vend HQ,,Cash Rounding,SA,MRSOOL,209
+597,Mrsool,45015,210093,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DANA,Vend HQ,,Cash Rounding,SA,MRSOOL,1701
+598,Mrsool,45015,210089,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ARABMALL,Vend HQ,,Cash Rounding,SA,MRSOOL,210
+599,Mrsool,45015,210087,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,YASMEEN,Vend HQ,,Cash Rounding,SA,MRSOOL,207
+600,Mrsool,45015,210080,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKKAH,Vend HQ,,Cash Rounding,SA,MRSOOL,1401
+601,Mrsool,45015,210085,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALULA,Vend HQ,,Cash Rounding,SA,MRSOOL,1502
+602,Mrsool,45015,210101,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,GRANADA,Vend HQ,,Cash Rounding,SA,MRSOOL,110
+603,Hungerstation,45014,210057,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ZAHRAN,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,601
+604,Hungerstation,45014,210041,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,EHSAA,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,801
+605,Hungerstation,45014,210056,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBAIL,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,901
+606,Hungerstation,45014,210058,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAKJPLAZA,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1101
+607,Hungerstation,45014,210070,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,AMWAJ,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,401
+608,Hungerstation,45014,210035,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ASEER,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,501
+609,Hungerstation,45014,210048,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAMRAA,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,108
+610,Hungerstation,45014,210031,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAYAT,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,104
+611,Hungerstation,45014,210040,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MANAR,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,301
+612,Hungerstation,45014,210052,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAKHELMALL,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,105
+613,Hungerstation,45014,210032,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SALAMRYD,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,109
+614,Hungerstation,45014,210043,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALULA,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1502
+615,Hungerstation,45014,210064,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ANDLUS,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,203
+616,Hungerstation,45014,210047,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ARABMALL,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,210
+617,Hungerstation,45014,210067,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,AZIZMALL,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,206
+618,Al Nakheel Mall,3003,11006,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAKHELMALL,Vend HQ,,Cash Rounding,SA,NORMAL,105
+619,Tala Mall,3004,11007,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TALAMALL,Vend HQ,,Cash Rounding,SA,NORMAL,106
+620,Khris Mall,3005,11008,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHERAIS,Vend HQ,,Cash Rounding,SA,NORMAL,107
+621,Al Hamra Mall,3006,11009,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAMRAA,Vend HQ,,Cash Rounding,SA,NORMAL,108
+622,Al Salam Mall,3007,11010,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SALAMRYD,Vend HQ,,Cash Rounding,SA,NORMAL,109
+623,Noor Mall,3008,11011,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NOUR,Vend HQ,,Cash Rounding,SA,NORMAL,302
+624,Al Manar Mall,3009,11012,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MANAR,Vend HQ,,Cash Rounding,SA,NORMAL,301
+625,JORI MALL,4002,12002,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JURIMALL,Vend HQ,,Cash Rounding,SA,NORMAL,1001
+626,DAREEN MALL,4003,12003,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DAREEN,Vend HQ,,Cash Rounding,SA,NORMAL,701
+627,WEST AVINEO,4004,12004,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,WESTAVENUE,Vend HQ,,Cash Rounding,SA,NORMAL,702
+628,AL JUBAIL MALL,4005,12005,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBAIL,Vend HQ,,Cash Rounding,SA,NORMAL,901
+629,AL DAHRAN MALL,4006,12006,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ZAHRAN,Vend HQ,,Cash Rounding,SA,NORMAL,601
+630,AL IHSA MALL,4007,12007,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,EHSAA,Vend HQ,,Cash Rounding,SA,NORMAL,801
+631,AL NAKheel PLAZA,4008,12008,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAKJPLAZA,Vend HQ,,Cash Rounding,SA,NORMAL,1101
+632,KADI MALL,4009,12009,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KADI,Vend HQ,,Cash Rounding,SA,NORMAL,1301
+633,SALMAH MALL,4010,12010,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SALAMAH,Vend HQ,,Cash Rounding,SA,NORMAL,1201
+634,PARK MALL,4011,12011,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TABOUK,Vend HQ,,Cash Rounding,SA,NORMAL,1501
+635,ASSER MALL,4012,12012,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ASEER,Vend HQ,,Cash Rounding,SA,NORMAL,501
+636,Hall 8,14003,56008,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,Hall 8,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,NORMAL,7002
+637,Hall 4,18007,72019,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,Hall 4,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,NORMAL,7003
+638,Hungerstation,45014,210054,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DAREEN,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,701
+639,Dubai Mall,52012,318042,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,DUBMAL,Vend HQ,,Cash Rounding UAE,AE,NORMAL,3101
+640,Mall of Oman,52013,318043,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,OMMAL,Vend HQ,,Cash Rounding OMN,OM,NORMAL,
+641,City Walk Mall,6003,16006,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,CITYWALK,Vend HQ,,Cash Rounding UAE,AE,NORMAL,3101
+642,Marsa AL Seef Mall,6004,16007,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,MARSASEEF,Vend HQ,,Cash Rounding UAE,AE,NORMAL,3003
+643,Twaren Center,3001,11004,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TAWAREN,Vend HQ,,Cash Rounding,SA,NORMAL,101
+644,Riyadh Gallery,5,1024,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDGALLER,Vend HQ,,Cash Rounding,SA,NORMAL,102
+645,Al Hayat Mall,3002,11005,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAYAT,Vend HQ,,Cash Rounding,SA,NORMAL,104
+646,Tahliah,8,1027,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TAHLIA,Vend HQ,,Cash Rounding,SA,NORMAL,201
+647,Red Sea Mall,9,1028,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,REDSEA,Vend HQ,,Cash Rounding,SA,NORMAL,202
+648,Andalus Mall,10,1029,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ANDLUS,Vend HQ,,Cash Rounding,SA,NORMAL,203
+649,Mahmal Center,11,1030,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAHMAL,Vend HQ,,Cash Rounding,SA,NORMAL,204
+650,Felamengo Mall,12,1031,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,FLAMINGO,Vend HQ,,Cash Rounding,SA,NORMAL,205
+651,Salam Mall,15,1034,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SALAMJED,Vend HQ,,Cash Rounding,SA,NORMAL,208
+652,Medad Center,6,1025,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDAD,Vend HQ,,Cash Rounding,SA,NORMAL,103
+653,AMUAJJ MALL,4001,12001,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,AMWAJ,Vend HQ,,Cash Rounding,SA,NORMAL,401
+654,Aziz Mall,13,1032,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,AZIZMALL,Vend HQ,,Cash Rounding,SA,NORMAL,206
+655,Haifaa Mall,16,1035,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAIFAA,Vend HQ,,Cash Rounding,SA,NORMAL,209
+656,Saharah Mall,6005,16008,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,SAHARH,Vend HQ,,Cash Rounding UAE,AE,NORMAL,3201
+657,AL Ain Mall,6006,16009,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,ALAIN,Vend HQ,,Cash Rounding UAE,AE,NORMAL,3301
+658,AL Fujairah Mall,6007,16010,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,FUJAIRAH,Vend HQ,,Cash Rounding UAE,AE,NORMAL,3402
+659,Manar Mall RAK,6008,16011,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,MANARRAK,Vend HQ,,Cash Rounding UAE,AE,NORMAL,3501
+660,AL Wehdah Mall,6001,16004,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,WEHDA,Vend HQ,,Cash Rounding UAE,AE,NORMAL,3001
+661,Deerfields Mall,6002,16005,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,DEERFIELDS,Vend HQ,,Cash Rounding UAE,AE,NORMAL,3002
+662,Dana Mall,34011,176028,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DANA,Vend HQ,,Cash Rounding,SA,NORMAL,1701
+663,Exhibition-SA3,67014,382046,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,EXBSA03,Vend HQ,,Cash Rounding,SA,NORMAL,110
+664,Exhibition-SA4,67015,382047,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,EXBSA04,Vend HQ,,Cash Rounding,SA,NORMAL,110
+665,Arab Mall,2001,10001,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ARABMALL,Vend HQ,,Cash Rounding,SA,NORMAL,210
+666,Yasmeen Mall,14,1033,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,YASMEEN,Vend HQ,,Cash Rounding,SA,NORMAL,207
+667,Makkah Mall,2002,10002,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKKAH,Vend HQ,,Cash Rounding,SA,NORMAL,1401
+668,Al Ula,45013,210030,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALULA,Vend HQ,,Cash Rounding,SA,NORMAL,1502
+669,Mrsool,45015,210080,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKTOWER,Vend HQ,,Cash Rounding,SA,MRSOOL,1402
+670,Makkah Tower,55011,338044,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKTOWER,Vend HQ,,Cash Rounding,SA,NORMAL,1402
+671,Hungerstation,45014,210038,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKTOWER,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1402
+672,Yas Mall,55015,338048,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,YASKIOSK,Vend HQ,,Cash Rounding UAE,AE,NORMAL,3003
+673,Mrsool,45015,210082,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ONAIZAH,Vend HQ,,Cash Rounding,SA,MRSOOL,1102
+674,Hungerstation,45014,210040,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ONAIZAH,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1102
+675,Onaizah Store,55013,338046,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ONAIZAH,Vend HQ,,Cash Rounding,SA,NORMAL,1102
+676,Mrsool,45015,210082,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,EXBSA,Vend HQ,,Cash Rounding,SA,MRSOOL,113
+4717,Tabby Saudi For communication and IT,50011,449115,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,ALKOUTMALL,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,TABBY,7005
+5717,Nakhla IT Systems (LLC) Tamara,69011,449117,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,ALKOUTMALL,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,TAMARA,7005
+3717,ALKOUTMALL,72011,446109,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,ALKOUTMALL,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,NORMAL,7005
+8717,GATEMALL,72013,447109,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,GATEMALL,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,NORMAL,7006
+6717,Tabby Saudi For communication and IT,50011,449116,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,GATEMALL,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,TABBY,7006
+7717,Nakhla IT Systems (LLC) Tamara,69011,449118,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,GATEMALL,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,TAMARA,7006
+1679,SALALAH,72012,446110,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,SALALAH,Vend HQ,,Cash Rounding OMN,OM,NORMAL,
+3668,AJAWEED,72015,447111,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,AJAWEED,Vend HQ,,Cash Rounding,SA,NORMAL,216
+4614,Hungerstation,45014,449126,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,AJAWEED,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,216
+5668,Tabby Saudi For communication and IT,50011,449110,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,AJAWEED,Vend HQ,,Cash Rounding,SA,TABBY,216
+6668,Nakhla IT Systems (LLC) Tamara,69011,449119,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,AJAWEED,Vend HQ,,Cash Rounding,SA,TAMARA,216
+7601,Mrsool,45015,449133,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,AJAWEED,Vend HQ,,Cash Rounding,SA,MRSOOL,216
+8668,RYDAVENUE,72016,447112,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDAVENUE,Vend HQ,,Cash Rounding,SA,NORMAL,116
+9614,Hungerstation,45014,449127,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDAVENUE,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,116
+10668,Tabby Saudi For communication and IT,50011,449111,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDAVENUE,Vend HQ,,Cash Rounding,SA,TABBY,116
+11668,Nakhla IT Systems (LLC) Tamara,69011,449120,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDAVENUE,Vend HQ,,Cash Rounding,SA,TAMARA,116
+12601,Mrsool,45015,449134,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDAVENUE,Vend HQ,,Cash Rounding,SA,MRSOOL,116
+13668,RYDPARK,72017,447113,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDPARK,Vend HQ,,Cash Rounding,SA,NORMAL,117
+14614,Hungerstation,45014,449128,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDPARK,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,117
+15668,Tabby Saudi For communication and IT,50011,449112,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDPARK,Vend HQ,,Cash Rounding,SA,TABBY,117
+16668,Nakhla IT Systems (LLC) Tamara,69011,449121,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDPARK,Vend HQ,,Cash Rounding,SA,TAMARA,117
+17601,Mrsool,45015,449135,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDPARK,Vend HQ,,Cash Rounding,SA,MRSOOL,117
+18668,OBHURMALL,72018,447114,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,OBHURMALL,Vend HQ,,Cash Rounding,SA,NORMAL,217
+19614,Hungerstation,45014,449129,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,OBHURMALL,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,217
+20668,Tabby Saudi For communication and IT,50011,449113,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,OBHURMALL,Vend HQ,,Cash Rounding,SA,TABBY,217
+21668,Nakhla IT Systems (LLC) Tamara,69011,449122,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,OBHURMALL,Vend HQ,,Cash Rounding,SA,TAMARA,217
+22601,Mrsool,45015,449136,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,OBHURMALL,Vend HQ,,Cash Rounding,SA,MRSOOL,217
+23668,HAMDANIIYA,72019,447115,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAMDANIIYA,Vend HQ,,Cash Rounding,SA,NORMAL,218
+24614,Hungerstation,45014,449130,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAMDANIIYA,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,218
+25668,Tabby Saudi For communication and IT,50011,449114,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAMDANIIYA,Vend HQ,,Cash Rounding,SA,TABBY,218
+26668,Nakhla IT Systems (LLC) Tamara,69011,449123,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAMDANIIYA,Vend HQ,,Cash Rounding,SA,TAMARA,218
+27601,Mrsool,45015,449137,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAMDANIIYA,Vend HQ,,Cash Rounding,SA,MRSOOL,218
+1366833,RIYADHDST,83017,525147,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RIYADHDST,Vend HQ,,Cash Rounding,SA,NORMAL,122
+2366833,Hungerstation,45014,525149,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RIYADHDST,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,122
+1566833,Tabby Saudi For communication and IT,50011,525152,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RIYADHDST,Vend HQ,,Cash Rounding,SA,TABBY,122
+1666833,Nakhla IT Systems (LLC) Tamara,69011,525154,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RIYADHDST,Vend HQ,,Cash Rounding,SA,TAMARA,122
+1760133,Mrsool,45015,525156,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RIYADHDST,Vend HQ,,Cash Rounding,SA,MRSOOL,122
+1366834,RYDSHIFA,83018,525148,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDSHIFA,Vend HQ,,Cash Rounding,SA,NORMAL,121
+2366834,Hungerstation,45014,525151,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDSHIFA,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,121
+1566834,Tabby Saudi For communication and IT,50011,525153,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDSHIFA,Vend HQ,,Cash Rounding,SA,TABBY,121
+1666834,Nakhla IT Systems (LLC) Tamara,69011,525155,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDSHIFA,Vend HQ,,Cash Rounding,SA,TAMARA,121
+1760134,Mrsool,45015,525157,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDSHIFA,Vend HQ,,Cash Rounding,SA,MRSOOL,121
+1366835,JAHARKWT,84020,528124,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,JAHARKWT,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,NORMAL,121
+236722,Mrsool,45015,548175,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,QUNKYLPLZA,Vend HQ,,Cash Rounding,SA,MRSOOL,1004
+236723,Tabby Saudi For communication and IT,50011,548198,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,QUNKYLPLZA,Vend HQ,,Cash Rounding,SA,TABBY,1004
+236724,Nakhla IT Systems (LLC) Tamara,69011,548222,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,QUNKYLPLZA,Vend HQ,,Cash Rounding,SA,TAMARA,1004
+236725,ALBAHAMAL,87021,548130,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALBAHAMAL,Vend HQ,,Cash Rounding,SA,NORMAL,1003
+236726,Hungerstation,45014,548153,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALBAHAMAL,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1003
+236727,Mrsool,45015,548176,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALBAHAMAL,Vend HQ,,Cash Rounding,SA,MRSOOL,1003
+236728,Tabby Saudi For communication and IT,50011,548199,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALBAHAMAL,Vend HQ,,Cash Rounding,SA,TABBY,1003
+236729,Nakhla IT Systems (LLC) Tamara,69011,548223,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALBAHAMAL,Vend HQ,,Cash Rounding,SA,TAMARA,1003
+236730,JEDCORNCH1,87022,548131,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDCORNCH1,Vend HQ,,Cash Rounding,SA,NORMAL,221
+1562,Tabby Saudi For communication and IT,50011,445061,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,Avenues,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,TABBY,7001
+2562,Nakhla IT Systems (LLC) Tamara,69011,445057,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,Avenues,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,TAMARA,7001
+1636,Tabby Saudi For communication and IT,50011,445063,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,Hall 8,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,TABBY,7002
+2636,Nakhla IT Systems (LLC) Tamara,69011,445058,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,Hall 8,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,TAMARA,7002
+1637,Tabby Saudi For communication and IT,50011,445064,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,Hall 4,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,TABBY,7003
+2637,Nakhla IT Systems (LLC) Tamara,69011,445059,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,Hall 4,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,TAMARA,7003
+1717,Tabby Saudi For communication and IT,50011,445065,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,AVENUKIOSK,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,TABBY,7004
+2717,Nakhla IT Systems (LLC) Tamara,69011,445060,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,AVENUKIOSK,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,TAMARA,7004
+1680,Tabby Saudi For communication and IT,50011,445069,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,FUJAIRAHCC,Vend HQ,,Cash Rounding UAE,AE,TABBY,3402
+2680,Nakhla IT Systems (LLC) Tamara,69011,445082,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,FUJAIRAHCC,Vend HQ,,Cash Rounding UAE,AE,TAMARA,3402
+1716,Tabby Saudi For communication and IT,50011,445070,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,MIRDIFFCC,Vend HQ,,Cash Rounding UAE,AE,TABBY,3104
+2716,Nakhla IT Systems (LLC) Tamara,69011,445083,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,MIRDIFFCC,Vend HQ,,Cash Rounding UAE,AE,TAMARA,3104
+1564,Tabby Saudi For communication and IT,50011,445066,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,ZAHIA,Vend HQ,,Cash Rounding UAE,AE,TABBY,3202
+2564,Nakhla IT Systems (LLC) Tamara,69011,445079,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,ZAHIA,Vend HQ,,Cash Rounding UAE,AE,TAMARA,3202
+1639,Tabby Saudi For communication and IT,50011,445067,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,DUBMAL,Vend HQ,,Cash Rounding UAE,AE,TABBY,3101
+2639,Nakhla IT Systems (LLC) Tamara,69011,445080,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,DUBMAL,Vend HQ,,Cash Rounding UAE,AE,TAMARA,3101
+1641,Tabby Saudi For communication and IT,50011,495111,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,CITYWALK,Vend HQ,,Cash Rounding UAE,AE,TABBY,3101
+2641,Nakhla IT Systems (LLC) Tamara,69011,445087,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,CITYWALK,Vend HQ,,Cash Rounding UAE,AE,TAMARA,3101
+1642,Tabby Saudi For communication and IT,50011,445074,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,MARSASEEF,Vend HQ,,Cash Rounding UAE,AE,TABBY,3003
+2642,Nakhla IT Systems (LLC) Tamara,69011,445088,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,MARSASEEF,Vend HQ,,Cash Rounding UAE,AE,TAMARA,3003
+1656,Tabby Saudi For communication and IT,50011,445075,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,SAHARH,Vend HQ,,Cash Rounding UAE,AE,TABBY,3201
+2656,Nakhla IT Systems (LLC) Tamara,69011,445089,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,SAHARH,Vend HQ,,Cash Rounding UAE,AE,TAMARA,3201
+1657,Tabby Saudi For communication and IT,50011,445076,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,ALAIN,Vend HQ,,Cash Rounding UAE,AE,TABBY,3301
+2657,Nakhla IT Systems (LLC) Tamara,69011,445090,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,ALAIN,Vend HQ,,Cash Rounding UAE,AE,TAMARA,3301
+1658,Tabby Saudi For communication and IT,50011,445077,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,FUJAIRAH,Vend HQ,,Cash Rounding UAE,AE,TABBY,3402
+2658,Nakhla IT Systems (LLC) Tamara,69011,445091,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,FUJAIRAH,Vend HQ,,Cash Rounding UAE,AE,TAMARA,3402
+1659,Tabby Saudi For communication and IT,50011,445078,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,MANARRAK,Vend HQ,,Cash Rounding UAE,AE,TABBY,3501
+2659,Nakhla IT Systems (LLC) Tamara,69011,445092,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,MANARRAK,Vend HQ,,Cash Rounding UAE,AE,TAMARA,3501
+1660,Tabby Saudi For communication and IT,50011,445072,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,WEHDA,Vend HQ,,Cash Rounding UAE,AE,TABBY,3001
+2660,Nakhla IT Systems (LLC) Tamara,69011,445085,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,WEHDA,Vend HQ,,Cash Rounding UAE,AE,TAMARA,3001
+1661,Tabby Saudi For communication and IT,50011,445073,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,DEERFIELDS,Vend HQ,,Cash Rounding UAE,AE,TABBY,3002
+2661,Nakhla IT Systems (LLC) Tamara,69011,445086,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,DEERFIELDS,Vend HQ,,Cash Rounding UAE,AE,TAMARA,3002
+1672,Tabby Saudi For communication and IT,50011,445068,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,YASKIOSK,Vend HQ,,Cash Rounding UAE,AE,TABBY,3003
+2672,Nakhla IT Systems (LLC) Tamara,69011,445081,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,YASKIOSK,Vend HQ,,Cash Rounding UAE,AE,TAMARA,3003
+1366831,KHURAISSQ,83012,525118,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHURAISSQ,Vend HQ,,Cash Rounding,SA,NORMAL,120
+2366831,Hungerstation,45014,525122,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHURAISSQ,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,120
+1566831,Tabby Saudi For communication and IT,50011,525125,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHURAISSQ,Vend HQ,,Cash Rounding,SA,TABBY,120
+1666831,Nakhla IT Systems (LLC) Tamara,69011,525129,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHURAISSQ,Vend HQ,,Cash Rounding,SA,TAMARA,120
+1760131,Mrsool,45015,525132,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHURAISSQ,Vend HQ,,Cash Rounding,SA,MRSOOL,120
+1366832,PRNCSLRD,83015,525121,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,PRNCSLRD,Vend HQ,,Cash Rounding,SA,NORMAL,219
+2366832,Hungerstation,45014,525123,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,PRNCSLRD,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,219
+1566832,Tabby Saudi For communication and IT,50011,525126,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,PRNCSLRD,Vend HQ,,Cash Rounding,SA,TABBY,219
+1666832,Nakhla IT Systems (LLC) Tamara,69011,525130,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,PRNCSLRD,Vend HQ,,Cash Rounding,SA,TAMARA,219
+1760132,Mrsool,45015,525133,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,PRNCSLRD,Vend HQ,,Cash Rounding,SA,MRSOOL,219
+136684,MEDANDLUSH,85012,537119,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDANDLUSH,Vend HQ,,Cash Rounding,SA,NORMAL,305
+236684,Hungerstation,45014,537120,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDANDLUSH,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,305
+156684,Tabby Saudi For communication and IT,50011,537121,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDANDLUSH,Vend HQ,,Cash Rounding,SA,TABBY,305
+166684,Nakhla IT Systems (LLC) Tamara,69011,537123,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDANDLUSH,Vend HQ,,Cash Rounding,SA,TAMARA,305
+176014,Mrsool,45015,537124,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDANDLUSH,Vend HQ,,Cash Rounding,SA,MRSOOL,305
+236731,Hungerstation,45014,548154,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDCORNCH1,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,221
+236732,Mrsool,45015,548177,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDCORNCH1,Vend HQ,,Cash Rounding,SA,MRSOOL,221
+236733,Tabby Saudi For communication and IT,50011,548200,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDCORNCH1,Vend HQ,,Cash Rounding,SA,TABBY,221
+236734,Nakhla IT Systems (LLC) Tamara,69011,548224,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDCORNCH1,Vend HQ,,Cash Rounding,SA,TAMARA,221
+236735,KHAMESBLD,87023,548132,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHAMESBLD,Vend HQ,,Cash Rounding,SA,NORMAL,504
+236736,Hungerstation,45014,548155,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHAMESBLD,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,504
+236737,Mrsool,45015,548178,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHAMESBLD,Vend HQ,,Cash Rounding,SA,MRSOOL,504
+236738,Tabby Saudi For communication and IT,50011,548201,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHAMESBLD,Vend HQ,,Cash Rounding,SA,TABBY,504
+236739,Nakhla IT Systems (LLC) Tamara,69011,548225,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHAMESBLD,Vend HQ,,Cash Rounding,SA,TAMARA,504
+236740,MEDSULTANA,87024,548133,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDSULTANA,Vend HQ,,Cash Rounding,SA,NORMAL,308
+236741,Hungerstation,45014,548156,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDSULTANA,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,308
+236742,Mrsool,45015,548179,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDSULTANA,Vend HQ,,Cash Rounding,SA,MRSOOL,308
+236743,Tabby Saudi For communication and IT,50011,548202,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDSULTANA,Vend HQ,,Cash Rounding,SA,TABBY,308
+236744,Nakhla IT Systems (LLC) Tamara,69011,548226,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDSULTANA,Vend HQ,,Cash Rounding,SA,TAMARA,308
+236745,MCTAVENUES,87025,548134,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,MCTAVENUES,Vend HQ,,Cash Rounding OMN,OM,NORMAL,5006
+236746,Hungerstation,45014,548157,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,MCTAVENUES,Vend HQ,,Cash Rounding OMN,OM,HUNGERSTATION,5006
+236747,Mrsool,45015,548180,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,MCTAVENUES,Vend HQ,,Cash Rounding OMN,OM,MRSOOL,5006
+236748,Tabby Saudi For communication and IT,50011,548203,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,MCTAVENUES,Vend HQ,,Cash Rounding OMN,OM,TABBY,5006
+236749,Nakhla IT Systems (LLC) Tamara,69011,548227,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,MCTAVENUES,Vend HQ,,Cash Rounding OMN,OM,TAMARA,5006
+236750,MCTLLUIBRI,87026,548135,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,MCTLLUIBRI,Vend HQ,,Cash Rounding OMN,OM,NORMAL,5007
+236751,Hungerstation,45014,548158,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,MCTLLUIBRI,Vend HQ,,Cash Rounding OMN,OM,HUNGERSTATION,5007
+236752,Mrsool,45015,548181,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,MCTLLUIBRI,Vend HQ,,Cash Rounding OMN,OM,MRSOOL,5007
+236753,Tabby Saudi For communication and IT,50011,548204,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,MCTLLUIBRI,Vend HQ,,Cash Rounding OMN,OM,TABBY,5007
+236754,Nakhla IT Systems (LLC) Tamara,69011,548228,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,MCTLLUIBRI,Vend HQ,,Cash Rounding OMN,OM,TAMARA,5007
+236755,MCTLLUAMRT,87027,548136,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,MCTLLUAMRT,Vend HQ,,Cash Rounding OMN,OM,NORMAL,5008
+236756,Hungerstation,45014,548159,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,MCTLLUAMRT,Vend HQ,,Cash Rounding OMN,OM,HUNGERSTATION,5008
+236757,Mrsool,45015,548182,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,MCTLLUAMRT,Vend HQ,,Cash Rounding OMN,OM,MRSOOL,5008
+236758,Tabby Saudi For communication and IT,50011,548205,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,MCTLLUAMRT,Vend HQ,,Cash Rounding OMN,OM,TABBY,5008
+236759,Nakhla IT Systems (LLC) Tamara,69011,548229,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,MCTLLUAMRT,Vend HQ,,Cash Rounding OMN,OM,TAMARA,5008
+236760,MCTLLUNZWA,87028,548137,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,MCTLLUNZWA,Vend HQ,,Cash Rounding OMN,OM,NORMAL,5009
+236761,Hungerstation,45014,548160,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,MCTLLUNZWA,Vend HQ,,Cash Rounding OMN,OM,HUNGERSTATION,5009
+236762,Mrsool,45015,548183,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,MCTLLUNZWA,Vend HQ,,Cash Rounding OMN,OM,MRSOOL,5009
+236763,Tabby Saudi For communication and IT,50011,548207,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,MCTLLUNZWA,Vend HQ,,Cash Rounding OMN,OM,TABBY,5009
+236764,Nakhla IT Systems (LLC) Tamara,69011,548230,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,MCTLLUNZWA,Vend HQ,,Cash Rounding OMN,OM,TAMARA,5009
+236765,MAKDNACNTR,87029,548138,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKDNACNTR,Vend HQ,,Cash Rounding,SA,NORMAL,1406
+236766,Hungerstation,45014,548161,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKDNACNTR,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1406
+236767,Mrsool,45015,548184,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKDNACNTR,Vend HQ,,Cash Rounding,SA,MRSOOL,1406
+236768,Tabby Saudi For communication and IT,50011,548208,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKDNACNTR,Vend HQ,,Cash Rounding,SA,TABBY,1406
+236769,Nakhla IT Systems (LLC) Tamara,69011,548231,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKDNACNTR,Vend HQ,,Cash Rounding,SA,TAMARA,1406
+236770,ABHLVNDAPK,87030,548139,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ABHLVNDAPK,Vend HQ,,Cash Rounding,SA,NORMAL,505
+236771,Hungerstation,45014,548162,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ABHLVNDAPK,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,505
+236772,Mrsool,45015,548185,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ABHLVNDAPK,Vend HQ,,Cash Rounding,SA,MRSOOL,505
+236773,Tabby Saudi For communication and IT,50011,548209,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ABHLVNDAPK,Vend HQ,,Cash Rounding,SA,TABBY,505
+236774,Nakhla IT Systems (LLC) Tamara,69011,548232,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ABHLVNDAPK,Vend HQ,,Cash Rounding,SA,TAMARA,505
+236775,MAKMYANYRD,87031,548140,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKMYANYRD,Vend HQ,,Cash Rounding,SA,NORMAL,1407
+236776,Hungerstation,45014,548163,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKMYANYRD,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1407
+236777,Mrsool,45015,548186,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKMYANYRD,Vend HQ,,Cash Rounding,SA,MRSOOL,1407
+236778,Tabby Saudi For communication and IT,50011,548210,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKMYANYRD,Vend HQ,,Cash Rounding,SA,TABBY,1407
+236779,Nakhla IT Systems (LLC) Tamara,69011,548233,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKMYANYRD,Vend HQ,,Cash Rounding,SA,TAMARA,1407
+236780,MEDDARIMAN,87032,548141,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDDARIMAN,Vend HQ,,Cash Rounding,SA,NORMAL,306
+236781,Hungerstation,45014,548164,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDDARIMAN,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,306
+236782,Mrsool,45015,548187,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDDARIMAN,Vend HQ,,Cash Rounding,SA,MRSOOL,306
+236783,Tabby Saudi For communication and IT,50011,548211,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDDARIMAN,Vend HQ,,Cash Rounding,SA,TABBY,306
+236784,Nakhla IT Systems (LLC) Tamara,69011,548234,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDDARIMAN,Vend HQ,,Cash Rounding,SA,TAMARA,306
+236785,MEDALHIJRA,87033,548142,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDALHIJRA,Vend HQ,,Cash Rounding,SA,NORMAL,309
+236786,Hungerstation,45014,548165,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDALHIJRA,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,309
+236787,Mrsool,45015,548188,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDALHIJRA,Vend HQ,,Cash Rounding,SA,MRSOOL,309
+236788,Tabby Saudi For communication and IT,50011,548212,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDALHIJRA,Vend HQ,,Cash Rounding,SA,TABBY,309
+236789,Nakhla IT Systems (LLC) Tamara,69011,548235,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDALHIJRA,Vend HQ,,Cash Rounding,SA,TAMARA,309
+236790,MEDMVNPICK,87034,548143,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDMVNPICK,Vend HQ,,Cash Rounding,SA,NORMAL,307
+236791,Hungerstation,45014,548166,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDMVNPICK,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,307
+236792,Mrsool,45015,548189,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDMVNPICK,Vend HQ,,Cash Rounding,SA,MRSOOL,307
+236793,Tabby Saudi For communication and IT,50011,548213,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDMVNPICK,Vend HQ,,Cash Rounding,SA,TABBY,307
+236794,Nakhla IT Systems (LLC) Tamara,69011,548236,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDMVNPICK,Vend HQ,,Cash Rounding,SA,TAMARA,307
+236795,RYDALYAPLZ,87035,548144,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDALYAPLZ,Vend HQ,,Cash Rounding,SA,NORMAL,125
+236796,Hungerstation,45014,548167,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDALYAPLZ,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,125
+236797,Mrsool,45015,548190,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDALYAPLZ,Vend HQ,,Cash Rounding,SA,MRSOOL,125
+236798,Tabby Saudi For communication and IT,50011,548214,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDALYAPLZ,Vend HQ,,Cash Rounding,SA,TABBY,125
+236799,Nakhla IT Systems (LLC) Tamara,69011,548237,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDALYAPLZ,Vend HQ,,Cash Rounding,SA,TAMARA,125
+2366835,MUBARKIA,88013,561120,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,MUBARKIA,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,NORMAL,7008
+2366836,Hungerstation,45014,561131,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,MUBARKIA,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,HUNGERSTATION,7008
+2366837,Mrsool,45015,561141,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,MUBARKIA,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,MRSOOL,7008
+2366838,Tabby Saudi For communication and IT,50011,561151,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,MUBARKIA,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,TABBY,7008
+2366839,Nakhla IT Systems (LLC) Tamara,69011,561163,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,MUBARKIA,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,TAMARA,7008
+2366840,SMARTSHRYD,88015,561122,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SMARTSHRYD,Vend HQ,,Cash Rounding,SA,NORMAL,1405
+2366841,Hungerstation,45014,561132,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SMARTSHRYD,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1405
+2366842,Mrsool,45015,561142,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SMARTSHRYD,Vend HQ,,Cash Rounding,SA,MRSOOL,1405
+2366843,Tabby Saudi For communication and IT,50011,561152,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SMARTSHRYD,Vend HQ,,Cash Rounding,SA,TABBY,1405
+2366844,Nakhla IT Systems (LLC) Tamara,69011,561164,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SMARTSHRYD,Vend HQ,,Cash Rounding,SA,TAMARA,1405
+2366845,HAMDANYA2,88016,561123,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAMDANYA2,Vend HQ,,Cash Rounding,SA,NORMAL,1005
+2366846,Hungerstation,45014,561133,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAMDANYA2,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1005
+2366847,Mrsool,45015,561143,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAMDANYA2,Vend HQ,,Cash Rounding,SA,MRSOOL,1005
+2366848,Tabby Saudi For communication and IT,50011,561153,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAMDANYA2,Vend HQ,,Cash Rounding,SA,TABBY,1005
+2366849,Nakhla IT Systems (LLC) Tamara,69011,561165,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAMDANYA2,Vend HQ,,Cash Rounding,SA,TAMARA,1005
+2366850,TAIBAMED,88017,561124,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TAIBAMED,Vend HQ,,Cash Rounding,SA,NORMAL,1303
+2366851,Hungerstation,45014,561134,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TAIBAMED,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1303
+2366852,Mrsool,45015,561144,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TAIBAMED,Vend HQ,,Cash Rounding,SA,MRSOOL,1303
+2366853,Tabby Saudi For communication and IT,50011,561154,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TAIBAMED,Vend HQ,,Cash Rounding,SA,TABBY,1303
+2366854,Nakhla IT Systems (LLC) Tamara,69011,561166,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TAIBAMED,Vend HQ,,Cash Rounding,SA,TAMARA,1303
+2366855,DEERFIELD2,88018,561125,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,DEERFIELD2,Vend HQ,,Cash Rounding UAE,AE,NORMAL,3004
+2366856,Hungerstation,45014,561135,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,DEERFIELD2,Vend HQ,,Cash Rounding UAE,AE,HUNGERSTATION,3004
+2366857,Mrsool,45015,561145,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,DEERFIELD2,Vend HQ,,Cash Rounding UAE,AE,MRSOOL,3004
+2366858,Tabby Saudi For communication and IT,50011,561156,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,DEERFIELD2,Vend HQ,,Cash Rounding UAE,AE,TABBY,3004
+2366859,Nakhla IT Systems (LLC) Tamara,69011,561167,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,DEERFIELD2,Vend HQ,,Cash Rounding UAE,AE,TAMARA,3004
+2366860,ALAQEQRYD,88019,561126,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALAQEQRYD,Vend HQ,,Cash Rounding,SA,NORMAL,123
+2366861,Hungerstation,45014,561136,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALAQEQRYD,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,123
+2366862,Mrsool,45015,561146,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALAQEQRYD,Vend HQ,,Cash Rounding,SA,MRSOOL,123
+2366863,Tabby Saudi For communication and IT,50011,561157,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALAQEQRYD,Vend HQ,,Cash Rounding,SA,TABBY,123
+2366864,Nakhla IT Systems (LLC) Tamara,69011,561168,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALAQEQRYD,Vend HQ,,Cash Rounding,SA,TAMARA,123
+2366865,AZIZIARYD,88020,561127,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,AZIZIARYD,Vend HQ,,Cash Rounding,SA,NORMAL,124
+2366866,Hungerstation,45014,561137,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,AZIZIARYD,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,124
+2366867,Mrsool,45015,561147,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,AZIZIARYD,Vend HQ,,Cash Rounding,SA,MRSOOL,124
+2366868,Tabby Saudi For communication and IT,50011,561158,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,AZIZIARYD,Vend HQ,,Cash Rounding,SA,TABBY,124
+2366869,Nakhla IT Systems (LLC) Tamara,69011,561169,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,AZIZIARYD,Vend HQ,,Cash Rounding,SA,TAMARA,124
+2366870,THEGATERYD,88021,561128,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,THEGATERYD,Vend HQ,,Cash Rounding,SA,NORMAL,1004
+2366871,Hungerstation,45014,561138,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,THEGATERYD,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1004
+2366872,Mrsool,45015,561148,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,THEGATERYD,Vend HQ,,Cash Rounding,SA,MRSOOL,1004
+2366873,Tabby Saudi For communication and IT,50011,561159,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,THEGATERYD,Vend HQ,,Cash Rounding,SA,TABBY,1004
+2366874,Nakhla IT Systems (LLC) Tamara,69011,561170,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,THEGATERYD,Vend HQ,,Cash Rounding,SA,TAMARA,1004
+2366875,ALMALGARYD,88022,561129,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALMALGARYD,Vend HQ,,Cash Rounding,SA,NORMAL,1003
+2366876,Hungerstation,45014,561139,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALMALGARYD,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1003
+2366877,Mrsool,45015,561149,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALMALGARYD,Vend HQ,,Cash Rounding,SA,MRSOOL,1003
+2366878,Tabby Saudi For communication and IT,50011,561160,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALMALGARYD,Vend HQ,,Cash Rounding,SA,TABBY,1003
+2366879,Nakhla IT Systems (LLC) Tamara,69011,561171,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALMALGARYD,Vend HQ,,Cash Rounding,SA,TAMARA,1003
+2366880,MEDTHEGATE,88023,561130,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDTHEGATE,Vend HQ,,Cash Rounding,SA,NORMAL,221
+2366881,Hungerstation,45014,561140,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDTHEGATE,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,221
+2366882,Mrsool,45015,561150,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDTHEGATE,Vend HQ,,Cash Rounding,SA,MRSOOL,221
+2366883,Tabby Saudi For communication and IT,50011,561162,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDTHEGATE,Vend HQ,,Cash Rounding,SA,TABBY,221
+2366884,Nakhla IT Systems (LLC) Tamara,69011,561172,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDTHEGATE,Vend HQ,,Cash Rounding,SA,TAMARA,221
+236810,HILTONMAK2,93012,573127,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HILTONMAK2,Vend HQ,,Cash Rounding,SA,NORMAL,1408
+236811,Hungerstation,45014,574120,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HILTONMAK2,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1408
+236812,Mrsool,45015,574122,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HILTONMAK2,Vend HQ,,Cash Rounding,SA,MRSOOL,1408
+236813,Tabby Saudi For communication and IT,50011,574123,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HILTONMAK2,Vend HQ,,Cash Rounding,SA,TABBY,1408
+236814,Nakhla IT Systems (LLC) Tamara,69011,574124,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HILTONMAK2,Vend HQ,,Cash Rounding,SA,TAMARA,1408
+23731500,KHAMISKKHD,98014,586119,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHAMISKKHD,Vend HQ,,Cash Rounding,SA,NORMAL,506
+23731501,Hungerstation,45014,586123,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHAMISKKHD,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,506
+23731502,Tabby Saudi For communication and IT,50011,586129,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHAMISKKHD,Vend HQ,,Cash Rounding,SA,TABBY,506
+23731507,Tabby Saudi For communication and IT,50011,611144,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDSAWARIP,Vend HQ,,Cash Rounding,SA,TABBY,131
+23731508,Nakhla IT Systems (LLC) Tamara,69011,611146,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDSAWARIP,Vend HQ,,Cash Rounding,SA,TAMARA,131
+23731509,Mrsool,45015,611140,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDSAWARIP,Vend HQ,,Cash Rounding,SA,MRSOOL,131
+23731510,ABHATIMSQR,100016,611134,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ABHATIMSQR,Vend HQ,,Cash Rounding,SA,NORMAL,507
+23731511,Hungerstation,45014,611138,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ABHATIMSQR,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,507
+23731512,Tabby Saudi For communication and IT,50011,611145,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ABHATIMSQR,Vend HQ,,Cash Rounding,SA,TABBY,507
+23731513,Nakhla IT Systems (LLC) Tamara,69011,611147,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ABHATIMSQR,Vend HQ,,Cash Rounding,SA,TAMARA,507
+23731514,Mrsool,45015,611142,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ABHATIMSQR,Vend HQ,,Cash Rounding,SA,MRSOOL,507
+23731517,Tabby Saudi For communication and IT,50011,624127,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TOWNSQJED,Vend HQ,,Cash Rounding,SA,TABBY,227
+23731518,Hungerstation,45014,624124,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TOWNSQJED,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,227
+23731519,TOWNSQJED,104012,624120,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TOWNSQJED,Vend HQ,,Cash Rounding,SA,NORMAL,227
+23731532,Tabby Saudi For communication and IT,50011,630143,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHOQOSAIBI,Vend HQ,,Cash Rounding,SA,TABBY,402
+23731531,Hungerstation,45014,633122,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHOQOSAIBI,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,402
+23731530,KHOQOSAIBI,106012,633120,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHOQOSAIBI,Vend HQ,,Cash Rounding,SA,NORMAL,402
+23731540,SAMTAHMALL,108012,636131,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SAMTAHMALL,Vend HQ,,Cash Rounding,SA,NORMAL,1306
+23731541,Hungerstation,45014,636134,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SAMTAHMALL,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1306
+23731557,Tabby Saudi For communication and IT,50011,639143,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,WATANIYAHB,Vend HQ,,Cash Rounding,SA,TABBY,804
+23731552,Tabby Saudi For communication and IT,50011,636136,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SAMTAHMALL,Vend HQ,,Cash Rounding,SA,TABBY,1306
+23731553,Nakhla IT Systems (LLC) Tamara,69011,636137,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SAMTAHMALL,Vend HQ,,Cash Rounding,SA,TAMARA,1306
+23731554,Mrsool,45015,636135,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SAMTAHMALL,Vend HQ,,Cash Rounding,SA,MRSOOL,1306
+23731559,Mrsool,45015,639149,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,WATANIYAHB,Vend HQ,,Cash Rounding,SA,MRSOOL,804
+23731558,Nakhla IT Systems (LLC) Tamara,69011,639146,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,WATANIYAHB,Vend HQ,,Cash Rounding,SA,TAMARA,804
+23731556,Hungerstation,45014,639138,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,WATANIYAHB,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,804
+23731555,WATANIYAHB,110013,639133,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,WATANIYAHB,Vend HQ,,Cash Rounding,SA,NORMAL,804
+2368291,Nakhla IT Systems (LLC) Tamara,69011,577143,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SABIAYASMN,Vend HQ,,Cash Rounding,SA,TAMARA,1304
+2368281,Tabby Saudi For communication and IT,50011,577138,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SABIAYASMN,Vend HQ,,Cash Rounding,SA,TABBY,1304
+2368271,Mrsool,45015,577133,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SABIAYASMN,Vend HQ,,Cash Rounding,SA,MRSOOL,1304
+2368261,Hungerstation,45014,577127,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SABIAYASMN,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1304
+2368251,SABIAYASMN,95013,577120,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SABIAYASMN,Vend HQ,,Cash Rounding,SA,NORMAL,1304
+2369291,Nakhla IT Systems (LLC) Tamara,69011,577144,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKAHMEJAZ,Vend HQ,,Cash Rounding,SA,TAMARA,1409
+2369281,Tabby Saudi For communication and IT,50011,577139,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKAHMEJAZ,Vend HQ,,Cash Rounding,SA,TABBY,1409
+2369271,Mrsool,45015,577134,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKAHMEJAZ,Vend HQ,,Cash Rounding,SA,MRSOOL,1409
+2369261,Hungerstation,45014,577128,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKAHMEJAZ,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1409
+2369251,MAKAHMEJAZ,95014,577121,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKAHMEJAZ,Vend HQ,,Cash Rounding,SA,NORMAL,1409
+2370291,Nakhla IT Systems (LLC) Tamara,69011,577145,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAJKINGROD,Vend HQ,,Cash Rounding,SA,TAMARA,1307
+2370281,Tabby Saudi For communication and IT,50011,577140,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAJKINGROD,Vend HQ,,Cash Rounding,SA,TABBY,1307
+2370271,Mrsool,45015,577135,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAJKINGROD,Vend HQ,,Cash Rounding,SA,MRSOOL,1307
+2370261,Hungerstation,45014,577129,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAJKINGROD,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1307
+2370251,NAJKINGROD,95015,577123,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAJKINGROD,Vend HQ,,Cash Rounding,SA,NORMAL,1307
+2371291,Nakhla IT Systems (LLC) Tamara,69011,577146,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAJRANPLZA,Vend HQ,,Cash Rounding,SA,TAMARA,1308
+2371281,Tabby Saudi For communication and IT,50011,577141,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAJRANPLZA,Vend HQ,,Cash Rounding,SA,TABBY,1308
+2371271,Mrsool,45015,577136,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAJRANPLZA,Vend HQ,,Cash Rounding,SA,MRSOOL,1308
+2371261,Hungerstation,45014,577131,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAJRANPLZA,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1308
+2371251,NAJRANPLZA,95017,577125,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAJRANPLZA,Vend HQ,,Cash Rounding,SA,NORMAL,1308
+2367939,Nakhla IT Systems (LLC) Tamara,69011,577147,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,KUWTMARINA,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,TAMARA,7009
+2367938,Tabby Saudi For communication and IT,50011,577142,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,KUWTMARINA,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,TABBY,7009
+2367937,Mrsool,45015,577137,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,KUWTMARINA,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,MRSOOL,7009
+2367936,Hungerstation,45014,577132,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,KUWTMARINA,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,HUNGERSTATION,7009
+2367935,KUWTMARINA,95018,577126,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,KUWTMARINA,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,NORMAL,7009
+2820,Nakhla IT Systems (LLC) Tamara,69011,586131,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,DUBAIDALMA,Vend HQ,,Cash Rounding UAE,AE,TAMARA,3005
+2819,Tabby Saudi For communication and IT,50011,586128,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,DUBAIDALMA,Vend HQ,,Cash Rounding UAE,AE,TABBY,3005
+2818,Mrsool,45015,586125,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,DUBAIDALMA,Vend HQ,,Cash Rounding UAE,AE,MRSOOL,3005
+2817,Hungerstation,45014,586121,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,DUBAIDALMA,Vend HQ,,Cash Rounding UAE,AE,HUNGERSTATION,3005
+2816,DUBAIDALMA,98013,586118,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,DUBAIDALMA,Vend HQ,,Cash Rounding UAE,AE,NORMAL,3005
+23731503,Nakhla IT Systems (LLC) Tamara,69011,586132,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHAMISKKHD,Vend HQ,,Cash Rounding,SA,TAMARA,506
+23731504,Mrsool,45015,586126,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHAMISKKHD,Vend HQ,,Cash Rounding,SA,MRSOOL,506
+23731505,RYDSAWARIP,100014,611126,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDSAWARIP,Vend HQ,,Cash Rounding,SA,NORMAL,131
+23731506,Hungerstation,45014,611137,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDSAWARIP,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,131
+23731564,Mrsool,45015,639148,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MILAQROTAB,Vend HQ,,Cash Rounding,SA,MRSOOL,1503
+23731563,Nakhla IT Systems (LLC) Tamara,69011,639145,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MILAQROTAB,Vend HQ,,Cash Rounding,SA,TAMARA,1503
+23731562,Tabby Saudi For communication and IT,50011,639140,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MILAQROTAB,Vend HQ,,Cash Rounding,SA,TABBY,1503
+23731561,Hungerstation,45014,639137,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MILAQROTAB,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1503
+23731560,MILAQROTAB,110012,639132,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MILAQROTAB,Vend HQ,,Cash Rounding,SA,NORMAL,1503
+23731569,Mrsool,45015,639150,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDYARMOOK,Vend HQ,,Cash Rounding,SA,MRSOOL,136
+23731568,Nakhla IT Systems (LLC) Tamara,69011,639147,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDYARMOOK,Vend HQ,,Cash Rounding,SA,TAMARA,136
+23731567,Tabby Saudi For communication and IT,50011,639144,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDYARMOOK,Vend HQ,,Cash Rounding,SA,TABBY,136
+23731566,Hungerstation,45014,639139,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDYARMOOK,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,136
+23731565,RYDYARMOOK,110014,639134,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDYARMOOK,Vend HQ,,Cash Rounding,SA,NORMAL,136
+23731574,Mrsool,45015,640160,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,EHSALBUSTA,Vend HQ,,Cash Rounding,SA,Mrsool,805
+23731573,Nakhla IT Systems (LLC) Tamara,69011,640164,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,EHSALBUSTA,Vend HQ,,Cash Rounding,SA,TAMARA,805
+23731570,Tabby Saudi For communication and IT,50011,640163,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,EHSALBUSTA,Vend HQ,,Cash Rounding,SA,TABBY,805
+23731572,Hungerstation,45014,640158,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,EHSALBUSTA,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,805
+23731571,EHSALBUSTAN,112012,640154,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,EHSALBUSTA,Vend HQ,,Cash Rounding,SA,NORMAL,805
+23731575,Mrsool,45015,643247,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHMSBNDWOD,Vend HQ,,Cash Rounding,SA,Mrsool,509
+23731576,Nakhla IT Systems (LLC) Tamara,69011,643241,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHMSBNDWOD,Vend HQ,,Cash Rounding,SA,TAMARA,509
+1681,Tabby Saudi For communication and IT,50011,3000092,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,GRMALLHAIL,Vend HQ,,Cash Rounding,SA,TABBY,113
+2682,Nakhla IT Systems (LLC) Tamara,69011,30000112,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,GRMALLHAIL,Vend HQ,,Cash Rounding,SA,TAMARA,113
+2367251,MAKABRAJ1,87036,548145,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKABRAJ1,Vend HQ,,Cash Rounding,SA,NORMAL,1403
+2367261,Hungerstation,45014,548168,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKABRAJ1,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1403
+2367271,Mrsool,45015,548191,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKABRAJ1,Vend HQ,,Cash Rounding,SA,MRSOOL,1403
+2367281,Tabby Saudi For communication and IT,50011,548215,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKABRAJ1,Vend HQ,,Cash Rounding,SA,TABBY,1403
+2367291,Nakhla IT Systems (LLC) Tamara,69011,548238,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKABRAJ1,Vend HQ,,Cash Rounding,SA,TAMARA,1403
+23731515,Mrsool,45015,624126,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TOWNSQJED,Vend HQ,,Cash Rounding,SA,MRSOOL,227
+23731516,Nakhla IT Systems (LLC) Tamara,69011,624128,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TOWNSQJED,Vend HQ,,Cash Rounding,SA,TAMARA,227
+23731520,YASMEENPLZ,105012,630132,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,YASMEENPLZ,Vend HQ,,Cash Rounding,SA,NORMAL,511
+23731521,Hungerstation,45014,630137,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,YASMEENPLZ,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,511
+23731522,Tabby Saudi For communication and IT,50011,630141,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,YASMEENPLZ,Vend HQ,,Cash Rounding,SA,TABBY,511
+23731523,Nakhla IT Systems (LLC) Tamara,69011,630145,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,YASMEENPLZ,Vend HQ,,Cash Rounding,SA,TAMARA,511
+23731524,Mrsool,45015,630139,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,YASMEENPLZ,Vend HQ,,Cash Rounding,SA,MRSOOL,511
+23731525,ARARMHMDIA,105013,630133,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ARARMHMDIA,Vend HQ,,Cash Rounding,SA,NORMAL,1802
+23731526,Hungerstation,45014,630138,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ARARMHMDIA,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1802
+23731527,Tabby Saudi For communication and IT,50011,630142,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ARARMHMDIA,Vend HQ,,Cash Rounding,SA,TABBY,1802
+23731528,Nakhla IT Systems (LLC) Tamara,69011,630146,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ARARMHMDIA,Vend HQ,,Cash Rounding,SA,TAMARA,1802
+23731529,Mrsool,45015,630140,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ARARMHMDIA,Vend HQ,,Cash Rounding,SA,MRSOOL,1802
+23731534,Mrsool,45015,633124,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHOQOSAIBI,Vend HQ,,Cash Rounding,SA,MRSOOL,402
+23731533,Nakhla IT Systems (LLC) Tamara,69011,634126,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHOQOSAIBI,Vend HQ,,Cash Rounding,SA,TAMARA,402
+23731535,Mrsool,45015,602120,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDANDLUS2,Vend HQ,,Cash Rounding,SA,MRSOOL,223
+23731536,Nakhla IT Systems (LLC) Tamara,69011,602122,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDANDLUS2,Vend HQ,,Cash Rounding,SA,TAMARA,223
+23731537,Tabby Saudi For communication and IT,50011,602121,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDANDLUS2,Vend HQ,,Cash Rounding,SA,TABBY,223
+23731538,Hungerstation,45014,602119,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDANDLUS2,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,223
+23731539,JEDANDLUS2,99012,602118,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDANDLUS2,Vend HQ,,Cash Rounding,SA,NORMAL,223
+23731577,Hungerstation,45014,643231,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHMSBNDWOD,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,509
+23731578,Tabby Saudi For communication and IT,50011,643236,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHMSBNDWOD,Vend HQ,,Cash Rounding,SA,TABBY,509
+23731579,KHMSBNDWOD,116014,643223,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHMSBNDWOD,Vend HQ,,Cash Rounding,SA,NORMAL,509
+23731580,Mrsool,45015,643248,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ASEERGUNAI,Vend HQ,,Cash Rounding,SA,Mrsool,510
+23731581,Nakhla IT Systems (LLC) Tamara,69011,643242,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ASEERGUNAI,Vend HQ,,Cash Rounding,SA,TAMARA,510
+23731582,Hungerstation,45014,643232,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ASEERGUNAI,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,510
+23731583,Tabby Saudi For communication and IT,50011,643237,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ASEERGUNAI,Vend HQ,,Cash Rounding,SA,TABBY,510
+23731584,ASEERGUNAIM,116015,643224,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ASEERGUNAI,Vend HQ,,Cash Rounding,SA,NORMAL,510
+23731585,ALARIDAH,116012,643221,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALARIDAH,Vend HQ,,Cash Rounding,SA,NORMAL,1305
+23731586,Mrsool,45015,643245,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALARIDAH,Vend HQ,,Cash Rounding,SA,Mrsool,1305
+23731587,Tabby Saudi For communication and IT,50011,643234,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALARIDAH,Vend HQ,,Cash Rounding,SA,TABBY,1305
+23731588,Hungerstation,45014,643228,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALARIDAH,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1305
+23731589,Nakhla IT Systems (LLC) Tamara,69011,643239,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALARIDAH,Vend HQ,,Cash Rounding,SA,TAMARA,1305
+23731590,MAJARDAH,116013,643222,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAJARDAH,Vend HQ,,Cash Rounding,SA,NORMAL,508
+23731591,Mrsool,45015,643246,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAJARDAH,Vend HQ,,Cash Rounding,SA,Mrsool,508
+23731592,Tabby Saudi For communication and IT,50011,643235,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAJARDAH,Vend HQ,,Cash Rounding,SA,TABBY,508
+23731593,Hungerstation,45014,643230,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAJARDAH,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,508
+23731594,Nakhla IT Systems (LLC) Tamara,69011,643240,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAJARDAH,Vend HQ,,Cash Rounding,SA,TAMARA,508
+23731595,UWALKJED,116016,643225,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,UWALKJED,Vend HQ,,Cash Rounding,SA,NORMAL,230
+23731596,Mrsool,45015,643249,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,UWALKJED,Vend HQ,,Cash Rounding,SA,Mrsool,230
+23731597,Tabby Saudi For communication and IT,50011,643238,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,UWALKJED,Vend HQ,,Cash Rounding,SA,TABBY,230
+23731598,Hungerstation,45014,643233,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,UWALKJED,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,230
+23731599,Nakhla IT Systems (LLC) Tamara,69011,643243,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,UWALKJED,Vend HQ,,Cash Rounding,SA,TAMARA,230
+23731604,DUBSILCNML,98012,586117,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,DUBSILCNML,Vend HQ,,Cash Rounding UAE,AE,NORMAL,3105
+23731600,Mrsool,45015,586124,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,DUBSILCNML,Vend HQ,,Cash Rounding UAE,AE,MRSOOL,3105
+23731601,Tabby Saudi For communication and IT,50011,586127,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,DUBSILCNML,Vend HQ,,Cash Rounding UAE,AE,TABBY,3105
+23731602,Hungerstation,45014,586120,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,DUBSILCNML,Vend HQ,,Cash Rounding UAE,AE,HUNGERSTATION,3105
+23731603,Nakhla IT Systems (LLC) Tamara,69011,586130,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,DUBSILCNML,Vend HQ,,Cash Rounding UAE,AE,TAMARA,3105
+2671,Nakhla IT Systems (LLC) Tamara,69011,30000115,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKTOWER,Vend HQ,,Cash Rounding,SA,TAMARA,1402
+136681,PANORAMA,77011,481113,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,PANORAMA,Vend HQ,,Cash Rounding,SA,NORMAL,1013
+236681,Hungerstation,45014,508111,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,PANORAMA,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1013
+156681,Tabby Saudi For communication and IT,50011,508112,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,PANORAMA,Vend HQ,,Cash Rounding,SA,TABBY,1013
+166681,Nakhla IT Systems (LLC) Tamara,69011,508113,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,PANORAMA,Vend HQ,,Cash Rounding,SA,TAMARA,1013
+176011,Mrsool,45015,508114,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,PANORAMA,Vend HQ,,Cash Rounding,SA,MRSOOL,1013
+136682,HIJABMALL,81011,518113,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HIJABMALL,Vend HQ,,Cash Rounding,SA,NORMAL,1013
+236682,Hungerstation,45014,518116,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HIJABMALL,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1013
+156682,Tabby Saudi For communication and IT,50011,518118,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HIJABMALL,Vend HQ,,Cash Rounding,SA,TABBY,1013
+166682,Nakhla IT Systems (LLC) Tamara,69011,518120,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HIJABMALL,Vend HQ,,Cash Rounding,SA,TAMARA,1013
+176012,Mrsool,45015,518122,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HIJABMALL,Vend HQ,,Cash Rounding,SA,MRSOOL,1013
+136683,HILTONMAK,81012,518114,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HILTONMAK,Vend HQ,,Cash Rounding,SA,NORMAL,1013
+236683,Hungerstation,45014,518117,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HILTONMAK,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1013
+156683,Tabby Saudi For communication and IT,50011,518119,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HILTONMAK,Vend HQ,,Cash Rounding,SA,TABBY,1013
+166683,Nakhla IT Systems (LLC) Tamara,69011,518121,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HILTONMAK,Vend HQ,,Cash Rounding,SA,TAMARA,1013
+176013,Mrsool,45015,518123,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HILTONMAK,Vend HQ,,Cash Rounding,SA,MRSOOL,1013
+236685,KHMSAVENUE,87012,548117,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHMSAVENUE,Vend HQ,,Cash Rounding,SA,NORMAL,503
+236686,Hungerstation,45014,548118,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHMSAVENUE,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,503
+236687,Mrsool,45015,548119,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHMSAVENUE,Vend HQ,,Cash Rounding,SA,MRSOOL,503
+236688,Tabby Saudi For communication and IT,50011,548120,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHMSAVENUE,Vend HQ,,Cash Rounding,SA,TABBY,503
+236689,Nakhla IT Systems (LLC) Tamara,69011,548121,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHMSAVENUE,Vend HQ,,Cash Rounding,SA,TAMARA,503
+236690,MAKSHOUQ,87013,548122,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKSHOUQ,Vend HQ,,Cash Rounding,SA,NORMAL,1405
+236691,Hungerstation,45014,548146,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKSHOUQ,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1405
+236692,Mrsool,45015,548169,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKSHOUQ,Vend HQ,,Cash Rounding,SA,MRSOOL,1405
+236693,Tabby Saudi For communication and IT,50011,548192,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKSHOUQ,Vend HQ,,Cash Rounding,SA,TABBY,1405
+236694,Nakhla IT Systems (LLC) Tamara,69011,548216,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKSHOUQ,Vend HQ,,Cash Rounding,SA,TAMARA,1405
+236695,TAIFSHARST,87014,548123,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TAIFSHARST,Vend HQ,,Cash Rounding,SA,NORMAL,1005
+236696,Hungerstation,45014,548147,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TAIFSHARST,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1005
+236697,Mrsool,45015,548170,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TAIFSHARST,Vend HQ,,Cash Rounding,SA,MRSOOL,1005
+236698,Tabby Saudi For communication and IT,50011,548193,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TAIFSHARST,Vend HQ,,Cash Rounding,SA,TABBY,1005
+236699,Nakhla IT Systems (LLC) Tamara,69011,548217,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TAIFSHARST,Vend HQ,,Cash Rounding,SA,TAMARA,1005
+236700,NAJMELAGRO,87016,548125,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAJMELAGRO,Vend HQ,,Cash Rounding,SA,NORMAL,1303
+236701,Hungerstation,45014,548148,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAJMELAGRO,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1303
+236702,Mrsool,45015,548171,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAJMELAGRO,Vend HQ,,Cash Rounding,SA,MRSOOL,1303
+236703,Tabby Saudi For communication and IT,50011,548194,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAJMELAGRO,Vend HQ,,Cash Rounding,SA,TABBY,1303
+236704,Nakhla IT Systems (LLC) Tamara,69011,548218,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAJMELAGRO,Vend HQ,,Cash Rounding,SA,TAMARA,1303
+236705,JEDNRTHWLK,87017,548126,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDNRTHWLK,Vend HQ,,Cash Rounding,SA,NORMAL,220
+236706,Hungerstation,45014,548149,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDNRTHWLK,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,220
+236707,Mrsool,45015,548172,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDNRTHWLK,Vend HQ,,Cash Rounding,SA,MRSOOL,220
+236708,Tabby Saudi For communication and IT,50011,548195,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDNRTHWLK,Vend HQ,,Cash Rounding,SA,TABBY,220
+236709,Nakhla IT Systems (LLC) Tamara,69011,548219,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDNRTHWLK,Vend HQ,,Cash Rounding,SA,TAMARA,220
+236710,RYDANUDPRK,87018,548127,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDANUDPRK,Vend HQ,,Cash Rounding,SA,NORMAL,123
+236711,Hungerstation,45014,548150,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDANUDPRK,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,123
+236712,Mrsool,45015,548173,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDANUDPRK,Vend HQ,,Cash Rounding,SA,MRSOOL,123
+236713,Tabby Saudi For communication and IT,50011,548196,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDANUDPRK,Vend HQ,,Cash Rounding,SA,TABBY,123
+236714,Nakhla IT Systems (LLC) Tamara,69011,548220,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDANUDPRK,Vend HQ,,Cash Rounding,SA,TAMARA,123
+236715,KHRJHEDITY,87019,548128,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHRJHEDITY,Vend HQ,,Cash Rounding,SA,NORMAL,124
+236716,Hungerstation,45014,548151,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHRJHEDITY,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,124
+236717,Mrsool,45015,548174,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHRJHEDITY,Vend HQ,,Cash Rounding,SA,MRSOOL,124
+236718,Tabby Saudi For communication and IT,50011,548197,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHRJHEDITY,Vend HQ,,Cash Rounding,SA,TABBY,124
+236719,Nakhla IT Systems (LLC) Tamara,69011,548221,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHRJHEDITY,Vend HQ,,Cash Rounding,SA,TAMARA,124
+236720,QUNKYLPLZA,87020,548129,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,QUNKYLPLZA,Vend HQ,,Cash Rounding,SA,NORMAL,1004
+236721,Hungerstation,45014,548152,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,QUNKYLPLZA,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1004
+23731680,QATIFCFRNT,139012,671368,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,QATIFCFRNT,Vend HQ,,Cash Rounding,SA,NORMAL,810
+23731681,Nakhla IT Systems (LLC) Tamara,69011,671376,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,QATIFCFRNT,Vend HQ,,Cash Rounding,SA,TAMARA,810
+23731682,Tabby Saudi For communication and IT,50011,671375,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,QATIFCFRNT,Vend HQ,,Cash Rounding,SA,TABBY,810
+23731683,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,QATIFCFRNT,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,810
+23731684,Mrsool,45015,671373,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,QATIFCFRNT,Vend HQ,,Cash Rounding,SA,MRSOOL,810
+23731725,RASSBULVRD,141028,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RASSBULVRD,Vend HQ,,Cash Rounding,SA,NORMAL,1107
+23731726,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RASSBULVRD,Vend HQ,,Cash Rounding,SA,TAMARA,1107
+23731727,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RASSBULVRD,Vend HQ,,Cash Rounding,SA,TABBY,1107
+23731728,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RASSBULVRD,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1107
+2373179,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RASSBULVRD,Vend HQ,,Cash Rounding,SA,MRSOOL,1107
+23731729,JEDMNDARIN,141025,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDMNDARIN,Vend HQ,,Cash Rounding,SA,NORMAL,241
+23731730,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDMNDARIN,Vend HQ,,Cash Rounding,SA,MRSOOL,241
+23731731,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDMNDARIN,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,241
+23731732,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDMNDARIN,Vend HQ,,Cash Rounding,SA,TABBY,241
+23731733,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDMNDARIN,Vend HQ,,Cash Rounding,SA,TAMARA,241
+23731739,JARIRRD,147021,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JARIRRD,Vend HQ,,Cash Rounding,SA,NORMAL,159
+23731738,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SALAMRYD2,Vend HQ,,Cash Rounding,SA,TAMARA,153
+23731737,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SALAMRYD2,Vend HQ,,Cash Rounding,SA,TABBY,153
+23731736,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SALAMRYD2,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,153
+23731735,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SALAMRYD2,Vend HQ,,Cash Rounding,SA,MRSOOL,153
+23731734,SALAMRYD2,145019,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SALAMRYD2,Vend HQ,,Cash Rounding,SA,NORMAL,153
+23731743,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JARIRRD,Vend HQ,,Cash Rounding,SA,TAMARA,159
+23731742,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JARIRRD,Vend HQ,,Cash Rounding,SA,TABBY,159
+23731741,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JARIRRD,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,159
+23731740,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JARIRRD,Vend HQ,,Cash Rounding,SA,MRSOOL,159
+23731778,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,WADIDAWSER,Vend HQ,,Cash Rounding,SA,MRSOOL,160
+23731777,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,WADIDAWSER,Vend HQ,,Cash Rounding,SA,TAMARA,160
+23731776,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,WADIDAWSER,Vend HQ,,Cash Rounding,SA,TABBY,160
+23731775,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,WADIDAWSER,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,160
+23731774,WADIDAWSER,153012,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,WADIDAWSER,Vend HQ,,Cash Rounding,SA,NORMAL,160
+23731874,MEDALIYAT,164017,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDALIYAT,Vend HQ,,Cash Rounding,SA,NORMAL,327
+23731875,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDALIYAT,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,327
+23731876,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDALIYAT,Vend HQ,,Cash Rounding,SA,TABBY,327
+23731877,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDALIYAT,Vend HQ,,Cash Rounding,SA,TAMARA,327
+23731878,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDALIYAT,Vend HQ,,Cash Rounding,SA,MRSOOL,327
+23731879,RYDTWIQDIS,164018,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDTWIQDIS,Vend HQ,,Cash Rounding,SA,NORMAL,168
+23731880,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDTWIQDIS,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,168
+23731881,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDTWIQDIS,Vend HQ,,Cash Rounding,SA,TABBY,168
+23731882,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDTWIQDIS,Vend HQ,,Cash Rounding,SA,TAMARA,168
+23731883,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDTWIQDIS,Vend HQ,,Cash Rounding,SA,MRSOOL,168
+23731953,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBHUWYLYT,Vend HQ,,Cash Rounding,SA,TABBY,908
+23731954,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBHUWYLYT,Vend HQ,,Cash Rounding,SA,TAMARA,908
+23731955,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBHUWYLYT,Vend HQ,,Cash Rounding,SA,MRSOOL,908
+23731961,BURSULMAVE,168031,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,BURSULMAVE,Vend HQ,,Cash Rounding,SA,NORMAL,2001
+23731962,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,BURSULMAVE,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,2001
+23731963,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,BURSULMAVE,Vend HQ,,Cash Rounding,SA,TABBY,2001
+23731964,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,BURSULMAVE,Vend HQ,,Cash Rounding,SA,TAMARA,2001
+23731965,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,BURSULMAVE,Vend HQ,,Cash Rounding,SA,MRSOOL,2001
+23731966,MATHNABMAL,168032,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MATHNABMAL,Vend HQ,,Cash Rounding,SA,NORMAL,1112
+23731967,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MATHNABMAL,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1112
+23731968,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MATHNABMAL,Vend HQ,,Cash Rounding,SA,TABBY,1112
+23731969,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MATHNABMAL,Vend HQ,,Cash Rounding,SA,TAMARA,1112
+23731655,HAILZONE,125016,652352,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAILZONE,Vend HQ,,Cash Rounding,SA,NORMAL,1203
+23731656,Mrsool,45015,652354,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAILZONE,Vend HQ,,Cash Rounding,SA,MRSOOL,1203
+23731657,Hungerstation,45014,652353,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAILZONE,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1203
+23731658,Tabby Saudi For communication and IT,50011,652355,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAILZONE,Vend HQ,,Cash Rounding,SA,TABBY,1203
+23731659,Nakhla IT Systems (LLC) Tamara,69011,652356,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HAILZONE,Vend HQ,,Cash Rounding,SA,TAMARA,1203
+23731660,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MURJANJED,Vend HQ,,Cash Rounding,SA,TABBY,239
+23731661,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MURJANJED,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,239
+23731662,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MURJANJED,Vend HQ,,Cash Rounding,SA,MRSOOL,239
+23731663,MURJANJED,131015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MURJANJED,Vend HQ,,Cash Rounding,SA,NORMAL,239
+23731664,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MURJANJED,Vend HQ,,Cash Rounding,SA,TAMARA,239
+23731695,OMNHRMZPLZ,140017,#N/A,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,OMNHRMZPLZ,Vend HQ,,Cash Rounding OMN,OM,NORMAL,5013
+23731696,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,OMNHRMZPLZ,Vend HQ,,Cash Rounding OMN,OM,TAMARA,5013
+23731697,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,OMNHRMZPLZ,Vend HQ,,Cash Rounding OMN,OM,TABBY,5013
+23731698,Mrsool,45015,#N/A,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,OMNHRMZPLZ,Vend HQ,,Cash Rounding OMN,OM,MRSOOL,5013
+23731699,Hungerstation,45014,#N/A,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,OMNHRMZPLZ,Vend HQ,,Cash Rounding OMN,OM,HUNGERSTATION,5013
+23731700,JEDMUSADIA,140019,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDMUSADIA,Vend HQ,,Cash Rounding,SA,NORMAL,245
+23731701,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDMUSADIA,Vend HQ,,Cash Rounding,SA,TAMARA,245
+23731702,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDMUSADIA,Vend HQ,,Cash Rounding,SA,TABBY,245
+23731703,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDMUSADIA,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,245
+23731704,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDMUSADIA,Vend HQ,,Cash Rounding,SA,MRSOOL,245
+23731720,DMMMARINA,141023,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DMMMARINA,Vend HQ,,Cash Rounding,SA,NORMAL,708
+23731721,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DMMMARINA,Vend HQ,,Cash Rounding,SA,TAMARA,708
+23731722,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DMMMARINA,Vend HQ,,Cash Rounding,SA,TABBY,708
+23731723,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DMMMARINA,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,708
+23731724,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DMMMARINA,Vend HQ,,Cash Rounding,SA,MRSOOL,708
+23731748,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDQURAISH,Vend HQ,,Cash Rounding,SA,TAMARA,243
+23731747,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDQURAISH,Vend HQ,,Cash Rounding,SA,TABBY,243
+23731746,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDQURAISH,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,243
+23731745,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDQURAISH,Vend HQ,,Cash Rounding,SA,MRSOOL,243
+23731744,JEDQURAISH,141027,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDQURAISH,Vend HQ,,Cash Rounding,SA,NORMAL,243
+23731763,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TAIFTERAML,Vend HQ,,Cash Rounding,SA,TAMARA,1008
+23731762,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TAIFTERAML,Vend HQ,,Cash Rounding,SA,TABBY,1008
+23731761,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TAIFTERAML,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1008
+23731760,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TAIFTERAML,Vend HQ,,Cash Rounding,SA,MRSOOL,1008
+23731759,TAIFTERAML,145021,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TAIFTERAML,Vend HQ,,Cash Rounding,SA,NORMAL,1008
+23731798,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MTHNBOTHAM,Vend HQ,,Cash Rounding,SA,MRSOOL,1105
+23731797,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MTHNBOTHAM,Vend HQ,,Cash Rounding,SA,TAMARA,1105
+23731796,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MTHNBOTHAM,Vend HQ,,Cash Rounding,SA,TABBY,1105
+23731795,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MTHNBOTHAM,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1105
+23731794,MTHNBOTHAM,141021,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MTHNBOTHAM,Vend HQ,,Cash Rounding,SA,NORMAL,1105
+23731793,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHOBRRASHD,Vend HQ,,Cash Rounding,SA,MRSOOL,404
+23731792,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHOBRRASHD,Vend HQ,,Cash Rounding,SA,TAMARA,404
+23731791,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHOBRRASHD,Vend HQ,,Cash Rounding,SA,TABBY,404
+23731790,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHOBRRASHD,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,404
+23731789,KHOBRRASHD,141022,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHOBRRASHD,Vend HQ,,Cash Rounding,SA,NORMAL,404
+23731828,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SKAKASHLHB,Vend HQ,,Cash Rounding,SA,MRSOOL,1810
+23731827,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SKAKASHLHB,Vend HQ,,Cash Rounding,SA,TAMARA,1810
+23731826,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SKAKASHLHB,Vend HQ,,Cash Rounding,SA,TABBY,1810
+23731825,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SKAKASHLHB,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1810
+23731824,SKAKASHLHB,157020,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SKAKASHLHB,Vend HQ,,Cash Rounding,SA,NORMAL,1810
+23731833,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ARARWOMNMT,Vend HQ,,Cash Rounding,SA,MRSOOL,1803
+23731832,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ARARWOMNMT,Vend HQ,,Cash Rounding,SA,TAMARA,1803
+23731831,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ARARWOMNMT,Vend HQ,,Cash Rounding,SA,TABBY,1803
+23731830,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ARARWOMNMT,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1803
+23731829,ARARWOMNMT,157021,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ARARWOMNMT,Vend HQ,,Cash Rounding,SA,NORMAL,1803
+23731640,Hungerstation,45014,652358,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,BARKAOMN,Vend HQ,,Cash Rounding OMN,OM,HUNGERSTATION,5010
+23731641,Mrsool,45015,652359,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,BARKAOMN,Vend HQ,,Cash Rounding OMN,OM,MRSOOL,5010
+23731642,Tabby Saudi For communication and IT,50011,652360,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,BARKAOMN,Vend HQ,,Cash Rounding OMN,OM,TABBY,5010
+23731643,Nakhla IT Systems (LLC) Tamara,69011,652361,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,BARKAOMN,Vend HQ,,Cash Rounding OMN,OM,TAMARA,5010
+23731644,BARKAOMN,125017,652357,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,BARKAOMN,Vend HQ,,Cash Rounding OMN,OM,NORMAL,5010
+23731665,GALRYRYD2,138012,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,GALRYRYD2,Vend HQ,,Cash Rounding,SA,NORMAL,148
+23731666,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,GALRYRYD2,Vend HQ,,Cash Rounding,SA,MRSOOL,148
+23731667,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,GALRYRYD2,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,148
+23731668,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,GALRYRYD2,Vend HQ,,Cash Rounding,SA,TABBY,148
+23731669,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,GALRYRYD2,Vend HQ,,Cash Rounding,SA,TAMARA,148
+23731690,MAKDYAFAML,140018,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKDYAFAML,Vend HQ,,Cash Rounding,SA,NORMAL,1415
+23731691,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKDYAFAML,Vend HQ,,Cash Rounding,SA,TAMARA,1415
+23731692,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKDYAFAML,Vend HQ,,Cash Rounding,SA,TABBY,1415
+23731693,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKDYAFAML,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1415
+23731694,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKDYAFAML,Vend HQ,,Cash Rounding,SA,MRSOOL,1415
+23731705,JEDMRWACTR,141024,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDMRWACTR,Vend HQ,,Cash Rounding,SA,NORMAL,244
+23731706,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDMRWACTR,Vend HQ,,Cash Rounding,SA,MRSOOL,244
+23731707,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDMRWACTR,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,244
+23731708,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDMRWACTR,Vend HQ,,Cash Rounding,SA,TABBY,244
+23731709,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDMRWACTR,Vend HQ,,Cash Rounding,SA,TAMARA,244
+23731714,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,QATIFCC,Vend HQ,,Cash Rounding,SA,TAMARA,814
+23731713,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,QATIFCC,Vend HQ,,Cash Rounding,SA,TABBY,814
+23731712,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,QATIFCC,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,814
+23731711,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,QATIFCC,Vend HQ,,Cash Rounding,SA,MRSOOL,814
+23731710,QATIFCC,144013,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,QATIFCC,Vend HQ,,Cash Rounding,SA,NORMAL,814
+23731719,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,EXBUAE,Vend HQ,,Cash Rounding UAE,AE,TAMARA,3007
+23731718,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,EXBUAE,Vend HQ,,Cash Rounding UAE,AE,TABBY,3007
+23731717,Hungerstation,45014,#N/A,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,EXBUAE,Vend HQ,,Cash Rounding UAE,AE,HUNGERSTATION,3007
+23731716,Mrsool,45015,#N/A,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,EXBUAE,Vend HQ,,Cash Rounding UAE,AE,MRSOOL,3007
+23731715,EXBUAE,144014,#N/A,AlQurashi-UAE,Vend UAE,Vend Invoice UAE,1,Bank Charge UAE,EXBUAE,Vend HQ,,Cash Rounding UAE,AE,NORMAL,3007
+23731758,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDWAHBLVD,Vend HQ,,Cash Rounding,SA,TAMARA,242
+23731757,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDWAHBLVD,Vend HQ,,Cash Rounding,SA,TABBY,242
+23731788,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NJRANCFRNT,Vend HQ,,Cash Rounding,SA,MRSOOL,1317
+23731787,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NJRANCFRNT,Vend HQ,,Cash Rounding,SA,TAMARA,1317
+23731786,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NJRANCFRNT,Vend HQ,,Cash Rounding,SA,TABBY,1317
+23731785,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NJRANCFRNT,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1317
+23731784,NJRANCFRNT,147024,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NJRANCFRNT,Vend HQ,,Cash Rounding,SA,NORMAL,1317
+23731783,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKAHMALL2,Vend HQ,,Cash Rounding,SA,MRSOOL,1417
+23731782,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKAHMALL2,Vend HQ,,Cash Rounding,SA,TAMARA,1417
+23731781,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKAHMALL2,Vend HQ,,Cash Rounding,SA,TABBY,1417
+23731780,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKAHMALL2,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1417
+23731779,MAKAHMALL2,147023,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKAHMALL2,Vend HQ,,Cash Rounding,SA,NORMAL,1417
+23731813,BAHAAVENUS,156012,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,BAHAAVENUS,Vend HQ,,Cash Rounding,SA,NORMAL,1011
+23731812,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,BAHAAVENUS,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1011
+23731811,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,BAHAAVENUS,Vend HQ,,Cash Rounding,SA,TABBY,1011
+23731810,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,BAHAAVENUS,Vend HQ,,Cash Rounding,SA,TAMARA,1011
+23731809,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,BAHAAVENUS,Vend HQ,,Cash Rounding,SA,MRSOOL,1011
+23731838,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ABHHIZAMST,Vend HQ,,Cash Rounding,SA,MRSOOL,520
+23731837,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ABHHIZAMST,Vend HQ,,Cash Rounding,SA,TAMARA,520
+23731858,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKADANPLZ,Vend HQ,,Cash Rounding,SA,MRSOOL,1421
+23731857,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKADANPLZ,Vend HQ,,Cash Rounding,SA,TAMARA,1421
+23731856,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKADANPLZ,Vend HQ,,Cash Rounding,SA,TABBY,1421
+23731855,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKADANPLZ,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1421
+23731854,MAKADANPLZ,161012,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKADANPLZ,Vend HQ,,Cash Rounding,SA,NORMAL,1421
+23731614,ALQASRMALL,123013,650321,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALQASRMALL,Vend HQ,,Cash Rounding,SA,NORMAL,145
+23731613,Nakhla IT Systems (LLC) Tamara,69011,650325,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALQASRMALL,Vend HQ,,Cash Rounding,SA,TAMARA,145
+23731612,Hungerstation,45014,650322,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALQASRMALL,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,145
+23731611,Tabby Saudi For communication and IT,50011,650324,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALQASRMALL,Vend HQ,,Cash Rounding,SA,TABBY,145
+23731610,Mrsool,45015,650323,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ALQASRMALL,Vend HQ,,Cash Rounding,SA,MRSOOL,145
+23731619,MEDMAYAS,123012,650314,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDMAYAS,Vend HQ,,Cash Rounding,SA,NORMAL,315
+23731618,Nakhla IT Systems (LLC) Tamara,69011,650318,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDMAYAS,Vend HQ,,Cash Rounding,SA,TAMARA,315
+23731617,Hungerstation,45014,650315,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDMAYAS,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,315
+23731616,Tabby Saudi For communication and IT,50011,650317,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDMAYAS,Vend HQ,,Cash Rounding,SA,TABBY,315
+23731615,Mrsool,45015,650316,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDMAYAS,Vend HQ,,Cash Rounding,SA,MRSOOL,315
+23731803,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,EHSAOTHAIM,Vend HQ,,Cash Rounding,SA,MRSOOL,811
+23731802,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,EHSAOTHAIM,Vend HQ,,Cash Rounding,SA,TAMARA,811
+23731801,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,EHSAOTHAIM,Vend HQ,,Cash Rounding,SA,TABBY,811
+23731800,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,EHSAOTHAIM,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,811
+23731799,EHSAOTHAIM,155021,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,EHSAOTHAIM,Vend HQ,,Cash Rounding,SA,NORMAL,811
+23731814,QOUZBLVRD,156013,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,QOUZBLVRD,Vend HQ,,Cash Rounding,SA,NORMAL,1014
+23731815,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,QOUZBLVRD,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1014
+23731816,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,QOUZBLVRD,Vend HQ,,Cash Rounding,SA,TABBY,1014
+23731817,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,QOUZBLVRD,Vend HQ,,Cash Rounding,SA,TAMARA,1014
+23731818,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,QOUZBLVRD,Vend HQ,,Cash Rounding,SA,MRSOOL,1014
+23731863,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SBTALYABVD,Vend HQ,,Cash Rounding,SA,MRSOOL,517
+23731862,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SBTALYABVD,Vend HQ,,Cash Rounding,SA,TAMARA,517
+23731861,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SBTALYABVD,Vend HQ,,Cash Rounding,SA,TABBY,517
+23731860,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SBTALYABVD,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,517
+23731859,SBTALYABVD,161013,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SBTALYABVD,Vend HQ,,Cash Rounding,SA,NORMAL,517
+23731864,KHJTHEZONE,163018,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHJTHEZONE,Vend HQ,,Cash Rounding,SA,NORMAL,2101
+23731865,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHJTHEZONE,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,2101
+23731866,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHJTHEZONE,Vend HQ,,Cash Rounding,SA,TABBY,2101
+23731867,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHJTHEZONE,Vend HQ,,Cash Rounding,SA,TAMARA,2101
+23731868,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHJTHEZONE,Vend HQ,,Cash Rounding,SA,MRSOOL,2101
+23731869,SKAKAPLAZA,164016,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SKAKAPLAZA,Vend HQ,,Cash Rounding,SA,NORMAL,1805
+23731870,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SKAKAPLAZA,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1805
+23731871,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SKAKAPLAZA,Vend HQ,,Cash Rounding,SA,TABBY,1805
+23731872,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SKAKAPLAZA,Vend HQ,,Cash Rounding,SA,TAMARA,1805
+23731873,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SKAKAPLAZA,Vend HQ,,Cash Rounding,SA,MRSOOL,1805
+23731884,RYDQURTBAH,165020,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDQURTBAH,Vend HQ,,Cash Rounding,SA,NORMAL,170
+23731885,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDQURTBAH,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,170
+23731886,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDQURTBAH,Vend HQ,,Cash Rounding,SA,TABBY,170
+23731887,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDQURTBAH,Vend HQ,,Cash Rounding,SA,TAMARA,170
+23731888,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDQURTBAH,Vend HQ,,Cash Rounding,SA,MRSOOL,170
+23731889,ONZSOQJADD,165021,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ONZSOQJADD,Vend HQ,,Cash Rounding,SA,NORMAL,1113
+23731890,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ONZSOQJADD,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1113
+23731891,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ONZSOQJADD,Vend HQ,,Cash Rounding,SA,TABBY,1113
+23731892,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ONZSOQJADD,Vend HQ,,Cash Rounding,SA,TAMARA,1113
+23731893,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ONZSOQJADD,Vend HQ,,Cash Rounding,SA,MRSOOL,1113
+23731921,MEDSOUQEBQ,168022,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDSOUQEBQ,Vend HQ,,Cash Rounding,SA,NORMAL,328
+23731922,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDSOUQEBQ,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,328
+23731923,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDSOUQEBQ,Vend HQ,,Cash Rounding,SA,TABBY,328
+23731924,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDSOUQEBQ,Vend HQ,,Cash Rounding,SA,TAMARA,328
+23731925,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDSOUQEBQ,Vend HQ,,Cash Rounding,SA,MRSOOL,328
+23731931,SHUBAILYML,168024,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SHUBAILYML,Vend HQ,,Cash Rounding,SA,NORMAL,405
+23731932,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SHUBAILYML,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,405
+23731620,NAJPARK,124014,651327,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAJPARK,Vend HQ,,Cash Rounding,SA,NORMAL,1311
+23731621,Nakhla IT Systems (LLC) Tamara,69011,651340,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAJPARK,Vend HQ,,Cash Rounding,SA,TAMARA,1311
+23731622,Hungerstation,45014,651331,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAJPARK,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1311
+23731623,Tabby Saudi For communication and IT,50011,651337,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAJPARK,Vend HQ,,Cash Rounding,SA,TABBY,1311
+23731624,Mrsool,45015,651334,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NAJPARK,Vend HQ,,Cash Rounding,SA,MRSOOL,1311
+23731625,KHAMSBLVRD,124012,651319,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHAMSBLVRD,Vend HQ,,Cash Rounding,SA,NORMAL,515
+23731626,Nakhla IT Systems (LLC) Tamara,69011,651323,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHAMSBLVRD,Vend HQ,,Cash Rounding,SA,TAMARA,515
+23731627,Hungerstation,45014,651321,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHAMSBLVRD,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,515
+23731628,Tabby Saudi For communication and IT,50011,651325,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHAMSBLVRD,Vend HQ,,Cash Rounding,SA,TABBY,515
+23731629,Mrsool,45015,651322,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,KHAMSBLVRD,Vend HQ,,Cash Rounding,SA,MRSOOL,515
+23731630,YANBUMALL,124016,651332,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,YANBUMALL,Vend HQ,,Cash Rounding,SA,NORMAL,1703
+23731631,Tabby Saudi For communication and IT,50011,651336,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,YANBUMALL,Vend HQ,,Cash Rounding,SA,TABBY,1703
+23731632,Hungerstation,45014,651333,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,YANBUMALL,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1703
+23731633,Nakhla IT Systems (LLC) Tamara,69011,651338,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,YANBUMALL,Vend HQ,,Cash Rounding,SA,TAMARA,1703
+23731634,Mrsool,45015,651335,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,YANBUMALL,Vend HQ,,Cash Rounding,SA,MRSOOL,1703
+23731836,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ABHHIZAMST,Vend HQ,,Cash Rounding,SA,TABBY,520
+23731835,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ABHHIZAMST,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,520
+23731834,ABHHIZAMST,157022,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,ABHHIZAMST,Vend HQ,,Cash Rounding,SA,NORMAL,520
+23731915,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HILTONMAK3,Vend HQ,,Cash Rounding,SA,MRSOOL,1427
+23731913,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HILTONMAK3,Vend HQ,,Cash Rounding,SA,TABBY,1427
+23731914,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HILTONMAK3,Vend HQ,,Cash Rounding,SA,TAMARA,1427
+23731912,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HILTONMAK3,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1427
+23731911,HILTONMAK3,162016,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HILTONMAK3,Vend HQ,,Cash Rounding,SA,NORMAL,1427
+23731926,NJRANFRONT,168023,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NJRANFRONT,Vend HQ,,Cash Rounding,SA,NORMAL,2201
+23731927,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NJRANFRONT,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,2201
+23731928,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NJRANFRONT,Vend HQ,,Cash Rounding,SA,TABBY,2201
+23731929,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NJRANFRONT,Vend HQ,,Cash Rounding,SA,TAMARA,2201
+23731930,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,NJRANFRONT,Vend HQ,,Cash Rounding,SA,MRSOOL,2201
+23731933,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SHUBAILYML,Vend HQ,,Cash Rounding,SA,TABBY,405
+23731934,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SHUBAILYML,Vend HQ,,Cash Rounding,SA,TAMARA,405
+23731935,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SHUBAILYML,Vend HQ,,Cash Rounding,SA,MRSOOL,405
+23731936,JEDKNGAZIZ,168025,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDKNGAZIZ,Vend HQ,,Cash Rounding,SA,NORMAL,251
+23731937,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDKNGAZIZ,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,251
+23731938,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDKNGAZIZ,Vend HQ,,Cash Rounding,SA,TABBY,251
+23731939,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDKNGAZIZ,Vend HQ,,Cash Rounding,SA,TAMARA,251
+23731940,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDKNGAZIZ,Vend HQ,,Cash Rounding,SA,MRSOOL,251
+23731941,JUBGLRIMAL,168027,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBGLRIMAL,Vend HQ,,Cash Rounding,SA,NORMAL,907
+23731942,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBGLRIMAL,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,907
+23731943,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBGLRIMAL,Vend HQ,,Cash Rounding,SA,TABBY,907
+23731944,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBGLRIMAL,Vend HQ,,Cash Rounding,SA,TAMARA,907
+23731945,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBGLRIMAL,Vend HQ,,Cash Rounding,SA,MRSOOL,907
+23731946,DWADMIMKAN,168028,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DWADMIMKAN,Vend HQ,,Cash Rounding,SA,NORMAL,1901
+23731947,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DWADMIMKAN,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1901
+23731948,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DWADMIMKAN,Vend HQ,,Cash Rounding,SA,TABBY,1901
+23731949,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DWADMIMKAN,Vend HQ,,Cash Rounding,SA,TAMARA,1901
+23731950,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DWADMIMKAN,Vend HQ,,Cash Rounding,SA,MRSOOL,1901
+23731956,RYDROSHN,168030,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDROSHN,Vend HQ,,Cash Rounding,SA,NORMAL,169
+23731957,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDROSHN,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,169
+23731958,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDROSHN,Vend HQ,,Cash Rounding,SA,TABBY,169
+23731959,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDROSHN,Vend HQ,,Cash Rounding,SA,TAMARA,169
+23731960,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDROSHN,Vend HQ,,Cash Rounding,SA,MRSOOL,169
+23731970,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MATHNABMAL,Vend HQ,,Cash Rounding,SA,MRSOOL,1112
+23731609,DAMRIVEIRA,122015,649325,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DAMRIVEIRA,Vend HQ,,Cash Rounding,SA,NORMAL,705
+23731608,Nakhla IT Systems (LLC) Tamara,69011,649329,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DAMRIVEIRA,Vend HQ,,Cash Rounding,SA,TAMARA,705
+23731607,Hungerstation,45014,649326,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DAMRIVEIRA,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,705
+23731606,Tabby Saudi For communication and IT,50011,649328,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DAMRIVEIRA,Vend HQ,,Cash Rounding,SA,TABBY,705
+23731605,Mrsool,45015,649327,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DAMRIVEIRA,Vend HQ,,Cash Rounding,SA,MRSOOL,705
+23731650,MEDJWALK,125015,652347,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDJWALK,Vend HQ,,Cash Rounding,SA,NORMAL,316
+23731651,Tabby Saudi For communication and IT,50011,652350,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDJWALK,Vend HQ,,Cash Rounding,SA,TABBY,316
+23731652,Hungerstation,45014,652348,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDJWALK,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,316
+23731653,Mrsool,45015,652349,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDJWALK,Vend HQ,,Cash Rounding,SA,MRSOOL,316
+23731654,Nakhla IT Systems (LLC) Tamara,69011,652351,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDJWALK,Vend HQ,,Cash Rounding,SA,TAMARA,316
+23731753,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDDAHPARK,Vend HQ,,Cash Rounding,SA,TAMARA,248
+23731752,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDDAHPARK,Vend HQ,,Cash Rounding,SA,TABBY,248
+23731751,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDDAHPARK,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,248
+23731750,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDDAHPARK,Vend HQ,,Cash Rounding,SA,MRSOOL,248
+23731749,JEDDAHPARK,145020,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDDAHPARK,Vend HQ,,Cash Rounding,SA,NORMAL,248
+23731804,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKDARTWHD,Vend HQ,,Cash Rounding,SA,MRSOOL,1423
+23731805,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKDARTWHD,Vend HQ,,Cash Rounding,SA,TAMARA,1423
+23731806,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKDARTWHD,Vend HQ,,Cash Rounding,SA,TABBY,1423
+23731807,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKDARTWHD,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1423
+23731808,MAKDARTWHD,155022,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKDARTWHD,Vend HQ,,Cash Rounding,SA,NORMAL,1423
+23731823,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TIFZHRNCTR,Vend HQ,,Cash Rounding,SA,MRSOOL,1013
+23731822,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TIFZHRNCTR,Vend HQ,,Cash Rounding,SA,TAMARA,1013
+23731821,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TIFZHRNCTR,Vend HQ,,Cash Rounding,SA,TABBY,1013
+23731820,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TIFZHRNCTR,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1013
+23731819,TIFZHRNCTR,156026,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,TIFZHRNCTR,Vend HQ,,Cash Rounding,SA,NORMAL,1013
+23731843,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDKHUMRAH,Vend HQ,,Cash Rounding,SA,MRSOOL,253
+23731842,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDKHUMRAH,Vend HQ,,Cash Rounding,SA,TAMARA,253
+23731841,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDKHUMRAH,Vend HQ,,Cash Rounding,SA,TABBY,253
+23731840,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDKHUMRAH,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,253
+23731839,JEDKHUMRAH,158012,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDKHUMRAH,Vend HQ,,Cash Rounding,SA,NORMAL,253
+23731848,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDSULTNST,Vend HQ,,Cash Rounding,SA,MRSOOL,256
+23731847,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDSULTNST,Vend HQ,,Cash Rounding,SA,TAMARA,256
+23731846,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDSULTNST,Vend HQ,,Cash Rounding,SA,TABBY,256
+23731845,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDSULTNST,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,256
+23731844,JEDSULTNST,158014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDSULTNST,Vend HQ,,Cash Rounding,SA,NORMAL,256
+23731853,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RASHIDMAD2,Vend HQ,,Cash Rounding,SA,MRSOOL,324
+23731852,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RASHIDMAD2,Vend HQ,,Cash Rounding,SA,TAMARA,324
+23731851,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RASHIDMAD2,Vend HQ,,Cash Rounding,SA,TABBY,324
+23731850,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RASHIDMAD2,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,324
+23731849,RASHIDMAD2,158013,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RASHIDMAD2,Vend HQ,,Cash Rounding,SA,NORMAL,324
+23731894,KWT360MALL,164020,#N/A,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,KWT360MALL,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,NORMAL,7010
+23731895,Hungerstation,45014,#N/A,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,KWT360MALL,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,HUNGERSTATION,7010
+23731896,Tabby Saudi For communication and IT,50011,#N/A,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,KWT360MALL,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,TABBY,7010
+23731897,Nakhla IT Systems (LLC) Tamara,69011,#N/A,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,KWT360MALL,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,TAMARA,7010
+23731898,Mrsool,45015,#N/A,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,KWT360MALL,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,MRSOOL,7010
+23731899,KWTWHMALL,164021,#N/A,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,KWTWHMALL,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,NORMAL,7011
+23731900,Hungerstation,45014,#N/A,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,KWTWHMALL,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,HUNGERSTATION,7011
+23731901,Tabby Saudi For communication and IT,50011,#N/A,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,KWTWHMALL,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,TABBY,7011
+23731902,Nakhla IT Systems (LLC) Tamara,69011,#N/A,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,KWTWHMALL,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,TAMARA,7011
+23731903,Mrsool,45015,#N/A,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,KWTWHMALL,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,MRSOOL,7011
+23731635,AZAIBAOMN,125018,652362,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,AZAIBAOMN,Vend HQ,,Cash Rounding OMN,OM,NORMAL,5011
+23731636,Tabby Saudi For communication and IT,50011,652365,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,AZAIBAOMN,Vend HQ,,Cash Rounding OMN,OM,TABBY,5011
+23731637,Mrsool,45015,652364,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,AZAIBAOMN,Vend HQ,,Cash Rounding OMN,OM,MRSOOL,5011
+23731638,Hungerstation,45014,652363,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,AZAIBAOMN,Vend HQ,,Cash Rounding OMN,OM,HUNGERSTATION,5011
+23731639,Nakhla IT Systems (LLC) Tamara,69011,652366,AlQurashi-Oman,Vend Oman,Vend Invoice Oman,1,Bank Charge OMN,AZAIBAOMN,Vend HQ,,Cash Rounding OMN,OM,TAMARA,5011
+23731645,Nakhla IT Systems (LLC) Tamara,69011,652346,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDALMATAL,Vend HQ,,Cash Rounding,SA,TAMARA,314
+23731646,Hungerstation,45014,652343,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDALMATAL,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,314
+23731647,Tabby Saudi For communication and IT,50011,652345,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDALMATAL,Vend HQ,,Cash Rounding,SA,TABBY,314
+23731648,MEDALMATAL,125014,652342,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDALMATAL,Vend HQ,,Cash Rounding,SA,NORMAL,314
+23731649,Mrsool,45015,652344,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MEDALMATAL,Vend HQ,,Cash Rounding,SA,MRSOOL,314
+23731670,HIRAAJED,138013,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HIRAAJED,Vend HQ,,Cash Rounding,SA,NORMAL,240
+23731671,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HIRAAJED,Vend HQ,,Cash Rounding,SA,MRSOOL,240
+23731672,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HIRAAJED,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,240
+23731673,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HIRAAJED,Vend HQ,,Cash Rounding,SA,TABBY,240
+23731674,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,HIRAAJED,Vend HQ,,Cash Rounding,SA,TAMARA,240
+23731675,LELEMALL,139013,671377,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,LELEMALL,Vend HQ,,Cash Rounding,SA,NORMAL,1312
+23731676,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,LELEMALL,Vend HQ,,Cash Rounding,SA,TAMARA,1312
+23731677,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,LELEMALL,Vend HQ,,Cash Rounding,SA,TABBY,1312
+23731678,Hungerstation,45014,671378,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,LELEMALL,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1312
+23731679,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,LELEMALL,Vend HQ,,Cash Rounding,SA,MRSOOL,1312
+23731685,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKHIJZMLL,Vend HQ,,Cash Rounding,SA,MRSOOL,1414
+23731686,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKHIJZMLL,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1414
+23731687,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKHIJZMLL,Vend HQ,,Cash Rounding,SA,TABBY,1414
+23731688,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKHIJZMLL,Vend HQ,,Cash Rounding,SA,TAMARA,1414
+23731689,MAKHIJZMLL,140016,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,MAKHIJZMLL,Vend HQ,,Cash Rounding,SA,NORMAL,1414
+23731756,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDWAHBLVD,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,242
+23731755,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDWAHBLVD,Vend HQ,,Cash Rounding,SA,MRSOOL,242
+23731754,JEDWAHBLVD,141026,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDWAHBLVD,Vend HQ,,Cash Rounding,SA,NORMAL,242
+23731768,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBAILMAL2,Vend HQ,,Cash Rounding,SA,TAMARA,905
+23731767,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBAILMAL2,Vend HQ,,Cash Rounding,SA,TABBY,905
+23731766,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBAILMAL2,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,905
+23731765,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBAILMAL2,Vend HQ,,Cash Rounding,SA,MRSOOL,905
+23731770,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDMARINA,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,151
+23731764,JUBAILMAL2,151012,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBAILMAL2,Vend HQ,,Cash Rounding,SA,NORMAL,905
+23731769,RYDMARINA,151013,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDMARINA,Vend HQ,,Cash Rounding,SA,NORMAL,151
+23731772,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDMARINA,Vend HQ,,Cash Rounding,SA,TAMARA,151
+23731771,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDMARINA,Vend HQ,,Cash Rounding,SA,TABBY,151
+23731773,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDMARINA,Vend HQ,,Cash Rounding,SA,MRSOOL,151
+23731910,EXBBAH,83014,525120,IBRAQ-BAHRAIN (CR 171802),Vend Bahrain,Vend Invoice Bahrain,1,IBRAQ BAH Bank Charge,EXBBAH,Vend HQ,,IBRAQ-BAHRAIN Cash Rounding,BH,NORMAL,8002
+23731909,City Centre Bahrain,23011,105023,IBRAQ-BAHRAIN (CR 171802),Vend Bahrain,Vend Invoice Bahrain,1,IBRAQ BAH Bank Charge,CCNTRBHR,Vend HQ,,IBRAQ-BAHRAIN Cash Rounding,BH,NORMAL,
+23731916,JEDNUJOD,168020,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDNUJOD,Vend HQ,,Cash Rounding,SA,NORMAL,260
+23731917,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDNUJOD,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,260
+23731918,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDNUJOD,Vend HQ,,Cash Rounding,SA,TABBY,260
+23731919,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDNUJOD,Vend HQ,,Cash Rounding,SA,TAMARA,260
+23731920,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDNUJOD,Vend HQ,,Cash Rounding,SA,MRSOOL,260
+23731951,JUBHUWYLYT,168029,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBHUWYLYT,Vend HQ,,Cash Rounding,SA,NORMAL,908
+23731952,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBHUWYLYT,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,908
+23731971,JUBGLRYMAL,168034,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBGLRYMAL,Vend HQ,,Cash Rounding,SA,NORMAL,909
+23731972,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBGLRYMAL,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,909
+23731973,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBGLRYMAL,Vend HQ,,Cash Rounding,SA,TABBY,909
+23731974,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBGLRYMAL,Vend HQ,,Cash Rounding,SA,TAMARA,909
+23731975,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBGLRYMAL,Vend HQ,,Cash Rounding,SA,MRSOOL,909
+23731990,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DWADMIMKAN,Vend HQ,,Cash Rounding,SA,MRSOOL,1901
+23731989,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DWADMIMKAN,Vend HQ,,Cash Rounding,SA,TAMARA,1901
+23731988,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DWADMIMKAN,Vend HQ,,Cash Rounding,SA,TABBY,1901
+23731987,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DWADMIMKAN,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,1901
+23731986,DWADMIMKAN,168028,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,DWADMIMKAN,Vend HQ,,Cash Rounding,SA,NORMAL,1901
+23731991,JUBHUWYLYT,168029,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBHUWYLYT,Vend HQ,,Cash Rounding,SA,NORMAL,908
+23731992,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBHUWYLYT,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,908
+23731993,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBHUWYLYT,Vend HQ,,Cash Rounding,SA,TABBY,908
+23731994,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBHUWYLYT,Vend HQ,,Cash Rounding,SA,TAMARA,908
+23731995,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JUBHUWYLYT,Vend HQ,,Cash Rounding,SA,MRSOOL,908
+23731996,RYDROSHN,168030,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDROSHN,Vend HQ,,Cash Rounding,SA,NORMAL,169
+23731997,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDROSHN,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,169
+23731998,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDROSHN,Vend HQ,,Cash Rounding,SA,TABBY,169
+23731999,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDROSHN,Vend HQ,,Cash Rounding,SA,TAMARA,169
+23732000,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,RYDROSHN,Vend HQ,,Cash Rounding,SA,MRSOOL,169
+23732001,BURSULMAVE,168031,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,BURSULMAVE,Vend HQ,,Cash Rounding,SA,NORMAL,2001
+23732002,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,BURSULMAVE,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,2001
+23732003,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,BURSULMAVE,Vend HQ,,Cash Rounding,SA,TABBY,2001
+23732004,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,BURSULMAVE,Vend HQ,,Cash Rounding,SA,TAMARA,2001
+23732005,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,BURSULMAVE,Vend HQ,,Cash Rounding,SA,MRSOOL,2001
+23731979,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDMNRHPLZ,Vend HQ,,Cash Rounding,SA,TAMARA,261
+23731980,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDMNRHPLZ,Vend HQ,,Cash Rounding,SA,MRSOOL,261
+23731978,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDMNRHPLZ,Vend HQ,,Cash Rounding,SA,TABBY,261
+23731977,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDMNRHPLZ,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,261
+23731976,JEDMNRHPLZ,168016,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDMNRHPLZ,Vend HQ,,Cash Rounding,SA,NORMAL,261
+23731985,Mrsool,45015,#N/A,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,KWTMGHATER,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,MRSOOL,7012
+23731984,Nakhla IT Systems (LLC) Tamara,69011,#N/A,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,KWTMGHATER,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,TAMARA,7012
+23731983,Tabby Saudi For communication and IT,50011,#N/A,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,KWTMGHATER,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,TABBY,7012
+23731982,Hungerstation,45014,#N/A,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,KWTMGHATER,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,HUNGERSTATION,7012
+23731981,KWTMGHATER,175017,#N/A,IBRAQ-KUWAIT (CR 460767),Vend Kuwait,Vend Invoice Kuwait,1,IQ-KUW Bank Charge,KWTMGHATER,Vend HQ,,IBRAQ-KUWAIT Cash Rounding,KW,NORMAL,7012
+23732015,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDKNGAZIZ,Vend HQ,,Cash Rounding,SA,MRSOOL,251
+23732014,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDKNGAZIZ,Vend HQ,,Cash Rounding,SA,TAMARA,251
+23732013,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDKNGAZIZ,Vend HQ,,Cash Rounding,SA,TABBY,251
+23732012,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDKNGAZIZ,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,251
+23732011,JEDKNGAZIZ,168025,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,JEDKNGAZIZ,Vend HQ,,Cash Rounding,SA,NORMAL,251
+23732010,Mrsool,45015,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SHUBAILYML,Vend HQ,,Cash Rounding,SA,MRSOOL,405
+23732009,Nakhla IT Systems (LLC) Tamara,69011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SHUBAILYML,Vend HQ,,Cash Rounding,SA,TAMARA,405
+23732008,Tabby Saudi For communication and IT,50011,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SHUBAILYML,Vend HQ,,Cash Rounding,SA,TABBY,405
+23732007,Hungerstation,45014,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SHUBAILYML,Vend HQ,,Cash Rounding,SA,HUNGERSTATION,405
+23732006,SHUBAILYML,168024,#N/A,AlQurashi-KSA,Vend,Vend Invoice,1,Bank Charge,SHUBAILYML,Vend HQ,,Cash Rounding,SA,NORMAL,405
