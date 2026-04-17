@@ -8,7 +8,7 @@ After fixing the column mapping to read from "Subtotal" (with tax), there was st
 
 ### User Requirement
 
-> "no i want the perfct number please test it your report also doesn't giveing accurate"
+> "no i want the perfect number please test it your report also doesn't giving accurate"
 
 The user requires **EXACT matching** between AR Invoice totals and actual payments received.
 

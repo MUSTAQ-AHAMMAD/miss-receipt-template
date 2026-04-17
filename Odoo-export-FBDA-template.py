@@ -1557,8 +1557,8 @@ class OracleFusionIntegration:
             # ── Calculate payment-based adjustment factor for this invoice ──
             # Payment total is authoritative (matches bank deposits)
             # Adjust sales amounts proportionally to match payment total
-            invoice_payment_total = self.invoice_payments.get(inv, {})
-            payment_total_for_invoice = sum(invoice_payment_total.values()) if invoice_payment_total else 0.0
+            invoice_payments_dict = self.invoice_payments.get(inv, {})
+            payment_total_for_invoice = sum(invoice_payments_dict.values()) if invoice_payments_dict else 0.0
             
             # Calculate sales total for this invoice (with sign alignment)
             invoice_sales_total = 0.0
@@ -1678,7 +1678,7 @@ class OracleFusionIntegration:
                 records.append(row)
 
             # ── Add service charge line if needed ──
-            if add_service_charge and service_charge_amount != 0:
+            if add_service_charge:
                 service_row: Dict = {col: "" for col in self.AR_COLUMNS}
                 
                 service_row["Transaction Batch Source Name"]     = AR_STATIC["Transaction Batch Source Name"]
