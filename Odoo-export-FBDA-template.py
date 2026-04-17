@@ -1554,6 +1554,39 @@ class OracleFusionIntegration:
 
             row_positions = self._inv_row_index.get(inv, [])
 
+            # ── Calculate payment-based adjustment factor for this invoice ──
+            # Payment total is authoritative (matches bank deposits)
+            # Adjust sales amounts proportionally to match payment total
+            invoice_payment_total = self.invoice_payments.get(inv, {})
+            payment_total_for_invoice = sum(invoice_payment_total.values()) if invoice_payment_total else 0.0
+            
+            # Calculate sales total for this invoice (with sign alignment)
+            invoice_sales_total = 0.0
+            for pos in row_positions:
+                item_temp = self.line_items.iloc[pos]
+                qty_temp = safe_float(item_temp.get("Quantity", 0))
+                amt_temp = safe_float(item_temp.get("Subtotal w/o Tax", 0))
+                # Apply same sign alignment
+                if amt_temp < 0 and qty_temp > 0:
+                    qty_temp = -qty_temp
+                elif qty_temp < 0 and amt_temp > 0:
+                    amt_temp = -amt_temp
+                invoice_sales_total += amt_temp
+            
+            # Calculate adjustment factor (payment / sales)
+            payment_adjustment_factor = 1.0
+            add_service_charge = False
+            service_charge_amount = 0.0
+            
+            if abs(invoice_sales_total) < 0.01:  # Sales total is zero
+                if abs(payment_total_for_invoice) > 0.01:  # But payment is not zero
+                    # This is a service charge / tip situation
+                    add_service_charge = True
+                    service_charge_amount = payment_total_for_invoice
+            else:
+                # Normal case: adjust proportionally
+                payment_adjustment_factor = payment_total_for_invoice / invoice_sales_total
+            
             for pos in row_positions:
                 item = self.line_items.iloc[pos]
 
@@ -1571,6 +1604,10 @@ class OracleFusionIntegration:
                 # Case 2: quantity negative, amount positive → flip amount
                 elif quantity < 0 and amount > 0:
                     amount = -amount
+
+                # ── Apply payment adjustment factor ──
+                # Adjust amount to match payment total (proportionally)
+                amount = amount * payment_adjustment_factor
 
                 # ── Unit Selling Price always positive ──
                 unit_price = (abs(amount) / abs(quantity)) if quantity != 0 else 0.0
@@ -1639,6 +1676,53 @@ class OracleFusionIntegration:
                     row["Inventory Item Number"] = barcode
 
                 records.append(row)
+
+            # ── Add service charge line if needed ──
+            if add_service_charge and service_charge_amount != 0:
+                service_row: Dict = {col: "" for col in self.AR_COLUMNS}
+                
+                service_row["Transaction Batch Source Name"]     = AR_STATIC["Transaction Batch Source Name"]
+                service_row["Transaction Type Name"]             = AR_STATIC["Transaction Type Name"]
+                service_row["Payment Terms"]                     = AR_STATIC["Payment Terms"]
+                service_row["Transaction Date"]                  = format_datetime(sale_date)
+                service_row["Accounting Date"]                   = format_datetime(sale_date)
+                service_row["Transaction Number"]                = txn_num
+                service_row["Bill-to Customer Account Number"]   = bill_to_account
+                service_row["Bill-to Customer Site Number"]      = bill_to_site
+                service_row["Transaction Line Type"]             = AR_STATIC["Transaction Line Type"]
+                service_row["Transaction Line Description"]      = "Service Charge"
+                service_row["Currency Code"]                     = AR_STATIC["Currency Code"]
+                service_row["Currency Conversion Type"]          = AR_STATIC["Currency Conversion Type"]
+                service_row["Currency Conversion Date"]          = format_date(sale_date)
+                service_row["Currency Conversion Rate"]          = AR_STATIC["Currency Conversion Rate"]
+                service_row["Transaction Line Amount"]           = round(service_charge_amount, 2)
+                service_row["Transaction Line Quantity"]         = 1
+                service_row["Customer Ordered Quantity"]         = ""
+                service_row["Unit Selling Price"]                = round(service_charge_amount, 2)
+                service_row["Line Transactions Flexfield Context"] = AR_STATIC["Line Transactions Flexfield Context"]
+                service_row["Line Transactions Flexfield Segment 1"] = f"{self._seg1_prefix}{self.segment_seq_1:06d}"
+                service_row["Line Transactions Flexfield Segment 2"] = f"{self._seg2_prefix}{self.segment_seq_2:06d}"
+                self.segment_seq_1 += 1
+                self.segment_seq_2 += 1
+                service_row["Tax Classification Code"]           = DEFAULT_TAX_CODE
+                service_row["Sales Order Number"]                = inv
+                service_row["Unit of Measure Code"]              = ""
+                service_row["Unit of Measure Name"]              = "Each"
+                service_row["Default Taxation Country"]          = AR_STATIC["Default Taxation Country"]
+                service_row["Comments"]                          = AR_STATIC["Comments"]
+                service_row["END"]                               = AR_STATIC["END"]
+                service_row["Memo Line Name"]                    = "Service Charge"
+                service_row["Inventory Item Number"]             = ""
+                
+                records.append(service_row)
+                
+                # Update tracking
+                ss = store_stats[store]
+                ss["amount"] += service_charge_amount
+                ss["lines"] += 1
+                txn_registry[txn_num]["lines"] += 1
+                txn_registry[txn_num]["amount"] += service_charge_amount
+                self.invoice_ar_total[inv] += service_charge_amount
 
         df = pd.DataFrame(records, columns=self.AR_COLUMNS)
 
