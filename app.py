@@ -15,7 +15,6 @@ import os
 import queue
 import sys
 import threading
-import time
 import traceback
 import uuid
 import zipfile
@@ -32,16 +31,20 @@ from flask import (
     send_file,
     stream_with_context,
 )
+from werkzeug.utils import secure_filename
 
 # ---------------------------------------------------------------------------
 # App setup
 # ---------------------------------------------------------------------------
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24)
+# Use a fixed secret key from the environment for session stability across restarts;
+# falls back to a random key for development only.
+app.secret_key = os.environ.get("SECRET_KEY") or os.urandom(24)
 app.config["MAX_CONTENT_LENGTH"] = 512 * 1024 * 1024  # 512 MB
 
-UPLOAD_BASE = Path("/tmp/oracle_fusion_ui")
+# Upload directory is configurable via the UPLOAD_DIR environment variable.
+UPLOAD_BASE = Path(os.environ.get("UPLOAD_DIR", "/tmp/oracle_fusion_ui"))
 UPLOAD_BASE.mkdir(parents=True, exist_ok=True)
 
 # In-memory session store: session_id → {queue, status, output_dir, zip_path}
@@ -78,8 +81,11 @@ def _save_upload(sid: str, field: str) -> Optional[str]:
     f = request.files.get(field)
     if not f or not f.filename:
         return None
+    safe_name = secure_filename(f.filename)
+    if not safe_name:
+        return None
     sess = _session(sid)
-    dest = Path(sess["work_dir"]) / f.filename
+    dest = Path(sess["work_dir"]) / safe_name
     f.save(str(dest))
     return str(dest)
 
@@ -119,7 +125,7 @@ def _run_integration(sid: str, cfg: dict):
 
         try:
             # Lazy import of the integration module
-            import importlib.util, types
+            import importlib.util
 
             spec = importlib.util.spec_from_file_location(
                 "oracle_integration",
@@ -195,7 +201,6 @@ def _run_integration(sid: str, cfg: dict):
             sys.stdout = old_stdout
 
     except Exception as exc:
-        sys.stdout = old_stdout if "old_stdout" in dir() else sys.__stdout__
         tb = traceback.format_exc()
         log(f"❌ ERROR: {exc}")
         for line in tb.splitlines():
@@ -252,23 +257,17 @@ def run_integration():
         "bank_charges":    "bank_charges",
     }
 
-    errors = []
     for key, field in required_fields.items():
         path = _save_upload(sid, field)
         if path:
             cfg[key] = path
-        else:
-            errors.append(f"Required file '{field}' is missing.")
-
-    if errors:
-        return jsonify({"error": "\n".join(errors)}), 400
 
     for key, field in optional_fields.items():
         path = _save_upload(sid, field)
         if path:
             cfg[key] = path
 
-    # Also accept pre-existing reference files from the repo
+    # Fall back to pre-existing reference files shipped with the repo
     repo_dir = Path(__file__).parent
     if "receipt_methods" not in cfg:
         rp = repo_dir / "Receipt_Methods.csv"
@@ -282,6 +281,15 @@ def run_integration():
         md = repo_dir / "RCPT_Mapping_DATA.csv"
         if md.exists():
             cfg["metadata"] = str(md)
+
+    # Validate required fields (after applying repo-level fallbacks)
+    errors = [
+        f"Required file '{field}' is missing."
+        for key, field in required_fields.items()
+        if key not in cfg
+    ]
+    if errors:
+        return jsonify({"error": "\n".join(errors)}), 400
 
     # Configuration values
     cfg["org_name"]   = request.form.get("org_name", "AlQurashi-KSA")
