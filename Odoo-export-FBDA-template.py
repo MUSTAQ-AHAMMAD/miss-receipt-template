@@ -764,9 +764,10 @@ class VerificationLog:
     TRUNCATE_SUFFIX = "..."
     
     # Keywords for identifying major sections that need enhanced formatting
+    # Note: "VERIFICATION" will match "VERIFICATION SUMMARY" and similar titles
     MAJOR_SECTION_KEYWORDS = [
         "FINAL CROSS-CHECK", "VERIFICATION", "VALIDATION", 
-        "SUMMARY", "MAJOR VERIFICATION POINTS"
+        "MAJOR VERIFICATION POINTS"
     ]
 
     def __init__(self):
@@ -837,7 +838,12 @@ class VerificationLog:
                 
                 overall_status = "✓ ALL CHECKS PASSED" if fail_count == 0 else "⚠ ISSUES DETECTED"
                 f.write(f"║  Overall Status: {overall_status:<51}║\n")
-                f.write(f"║  Passed: {pass_count:<3}  |  Failed: {fail_count:<3}  |  Warnings: {warn_count:<3}{' ' * 26}║\n")
+                
+                # Calculate padding dynamically: total_width(70) - border_chars(4) - content
+                # Content: "Passed: XXX  |  Failed: XXX  |  Warnings: XXX" = ~44 chars (with spaces)
+                stats_line = f"Passed: {pass_count:<3}  |  Failed: {fail_count:<3}  |  Warnings: {warn_count:<3}"
+                padding_needed = 70 - 4 - len(stats_line) - 2  # -2 for "║  " at start
+                f.write(f"║  {stats_line}{' ' * padding_needed}║\n")
                 f.write("╠" + "═" * 70 + "╣\n")
                 
                 for label, value, status in self._summary_items:
