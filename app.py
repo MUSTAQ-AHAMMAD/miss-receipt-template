@@ -191,24 +191,23 @@ def _run_integration(sid: str, cfg: dict):
                 # Group AR by date
                 ar_by_date = ar_df.groupby('Transaction Date')['Transaction Line Amount'].sum().to_dict()
                 
-                # Group input by date
-                line_items_with_date = integration.line_items.copy()
-                line_items_with_date['adjusted_amount'] = line_items_with_date.apply(calculate_adjusted_amount, axis=1)
+                # Group payments by date (payment data is authoritative)
+                payments_with_date = integration.payments.copy()
                 
-                # Get date column from line items
+                # Get date column from payments
                 date_col = None
-                for col in line_items_with_date.columns:
-                    if any(x in col.lower() for x in ['date', 'sale date']):
+                for col in payments_with_date.columns:
+                    if any(x in col.lower() for x in ['date']):
                         date_col = col
                         break
                 
                 if date_col:
                     # Format dates consistently
-                    line_items_with_date['formatted_date'] = pd.to_datetime(
-                        line_items_with_date[date_col], errors='coerce'
+                    payments_with_date['formatted_date'] = pd.to_datetime(
+                        payments_with_date[date_col], errors='coerce'
                     ).dt.strftime('%Y-%m-%d %H:%M:%S')
                     
-                    input_by_date = line_items_with_date.groupby('formatted_date')['adjusted_amount'].sum().to_dict()
+                    input_by_date = payments_with_date.groupby('formatted_date')['Amount'].sum().to_dict()
                     
                     # Build comparison stats
                     date_comparison_text = "\n\nDATE-WISE COMPARISON:\n" + "="*80 + "\n"
