@@ -763,6 +763,13 @@ class VerificationLog:
     MAX_VALUE_WIDTH = 20
     TRUNCATE_SUFFIX = "..."
     
+    # Box formatting constants
+    BOX_WIDTH = 70          # Total width of the summary box
+    BORDER_CHARS = 4        # Width of border characters (║  ... ║)
+    
+    # Spacer for visual separation in highlight boxes
+    SPACER_LINE = ("", "")  # Empty tuple for adding blank lines in boxes
+    
     # Keywords for identifying major sections that need enhanced formatting
     # Note: "VERIFICATION" will match "VERIFICATION SUMMARY" and similar titles
     MAJOR_SECTION_KEYWORDS = [
@@ -839,10 +846,9 @@ class VerificationLog:
                 overall_status = "✓ ALL CHECKS PASSED" if fail_count == 0 else "⚠ ISSUES DETECTED"
                 f.write(f"║  Overall Status: {overall_status:<51}║\n")
                 
-                # Calculate padding dynamically: total_width(70) - border_chars(4) - content
-                # Content: "Passed: XXX  |  Failed: XXX  |  Warnings: XXX" = ~44 chars (with spaces)
+                # Calculate padding dynamically using class constants
                 stats_line = f"Passed: {pass_count:<3}  |  Failed: {fail_count:<3}  |  Warnings: {warn_count:<3}"
-                padding_needed = 70 - 4 - len(stats_line) - 2  # -2 for "║  " at start
+                padding_needed = self.BOX_WIDTH - self.BORDER_CHARS - len(stats_line) - 2  # -2 for "║  " at start
                 f.write(f"║  {stats_line}{' ' * padding_needed}║\n")
                 f.write("╠" + "═" * 70 + "╣\n")
                 
@@ -2097,12 +2103,12 @@ class OracleFusionIntegration:
             ("Input line item rows", f"{input_lines:,}"),
             ("Output AR rows", f"{output_lines:,}"),
             ("Line count match", match_flag),
-            ("", ""),
+            vl.SPACER_LINE,  # Visual spacer
             ("AR total amount", f"{ar_total:,.2f} SAR"),
             ("Payment file total", f"{pay_norm_total:,.2f} SAR"),
             ("Receipt total", f"{rcpt_total:,.2f} SAR"),
             ("Receipt vs payment diff", f"{diff:,.2f} SAR " + ("✓ MATCH" if amounts_match else "⚠ CHECK")),
-            ("", ""),
+            vl.SPACER_LINE,  # Visual spacer
             ("Segment 1 unique values", f"{seg1_unique:,} " + ("✓ OK" if seg1_ok else "⚠ duplicates")),
             ("Segment 2 unique values", f"{seg2_unique:,} " + ("✓ OK" if seg2_ok else "⚠ duplicates")),
         ])
@@ -2427,7 +2433,7 @@ class OracleFusionIntegration:
             ("Total AR Invoice amount", f"{ar_total:,.2f} SAR"),
             ("Total Standard Receipt amt", f"{rcpt_total:,.2f} SAR"),
             ("Difference", f"{diff:,.2f} SAR " + ("✓ MATCH" if amounts_match else "⚠ CHECK")),
-            ("", ""),
+            vl.SPACER_LINE,  # Visual spacer
             ("Status", "✓ VERIFIED" if amounts_match else "⚠ REVIEW REQUIRED"),
         ])
 

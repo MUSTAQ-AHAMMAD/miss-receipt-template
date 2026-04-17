@@ -80,7 +80,7 @@ Otherwise shows: "⚠ VERIFICATION COMPLETE WITH WARNINGS"
 ║  Passed: 4    |  Failed: 0    |  Warnings: 0                            ║
 ╠══════════════════════════════════════════════════════════════════════╣
 ║  ✓ Line Count Verification                  12,344 rows          ║
-║  ✓ Amount Reconciliation                    580,048.68 SAR       ║
+║  ✓ Amount Reconciliation                    700,974.00 SAR       ║
 ║  ✓ Segment 1 Uniqueness                     12,344 unique        ║
 ║  ✓ Segment 2 Uniqueness                     12,344 unique        ║
 ║  ℹ Total Invoices Processed                 3,145                ║
