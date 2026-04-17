@@ -152,6 +152,9 @@ python data_validator.py receipts receipts_directory/ [ar_invoice.csv]
 - Items with empty barcode/SKU → `Memo Line Name = "Discount Item"`, `Inventory Item Number = ""`
 - Items with "discount" in product name → treated as discount items
 - Regular items maintain barcode in `Inventory Item Number`
+- **Odoo Discount Format**: Discount items from Odoo have negative quantity (-1.0) and positive amount
+- **Sign Alignment**: System automatically converts positive discount amounts to negative to reduce invoice totals
+- This ensures accurate accounting where discounts reduce the total amount
 
 ### Invoice Sequence Management
 - Automatically tracks last used invoice numbers
@@ -181,6 +184,10 @@ requirements.txt                Python dependencies
 - Review verification report for "Invoice sequence persisted" message
 
 ### Total amount mismatch
+- **Note**: The system applies sign alignment logic for discount items from Odoo
+- Odoo exports discount items with negative quantity and positive amount
+- The system automatically flips these to negative amounts to reduce invoice totals
+- Input Sheet Total and AR Invoice Total both use the same sign-aligned calculation
 - Use data validator: `python data_validator.py ar ar_invoice.csv source_file.xlsx`
 - Check discount items are properly identified (empty SKU)
 - Verify no rows were dropped during processing
