@@ -757,6 +757,17 @@ class InvoiceSequenceManager:
 # ============================================================================
 
 class VerificationLog:
+    
+    # Display width constants for summary formatting
+    MAX_LABEL_WIDTH = 40
+    MAX_VALUE_WIDTH = 20
+    TRUNCATE_SUFFIX = "..."
+    
+    # Keywords for identifying major sections that need enhanced formatting
+    MAJOR_SECTION_KEYWORDS = [
+        "FINAL CROSS-CHECK", "VERIFICATION", "VALIDATION", 
+        "SUMMARY", "MAJOR VERIFICATION POINTS"
+    ]
 
     def __init__(self):
         self.run_ts    = datetime.now()
@@ -831,19 +842,19 @@ class VerificationLog:
                 
                 for label, value, status in self._summary_items:
                     icon = {"PASS": "✓", "FAIL": "✗", "WARN": "⚠", "INFO": "ℹ"}.get(status, "•")
-                    # Truncate to fit in display width (40 for label, 20 for value)
-                    # Take first N-3 chars and add "..." to make exactly N chars total
-                    label_truncated = (label[:37] + "...") if len(label) > 40 else label
-                    value_truncated = (value[:17] + "...") if len(value) > 20 else value
-                    f.write(f"║  {icon} {label_truncated:<40} {value_truncated:<20} ║\n")
+                    # Truncate to fit in display width using class constants
+                    # Take first (MAX_WIDTH - len(SUFFIX)) chars and add SUFFIX to make exactly MAX_WIDTH chars total
+                    suffix_len = len(self.TRUNCATE_SUFFIX)
+                    label_truncated = (label[:self.MAX_LABEL_WIDTH - suffix_len] + self.TRUNCATE_SUFFIX) if len(label) > self.MAX_LABEL_WIDTH else label
+                    value_truncated = (value[:self.MAX_VALUE_WIDTH - suffix_len] + self.TRUNCATE_SUFFIX) if len(value) > self.MAX_VALUE_WIDTH else value
+                    f.write(f"║  {icon} {label_truncated:<{self.MAX_LABEL_WIDTH}} {value_truncated:<{self.MAX_VALUE_WIDTH}} ║\n")
                 
                 f.write("╚" + "═" * 70 + "╝\n\n")
             
             # Detailed Sections
             for title, lines in self.sections:
-                # Highlight major verification sections
-                is_major = any(kw in title.upper() for kw in 
-                             ["FINAL CROSS-CHECK", "VERIFICATION", "VALIDATION", "SUMMARY"])
+                # Highlight major verification sections using class constant
+                is_major = any(kw in title.upper() for kw in self.MAJOR_SECTION_KEYWORDS)
                 
                 if is_major:
                     f.write("╔" + "═" * 70 + "╗\n")
