@@ -996,9 +996,10 @@ class MetadataCache:
 
 class RegisterCache:
 
-    def __init__(self, registers_path: str):
+    def __init__(self, registers_path: str = ""):
         self.name_map: Dict[str, str] = {}
-        self._load(registers_path)
+        if registers_path and Path(registers_path).exists():
+            self._load(registers_path)
 
     def _load(self, path: str):
         df = pd.read_csv(path, encoding="utf-8-sig", dtype=str)
@@ -1109,7 +1110,7 @@ class OracleFusionIntegration:
         line_items_path:      str,
         payments_path:        str,
         metadata_path:        str,
-        registers_path:       str,
+        registers_path:       str = "",
         receipt_methods_path: str = "",
         bank_charges_path:    str = "",
     ):

@@ -134,7 +134,7 @@ def _run_integration(sid: str, cfg: dict):
             mod = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(mod)
 
-            progress(10, "AR Invoice loaded — initialising engine…")
+            progress(10, "Initialising integration engine…")
 
             # Override AR_STATIC comments with org name from config
             if cfg.get("org_name"):
@@ -147,32 +147,87 @@ def _run_integration(sid: str, cfg: dict):
                 start_legacy_seq_2 = int(cfg.get("start_leg2", 1)),
             )
 
-            progress(20, "Loading reference data files…")
+            mode = cfg.get("mode", "ar_invoice")
 
-            integration.load_from_ar_invoice(
-                ar_invoice_path      = cfg["ar_invoice"],
-                metadata_path        = cfg["metadata"],
-                receipt_methods_path = cfg.get("receipt_methods", ""),
-                bank_charges_path    = cfg.get("bank_charges", ""),
-                payment_file_path    = cfg.get("payment_file", ""),
-            )
+            if mode == "sales_payment":
+                # ── GENERATE FROM SCRATCH (Sales Lines + Payment Lines) ──
+                progress(15, "Loading reference data files…")
 
-            progress(50, "Generating Standard Receipts…")
-            std_rcp = integration.generate_standard_receipts()
-            integration.save_standard_receipts(std_rcp)
-            stat("Standard Receipts", f"{len(std_rcp):,} files")
+                integration.load_data(
+                    line_items_path      = cfg["sales_lines"],
+                    payments_path        = cfg["payment_lines"],
+                    metadata_path        = cfg["metadata"],
+                    registers_path       = cfg.get("registers", ""),
+                    receipt_methods_path = cfg.get("receipt_methods", ""),
+                    bank_charges_path    = cfg.get("bank_charges", ""),
+                )
 
-            progress(75, "Generating Miscellaneous Receipts…")
-            misc_rcp = integration.generate_misc_receipts()
-            integration.save_misc_receipts(misc_rcp)
-            stat("Misc Receipts", f"{len(misc_rcp):,} files")
+                progress(35, "Generating AR Invoice…")
+                ar_df = integration.generate_ar_invoices()
+                integration.save_ar(ar_df)
 
-            progress(90, "Writing verification report…")
-            integration._write_ar_invoice_crosscheck(std_rcp)
-            integration.vlog.close()
-            ts       = datetime.now().strftime("%Y%m%d_%H%M%S")
-            log_path = Path(sess["output_dir"]) / f"Verification_Report_{ts}.txt"
-            integration.vlog.write(log_path)
+                ar_total     = float(ar_df["Transaction Line Amount"].sum())
+                ar_row_count = len(ar_df)
+                stat("AR Invoice Lines", f"{ar_row_count:,}")
+                stat("AR Invoice Total", f"{ar_total:,.2f} SAR")
+
+                # Compute input sheet total from loaded line items
+                input_total = float(
+                    integration.line_items["Subtotal w/o Tax"]
+                    .apply(mod.safe_float)
+                    .sum()
+                )
+                stat("Input Sheet Total", f"{input_total:,.2f} SAR")
+
+                diff = abs(ar_total - input_total)
+                match_flag = "✓ MATCH" if diff < 0.01 else f"⚠ DIFF {diff:,.2f}"
+                stat("Total Match", match_flag)
+
+                progress(55, "Generating Standard Receipts…")
+                std_rcp = integration.generate_standard_receipts()
+                integration.save_standard_receipts(std_rcp)
+                stat("Standard Receipts", f"{len(std_rcp):,} files")
+
+                progress(75, "Generating Miscellaneous Receipts…")
+                misc_rcp = integration.generate_misc_receipts()
+                integration.save_misc_receipts(misc_rcp)
+                stat("Misc Receipts", f"{len(misc_rcp):,} files")
+
+                progress(90, "Writing verification report…")
+                integration._write_final_crosscheck(ar_df, std_rcp)
+                integration.vlog.close()
+                ts       = datetime.now().strftime("%Y%m%d_%H%M%S")
+                log_path = Path(sess["output_dir"]) / f"Verification_Report_{ts}.txt"
+                integration.vlog.write(log_path)
+
+            else:
+                # ── AR INVOICE MODE (default) ──
+                progress(20, "Loading reference data files…")
+
+                integration.load_from_ar_invoice(
+                    ar_invoice_path      = cfg["ar_invoice"],
+                    metadata_path        = cfg["metadata"],
+                    receipt_methods_path = cfg.get("receipt_methods", ""),
+                    bank_charges_path    = cfg.get("bank_charges", ""),
+                    payment_file_path    = cfg.get("payment_file", ""),
+                )
+
+                progress(50, "Generating Standard Receipts…")
+                std_rcp = integration.generate_standard_receipts()
+                integration.save_standard_receipts(std_rcp)
+                stat("Standard Receipts", f"{len(std_rcp):,} files")
+
+                progress(75, "Generating Miscellaneous Receipts…")
+                misc_rcp = integration.generate_misc_receipts()
+                integration.save_misc_receipts(misc_rcp)
+                stat("Misc Receipts", f"{len(misc_rcp):,} files")
+
+                progress(90, "Writing verification report…")
+                integration._write_ar_invoice_crosscheck(std_rcp)
+                integration.vlog.close()
+                ts       = datetime.now().strftime("%Y%m%d_%H%M%S")
+                log_path = Path(sess["output_dir"]) / f"Verification_Report_{ts}.txt"
+                integration.vlog.write(log_path)
 
             progress(95, "Creating download ZIP…")
             zip_path = str(Path(sess["work_dir"]) / "oracle_fusion_output.zip")
@@ -240,23 +295,12 @@ def run_integration():
     if sess["status"] == "running":
         return jsonify({"error": "Already running"}), 409
 
-    cfg = {}
-
-    # AR Invoice is the only user-uploaded file
-    ar_invoice_path = _save_upload(sid, "ar_invoice")
-    if ar_invoice_path:
-        cfg["ar_invoice"] = ar_invoice_path
-
-    # Optional payment file (provides real payment-method breakdown for Misc Receipts)
-    payment_file_path = _save_upload(sid, "payment_file")
-    if payment_file_path:
-        cfg["payment_file"] = payment_file_path
+    cfg  = {}
+    mode = request.form.get("mode", "ar_invoice")
+    cfg["mode"] = mode
 
     # Auto-load all reference files from the repo root directory
     repo_dir = Path(__file__).parent
-    if "ar_invoice" not in cfg:
-        # Also try a fallback repo-level AR Invoice (for dev/testing)
-        pass
 
     for key, filename in [
         ("metadata",        "RCPT_Mapping_DATA.csv"),
@@ -267,11 +311,38 @@ def run_integration():
         if p.exists():
             cfg[key] = str(p)
 
-    # Validate the single required file
-    if "ar_invoice" not in cfg:
-        return jsonify({"error": "Required file 'AR Invoice CSV' is missing."}), 400
-    if "metadata" not in cfg:
-        return jsonify({"error": "Reference file RCPT_Mapping_DATA.csv not found in server root."}), 400
+    if mode == "sales_payment":
+        # New mode: Sales Lines + Payment Lines → generate AR Invoice
+        sales_lines_path   = _save_upload(sid, "sales_lines")
+        payment_lines_path = _save_upload(sid, "payment_lines")
+
+        if sales_lines_path:
+            cfg["sales_lines"] = sales_lines_path
+        if payment_lines_path:
+            cfg["payment_lines"] = payment_lines_path
+
+        if "sales_lines" not in cfg:
+            return jsonify({"error": "Required file 'Sales Lines CSV/XLSX' is missing."}), 400
+        if "payment_lines" not in cfg:
+            return jsonify({"error": "Required file 'Payment Lines CSV/XLSX' is missing."}), 400
+        if "metadata" not in cfg:
+            return jsonify({"error": "Reference file RCPT_Mapping_DATA.csv not found in server root."}), 400
+
+    else:
+        # Existing AR Invoice mode
+        ar_invoice_path = _save_upload(sid, "ar_invoice")
+        if ar_invoice_path:
+            cfg["ar_invoice"] = ar_invoice_path
+
+        # Optional payment file
+        payment_file_path = _save_upload(sid, "payment_file")
+        if payment_file_path:
+            cfg["payment_file"] = payment_file_path
+
+        if "ar_invoice" not in cfg:
+            return jsonify({"error": "Required file 'AR Invoice CSV' is missing."}), 400
+        if "metadata" not in cfg:
+            return jsonify({"error": "Reference file RCPT_Mapping_DATA.csv not found in server root."}), 400
 
     # Configuration values
     cfg["org_name"]   = request.form.get("org_name", "AlQurashi-KSA")
