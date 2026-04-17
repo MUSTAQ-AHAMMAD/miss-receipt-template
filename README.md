@@ -184,6 +184,10 @@ requirements.txt                Python dependencies
 - Review verification report for "Invoice sequence persisted" message
 
 ### Total amount mismatch
+- **Important**: The system reads from the "Subtotal" column (WITH tax), not "Subtotal w/o Tax"
+- This matches the payment total from the payment sheet
+- If using Odoo exports, ensure your sales sheet includes both "Order Lines/Subtotal" and "Order Lines/Subtotal w/o Tax" columns
+- The system will automatically use "Order Lines/Subtotal" (the one with tax) for calculations
 - **Note**: The system applies sign alignment logic for discount items from Odoo
 - Odoo exports discount items with negative quantity and positive amount
 - The system automatically flips these to negative amounts to reduce invoice totals
