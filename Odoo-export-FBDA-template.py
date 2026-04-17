@@ -831,7 +831,8 @@ class VerificationLog:
                 
                 for label, value, status in self._summary_items:
                     icon = {"PASS": "✓", "FAIL": "✗", "WARN": "⚠", "INFO": "ℹ"}.get(status, "•")
-                    # Truncate label and value to fit in the box
+                    # Truncate to fit in display width (40 for label, 20 for value)
+                    # Take first N-3 chars and add "..." to make exactly N chars total
                     label_truncated = (label[:37] + "...") if len(label) > 40 else label
                     value_truncated = (value[:17] + "...") if len(value) > 20 else value
                     f.write(f"║  {icon} {label_truncated:<40} {value_truncated:<20} ║\n")
