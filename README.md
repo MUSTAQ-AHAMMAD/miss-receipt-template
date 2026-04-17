@@ -184,18 +184,16 @@ requirements.txt                Python dependencies
 - Review verification report for "Invoice sequence persisted" message
 
 ### Total amount mismatch
-- **Important**: The system reads from the "Subtotal" column (WITH tax), not "Subtotal w/o Tax"
-- This matches the payment total from the payment sheet
-- If using Odoo exports, ensure your sales sheet includes both "Order Lines/Subtotal" and "Order Lines/Subtotal w/o Tax" columns
-- The system will automatically use "Order Lines/Subtotal" (the one with tax) for calculations
-- **Note**: The system applies sign alignment logic for discount items from Odoo
-- Odoo exports discount items with negative quantity and positive amount
-- The system automatically flips these to negative amounts to reduce invoice totals
-- Input Sheet Total and AR Invoice Total both use the same sign-aligned calculation
+- **IMPORTANT**: AR Invoice totals are based on **payment totals** (what was actually paid), not sales totals
+- This ensures perfect accuracy with bank deposits and financial reconciliation
+- The system automatically adjusts each invoice's line items proportionally to match its payment total
+- For orders with 100% discount but payment (tips/service charges), a "Service Charge" line is added
+- Input Sheet Total = sum of all payments (authoritative source)
+- AR Invoice Total = payment-adjusted amounts (matches Input Sheet Total exactly)
+- **Column Used**: Reads from "Subtotal" (WITH tax), not "Subtotal w/o Tax"
+- If using Odoo exports, ensure your payment sheet accurately reflects actual cash collected
 - Use data validator: `python data_validator.py ar ar_invoice.csv source_file.xlsx`
-- Check discount items are properly identified (empty SKU)
-- Verify no rows were dropped during processing
-- Review verification report for totals comparison
+- Review verification report for detailed breakdown
 
 ### Missing SKUs causing issues
 - Items without barcodes are automatically treated as discount items
