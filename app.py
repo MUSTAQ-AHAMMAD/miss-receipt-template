@@ -328,11 +328,16 @@ def _run_integration(sid: str, cfg: dict):
                 ts       = datetime.now().strftime("%Y%m%d_%H%M%S")
                 log_path = Path(sess["output_dir"]) / f"Verification_Report_{ts}.txt"
                 integration.vlog.write(log_path)
-                
+
                 # Copy report to persistent reports directory
                 import shutil
                 reports_copy = REPORTS_DIR / f"Verification_Report_{ts}.txt"
                 shutil.copy2(str(log_path), str(reports_copy))
+
+                # Send transaction sequence info to UI
+                if hasattr(integration, 'last_transaction_number'):
+                    stat("Last Transaction Number", f"BLKU-{integration.last_transaction_number:07d}")
+                    stat("Next Transaction Number", f"{integration.next_transaction_number}")
 
             else:
                 # ── AR INVOICE MODE (default) ──

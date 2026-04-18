@@ -1702,11 +1702,15 @@ class OracleFusionIntegration:
         vl.kv("Max Transaction Number used",         f"BLKU-{max_txn:07d}")
         vl.kv(">>> Next run START_TXN_SEQUENCE =",   f"{max_txn + 1}  ← set this next run")
         
-        # Update sequence manager if enabled
+        # Update sequence manager if enabled and store sequence info for UI
         if self.seq_manager:
             self.seq_manager.update(max_txn, self.segment_seq_1 - 1, self.segment_seq_2 - 1)
             vl.add()
             vl.kv("✓ Invoice sequence persisted", "Ready for next run")
+
+        # Store sequence information for display in UI
+        self.last_transaction_number = max_txn
+        self.next_transaction_number = max_txn + 1
         
         vl.add()
         vl.kv("Rows with EMPTY Bill-to Account",
