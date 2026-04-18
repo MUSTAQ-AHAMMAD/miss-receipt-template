@@ -832,13 +832,59 @@ class VerificationLog:
         """Write verification report to text file and generate CSV summaries"""
         # Write main text report
         with open(path, "w", encoding="utf-8") as f:
-            # Header
-            f.write("=" * 72 + "\n")
-            f.write("  ORACLE FUSION INTEGRATION — VERIFICATION REPORT\n")
-            f.write(f"  Generated : {self.run_ts.strftime('%Y-%m-%d %H:%M:%S')}\n")
-            f.write("=" * 72 + "\n\n")
+            # Professional Header with Company Branding
+            f.write("╔" + "═" * 90 + "╗\n")
+            f.write("║" + " " * 90 + "║\n")
+            f.write("║" + " " * 20 + "ORACLE FUSION FINANCIAL INTEGRATION" + " " * 35 + "║\n")
+            f.write("║" + " " * 25 + "VERIFICATION REPORT" + " " * 46 + "║\n")
+            f.write("║" + " " * 90 + "║\n")
+            f.write("╠" + "═" * 90 + "╣\n")
+            f.write(f"║  Report Generated    : {self.run_ts.strftime('%A, %B %d, %Y at %I:%M:%S %p'):<66}║\n")
+            f.write(f"║  Report Type         : {'Accounts Receivable & Receipt Validation':<66}║\n")
+            f.write(f"║  System Version      : {'v2.5.0 - Enhanced Verification':<66}║\n")
+            f.write("╚" + "═" * 90 + "╝\n\n")
 
-            # Quick Checklist for Manual Verification (NEW!)
+            # Executive Summary - Key Metrics Dashboard
+            if self._summary_items:
+                pass_count = sum(1 for _, _, s in self._summary_items if s == "PASS")
+                fail_count = sum(1 for _, _, s in self._summary_items if s == "FAIL")
+                warn_count = sum(1 for _, _, s in self._summary_items if s == "WARN")
+                total_checks = len(self._summary_items)
+
+                f.write("╔" + "═" * 90 + "╗\n")
+                f.write("║" + " " * 30 + "EXECUTIVE SUMMARY" + " " * 43 + "║\n")
+                f.write("╠" + "═" * 90 + "╣\n")
+
+                # Overall Status with color indicators
+                if fail_count == 0 and warn_count == 0:
+                    status_msg = "✓ READY FOR ORACLE FUSION IMPORT"
+                    status_detail = "All validation checks passed successfully"
+                elif fail_count == 0:
+                    status_msg = "⚠ REVIEW RECOMMENDED"
+                    status_detail = f"{warn_count} warning(s) require review before import"
+                else:
+                    status_msg = "✗ ACTION REQUIRED"
+                    status_detail = f"{fail_count} critical issue(s) must be resolved"
+
+                f.write(f"║                                                                                          ║\n")
+                f.write(f"║  Overall Status      : {status_msg:<66}║\n")
+                f.write(f"║  Assessment          : {status_detail:<66}║\n")
+                f.write(f"║                                                                                          ║\n")
+                f.write("╠" + "─" * 90 + "╣\n")
+                f.write(f"║  Validation Metrics  :                                                                   ║\n")
+                f.write(f"║                                                                                          ║\n")
+
+                # Calculate percentage
+                pass_pct = (pass_count / total_checks * 100) if total_checks > 0 else 0
+
+                f.write(f"║      Total Checks           : {total_checks:>3}                                                            ║\n")
+                f.write(f"║      Passed  [✓]            : {pass_count:>3}   ({pass_pct:>5.1f}%)                                              ║\n")
+                f.write(f"║      Failed  [✗]            : {fail_count:>3}                                                            ║\n")
+                f.write(f"║      Warnings [⚠]           : {warn_count:>3}                                                            ║\n")
+                f.write(f"║                                                                                          ║\n")
+                f.write("╚" + "═" * 90 + "╝\n\n")
+
+            # Quick Checklist for Manual Verification
             if self._summary_items:
                 f.write("╔" + "═" * 70 + "╗\n")
                 f.write("║" + " " * 15 + "QUICK VERIFICATION CHECKLIST" + " " * 27 + "║\n")
@@ -868,32 +914,49 @@ class VerificationLog:
                     f.write(f"║  {checkbox} {label_truncated:<{self.MAX_LABEL_WIDTH}} {value_truncated:<{self.MAX_VALUE_WIDTH - 1}}║\n")
 
                 f.write("╚" + "═" * 70 + "╝\n\n")
-            
-            # Detailed Sections
+
+            # Detailed Sections with improved formatting
+            f.write("\n" + "╔" + "═" * 90 + "╗\n")
+            f.write("║" + " " * 30 + "DETAILED VERIFICATION" + " " * 39 + "║\n")
+            f.write("╚" + "═" * 90 + "╝\n\n")
+
             for title, lines in self.sections:
                 # Highlight major verification sections using class constant
                 is_major = any(kw in title.upper() for kw in self.MAJOR_SECTION_KEYWORDS)
-                
+
                 if is_major:
-                    f.write("╔" + "═" * 70 + "╗\n")
-                    f.write(f"║  {title:<67} ║\n")
-                    f.write("╚" + "═" * 70 + "╝\n")
+                    f.write("\n╔" + "═" * 90 + "╗\n")
+                    f.write(f"║  {title:<87} ║\n")
+                    f.write("╚" + "═" * 90 + "╝\n")
                 else:
-                    f.write(f"{'─'*72}\n")
-                    f.write(f"  {title}\n")
-                    f.write(f"{'─'*72}\n")
-                
+                    f.write(f"\n{'━'*90}\n")
+                    f.write(f"▶ {title}\n")
+                    f.write(f"{'━'*90}\n")
+
                 for line in lines:
                     f.write(line + "\n")
                 f.write("\n")
 
+            # Professional Footer
+            f.write("\n" + "╔" + "═" * 90 + "╗\n")
+            f.write("║" + " " * 90 + "║\n")
+            f.write("║" + " " * 25 + "END OF VERIFICATION REPORT" + " " * 39 + "║\n")
+            f.write("║" + " " * 90 + "║\n")
+            f.write("║  For questions or support, please contact your system administrator.                    ║\n")
+            f.write("║  This is an automated report generated by Oracle Fusion Integration System.             ║\n")
+            f.write("║" + " " * 90 + "║\n")
+            f.write("╚" + "═" * 90 + "╝\n")
+
         print(f"  ✓ Verification report : {path}")
 
-        # Generate CSV summary for Excel analysis (NEW!)
+        # Generate CSV summary for Excel analysis
         self._write_csv_summary(path)
 
+        # Generate HTML report for professional presentation
+        self._write_html_report(path)
+
     def _write_csv_summary(self, base_path: Path):
-        """Generate CSV summary file for easy Excel analysis"""
+        """Generate enhanced CSV summary file for Excel analysis"""
         csv_path = base_path.with_name(base_path.stem + "_Summary.csv")
 
         try:
@@ -901,18 +964,349 @@ class VerificationLog:
             with open(csv_path, "w", encoding="utf-8-sig", newline="") as f:
                 writer = csv.writer(f)
 
-                # Write header
-                writer.writerow(["Verification Item", "Value", "Status", "Result"])
-                writer.writerow([])  # Empty row
+                # Professional header
+                writer.writerow(["Oracle Fusion Integration - Verification Summary"])
+                writer.writerow([f"Generated: {self.run_ts.strftime('%Y-%m-%d %H:%M:%S')}"])
+                writer.writerow([])
+
+                # Summary statistics
+                pass_count = sum(1 for _, _, s in self._summary_items if s == "PASS")
+                fail_count = sum(1 for _, _, s in self._summary_items if s == "FAIL")
+                warn_count = sum(1 for _, _, s in self._summary_items if s == "WARN")
+
+                writer.writerow(["Summary Statistics"])
+                writer.writerow(["Total Checks", "Passed", "Failed", "Warnings"])
+                writer.writerow([len(self._summary_items), pass_count, fail_count, warn_count])
+                writer.writerow([])
+
+                # Overall status
+                if fail_count == 0 and warn_count == 0:
+                    status = "READY FOR IMPORT"
+                elif fail_count == 0:
+                    status = "REVIEW RECOMMENDED"
+                else:
+                    status = "ACTION REQUIRED"
+                writer.writerow(["Overall Status", status])
+                writer.writerow([])
+
+                # Detailed verification items
+                writer.writerow(["Verification Details"])
+                writer.writerow(["Item", "Value", "Status", "Result"])
 
                 # Write summary items
                 for label, value, status in self._summary_items:
-                    result = {"PASS": "PASS", "FAIL": "FAIL", "WARN": "WARNING", "INFO": "INFO"}.get(status, status)
+                    result = {"PASS": "✓ PASS", "FAIL": "✗ FAIL", "WARN": "⚠ WARNING", "INFO": "ℹ INFO"}.get(status, status)
                     writer.writerow([label, value, status, result])
 
             print(f"  ✓ CSV Summary         : {csv_path}")
         except Exception as e:
             print(f"  ⚠ Could not generate CSV summary: {e}")
+
+    def _write_html_report(self, base_path: Path):
+        """Generate professional HTML report for web viewing"""
+        html_path = base_path.with_name(base_path.stem + "_Report.html")
+
+        try:
+            pass_count = sum(1 for _, _, s in self._summary_items if s == "PASS")
+            fail_count = sum(1 for _, _, s in self._summary_items if s == "FAIL")
+            warn_count = sum(1 for _, _, s in self._summary_items if s == "WARN")
+            total_checks = len(self._summary_items)
+
+            # Overall status
+            if fail_count == 0 and warn_count == 0:
+                status_class = "success"
+                status_msg = "✓ READY FOR ORACLE FUSION IMPORT"
+                status_detail = "All validation checks passed successfully"
+            elif fail_count == 0:
+                status_class = "warning"
+                status_msg = "⚠ REVIEW RECOMMENDED"
+                status_detail = f"{warn_count} warning(s) require review before import"
+            else:
+                status_class = "error"
+                status_msg = "✗ ACTION REQUIRED"
+                status_detail = f"{fail_count} critical issue(s) must be resolved"
+
+            pass_pct = (pass_count / total_checks * 100) if total_checks > 0 else 0
+
+            html_content = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oracle Fusion - Verification Report</title>
+    <style>
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        body {{
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: #333;
+        }}
+        .container {{
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }}
+        .header {{
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }}
+        .header h1 {{
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }}
+        .header h2 {{
+            font-size: 20px;
+            font-weight: 300;
+            opacity: 0.9;
+        }}
+        .metadata {{
+            background: #f8f9fa;
+            padding: 20px 40px;
+            border-bottom: 2px solid #e0e0e0;
+        }}
+        .metadata-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }}
+        .metadata-item {{
+            display: flex;
+            align-items: center;
+        }}
+        .metadata-label {{
+            font-weight: 600;
+            color: #555;
+            margin-right: 10px;
+        }}
+        .metadata-value {{
+            color: #333;
+        }}
+        .executive-summary {{
+            padding: 40px;
+            background: white;
+        }}
+        .status-card {{
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+        }}
+        .status-card.success {{
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }}
+        .status-card.warning {{
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }}
+        .status-card.error {{
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+        }}
+        .status-card h3 {{
+            font-size: 28px;
+            margin-bottom: 10px;
+        }}
+        .status-card p {{
+            font-size: 16px;
+            opacity: 0.95;
+        }}
+        .metrics {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }}
+        .metric-card {{
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }}
+        .metric-value {{
+            font-size: 36px;
+            font-weight: 700;
+            color: #1e3c72;
+            margin-bottom: 5px;
+        }}
+        .metric-label {{
+            font-size: 14px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }}
+        .checklist {{
+            padding: 40px;
+            background: #fafafa;
+        }}
+        .section-title {{
+            font-size: 24px;
+            color: #1e3c72;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }}
+        .checklist-items {{
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }}
+        .checklist-item {{
+            padding: 15px 25px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            transition: background 0.2s;
+        }}
+        .checklist-item:hover {{
+            background: #f8f9fa;
+        }}
+        .checklist-item:last-child {{
+            border-bottom: none;
+        }}
+        .checkbox {{
+            font-size: 20px;
+            margin-right: 15px;
+            min-width: 30px;
+        }}
+        .checkbox.pass {{ color: #38ef7d; }}
+        .checkbox.fail {{ color: #fee140; }}
+        .checkbox.warn {{ color: #f5576c; }}
+        .checkbox.info {{ color: #667eea; }}
+        .item-label {{
+            flex: 1;
+            font-weight: 500;
+            color: #333;
+        }}
+        .item-value {{
+            color: #666;
+            margin-left: 20px;
+            font-family: 'Courier New', monospace;
+        }}
+        .footer {{
+            background: #1e3c72;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }}
+        .footer p {{
+            margin: 5px 0;
+            opacity: 0.9;
+        }}
+        @media print {{
+            body {{ background: white; padding: 0; }}
+            .container {{ box-shadow: none; }}
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ORACLE FUSION FINANCIAL INTEGRATION</h1>
+            <h2>Verification Report</h2>
+        </div>
+
+        <div class="metadata">
+            <div class="metadata-grid">
+                <div class="metadata-item">
+                    <span class="metadata-label">Generated:</span>
+                    <span class="metadata-value">{self.run_ts.strftime('%A, %B %d, %Y at %I:%M:%S %p')}</span>
+                </div>
+                <div class="metadata-item">
+                    <span class="metadata-label">Report Type:</span>
+                    <span class="metadata-value">AR & Receipt Validation</span>
+                </div>
+                <div class="metadata-item">
+                    <span class="metadata-label">System Version:</span>
+                    <span class="metadata-value">v2.5.0 - Enhanced</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="executive-summary">
+            <h2 class="section-title">Executive Summary</h2>
+
+            <div class="status-card {status_class}">
+                <h3>{status_msg}</h3>
+                <p>{status_detail}</p>
+            </div>
+
+            <div class="metrics">
+                <div class="metric-card">
+                    <div class="metric-value">{total_checks}</div>
+                    <div class="metric-label">Total Checks</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">{pass_count}</div>
+                    <div class="metric-label">Passed</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">{fail_count}</div>
+                    <div class="metric-label">Failed</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">{warn_count}</div>
+                    <div class="metric-label">Warnings</div>
+                </div>
+                <div class="metric-card" style="border-left-color: #38ef7d;">
+                    <div class="metric-value">{pass_pct:.1f}%</div>
+                    <div class="metric-label">Success Rate</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="checklist">
+            <h2 class="section-title">Verification Checklist</h2>
+            <div class="checklist-items">
+"""
+
+            # Add checklist items
+            for label, value, status in self._summary_items:
+                checkbox_map = {
+                    "PASS": ('<span class="checkbox pass">✓</span>', "pass"),
+                    "FAIL": ('<span class="checkbox fail">✗</span>', "fail"),
+                    "WARN": ('<span class="checkbox warn">⚠</span>', "warn"),
+                    "INFO": ('<span class="checkbox info">ℹ</span>', "info")
+                }
+                checkbox_html, status_class = checkbox_map.get(status, ('<span class="checkbox">•</span>', ""))
+
+                html_content += f"""
+                <div class="checklist-item">
+                    {checkbox_html}
+                    <span class="item-label">{label}</span>
+                    <span class="item-value">{value}</span>
+                </div>
+"""
+
+            html_content += """
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>END OF VERIFICATION REPORT</strong></p>
+            <p>For questions or support, please contact your system administrator.</p>
+            <p>This is an automated report generated by Oracle Fusion Integration System.</p>
+        </div>
+    </div>
+</body>
+</html>
+"""
+
+            with open(html_path, "w", encoding="utf-8") as f:
+                f.write(html_content)
+
+            print(f"  ✓ HTML Report         : {html_path}")
+        except Exception as e:
+            print(f"  ⚠ Could not generate HTML report: {e}")
 
     def print_summary(self):
         print("\n" + "=" * 72)
