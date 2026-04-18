@@ -351,7 +351,7 @@ def _run_integration(sid: str, cfg: dict):
                 # Send transaction sequence info to UI
                 if hasattr(integration, 'last_transaction_number'):
                     stat("Last Transaction Number", f"BLKU-{integration.last_transaction_number:07d}")
-                    stat("Next Transaction Number", f"{integration.next_transaction_number}")
+                    stat("Next Transaction Number", f"BLKU-{integration.next_transaction_number:07d}")
 
             else:
                 # ── AR INVOICE MODE (default) ──
@@ -390,7 +390,7 @@ def _run_integration(sid: str, cfg: dict):
                 # Send transaction sequence info to UI
                 if hasattr(integration, 'last_transaction_number'):
                     stat("Last Transaction Number", f"BLKU-{integration.last_transaction_number:07d}")
-                    stat("Next Transaction Number", f"{integration.next_transaction_number}")
+                    stat("Next Transaction Number", f"BLKU-{integration.next_transaction_number:07d}")
 
             progress(95, "Creating download ZIP…")
             zip_path = str(Path(sess["work_dir"]) / "oracle_fusion_output.zip")
