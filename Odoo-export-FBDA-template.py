@@ -1550,39 +1550,6 @@ class OracleFusionIntegration:
 
             row_positions = self._inv_row_index.get(inv, [])
 
-            # ── Calculate payment-based adjustment factor for this invoice ──
-            # Payment total is authoritative (matches bank deposits)
-            # Adjust sales amounts proportionally to match payment total
-            invoice_payments_dict = self.invoice_payments.get(inv, {})
-            payment_total_for_invoice = sum(invoice_payments_dict.values()) if invoice_payments_dict else 0.0
-            
-            # Calculate sales total for this invoice (with sign alignment)
-            invoice_sales_total = 0.0
-            for pos in row_positions:
-                item_temp = self.line_items.iloc[pos]
-                qty_temp = safe_float(item_temp.get("Quantity", 0))
-                amt_temp = safe_float(item_temp.get("Subtotal w/o Tax", 0))
-                # Apply same sign alignment
-                if amt_temp < 0 and qty_temp > 0:
-                    qty_temp = -qty_temp
-                elif qty_temp < 0 and amt_temp > 0:
-                    amt_temp = -amt_temp
-                invoice_sales_total += amt_temp
-            
-            # Calculate adjustment factor (payment / sales)
-            payment_adjustment_factor = 1.0
-            add_service_charge = False
-            service_charge_amount = 0.0
-            
-            if abs(invoice_sales_total) < 0.01:  # Sales total is zero
-                if abs(payment_total_for_invoice) > 0.01:  # But payment is not zero
-                    # This is a service charge / tip situation
-                    add_service_charge = True
-                    service_charge_amount = payment_total_for_invoice
-            else:
-                # Normal case: adjust proportionally
-                payment_adjustment_factor = payment_total_for_invoice / invoice_sales_total
-            
             for pos in row_positions:
                 item = self.line_items.iloc[pos]
 
@@ -1593,20 +1560,12 @@ class OracleFusionIntegration:
                 quantity = safe_float(item.get("Quantity", 0))
                 amount   = safe_float(item.get("Subtotal w/o Tax", 0))
 
-                # ── Sign alignment: amount and quantity must share the same sign ──
-                # Case 1: amount negative, quantity positive → flip quantity
+                # If amount is negative, quantity must also be negative (return)
                 if amount < 0 and quantity > 0:
                     quantity = -quantity
-                # Case 2: quantity negative, amount positive → flip amount
-                elif quantity < 0 and amount > 0:
-                    amount = -amount
 
-                # ── Apply payment adjustment factor ──
-                # Adjust amount to match payment total (proportionally)
-                amount = amount * payment_adjustment_factor
-
-                # ── Unit Selling Price always positive ──
-                unit_price = (abs(amount) / abs(quantity)) if quantity != 0 else 0.0
+                # Unit price
+                unit_price = (amount / quantity) if quantity != 0 else 0.0
 
                 is_disc = is_discount_line(product_name)
 
