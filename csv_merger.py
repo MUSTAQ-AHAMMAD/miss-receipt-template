@@ -211,7 +211,7 @@ def main():
             # Quick stats
             f.write("║" + "-" * 78 + "║\n")
             f.write(f"║  Files Merged: {stats['total_files']}".ljust(41) + f"  Duplicates: {stats['duplicates_removed']:,}".ljust(37) + "║\n")
-            f.write(f"║  Input Rows: {stats['total_rows']:,}".ljust(41) + f"  Output Rows: {stats['final_rows']:,}".ljust(37) + "║\n")
+            f.write(f"║  Input Data Rows: {stats['total_rows']:,} (excl. headers)".ljust(41) + f"  Output Data Rows: {stats['final_rows']:,}".ljust(37) + "║\n")
             f.write(f"║  Input Amount: {stats['total_amount']:,.2f} SAR".ljust(41) + f"  Output Amount: {stats['final_amount']:,.2f} SAR".ljust(37) + "║\n")
             f.write("╠" + "═" * 78 + "╣\n")
 
@@ -253,7 +253,7 @@ def main():
 
             # Table header
             f.write("  ┌" + "─" * 4 + "┬" + "─" * 32 + "┬" + "─" * 12 + "┬" + "─" * 12 + "┬" + "─" * 14 + "┐\n")
-            f.write("  │ #  │ File Name".ljust(34) + "│ Rows".ljust(14) + "│ Txns".ljust(14) + "│ Amount (SAR)".ljust(16) + "│\n")
+            f.write("  │ #  │ File Name".ljust(34) + "│ Data Rows".ljust(14) + "│ Txns".ljust(14) + "│ Amount (SAR)".ljust(16) + "│\n")
             f.write("  ├" + "─" * 4 + "┼" + "─" * 32 + "┼" + "─" * 12 + "┼" + "─" * 12 + "┼" + "─" * 14 + "┤\n")
 
             for i, file_info in enumerate(stats["files_processed"], 1):
@@ -274,13 +274,14 @@ def main():
             f.write("  │ BEFORE MERGE".ljust(40) + "│ AFTER MERGE".ljust(40) + "│\n")
             f.write("  ├" + "─" * 38 + "┼" + "─" * 38 + "┤\n")
             f.write(f"  │ Files: {stats['total_files']}".ljust(40) + f"│ Unique Transactions: {stats['unique_transactions']:,}".ljust(40) + "│\n")
-            f.write(f"  │ Total Rows: {stats['total_rows']:,}".ljust(40) + f"│ Final Rows: {stats['final_rows']:,}".ljust(40) + "│\n")
+            f.write(f"  │ Total Data Rows: {stats['total_rows']:,}".ljust(40) + f"│ Final Data Rows: {stats['final_rows']:,}".ljust(40) + "│\n")
             f.write(f"  │ Total Amount: {stats['total_amount']:,.2f} SAR".ljust(40) + f"│ Final Amount: {stats['final_amount']:,.2f} SAR".ljust(40) + "│\n")
             f.write("  ├" + "─" * 38 + "┴" + "─" * 38 + "┤\n")
             f.write(f"  │ DIFFERENCE".ljust(79) + "│\n")
             f.write("  ├" + "─" * 77 + "┤\n")
-            f.write(f"  │ Rows Removed: {stats['duplicates_removed']:,} ({100 - row_retention:.2f}%)".ljust(79) + "│\n")
+            f.write(f"  │ Data Rows Removed: {stats['duplicates_removed']:,} ({100 - row_retention:.2f}%)".ljust(79) + "│\n")
             f.write(f"  │ Amount Removed: {stats['amount_difference']:,.2f} SAR ({100 - amount_retention:.2f}%)".ljust(79) + "│\n")
+            f.write(f"  │ Note: Data row counts exclude CSV header lines".ljust(79) + "│\n")
             f.write("  └" + "─" * 77 + "┘\n\n")
 
             # DUPLICATE ANALYSIS (if any)
