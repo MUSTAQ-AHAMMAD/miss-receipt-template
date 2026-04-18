@@ -1030,8 +1030,8 @@
           Transaction Start Seq
           <span class="tip" title="Starting BLK- number for this run. Increment from last report.">?</span>
         </label>
-        <input class="form-input" type="number" id="startSeq" name="start_seq"
-               value="1" min="1" placeholder="e.g. 587" />
+        <input class="form-input" type="text" id="startSeq" name="start_seq"
+               value="1" placeholder="e.g. 587 or BLK123" pattern="[A-Za-z0-9]+" />
       </div>
       <div class="form-group">
         <label class="form-label" for="legSeq1">
@@ -1039,8 +1039,8 @@
           Legacy Segment 1 Start
           <span class="tip" title="Flexfield Segment 1 counter (prefix is auto-randomised)">?</span>
         </label>
-        <input class="form-input" type="number" id="legSeq1" name="start_leg1"
-               value="1" min="1" />
+        <input class="form-input" type="text" id="legSeq1" name="start_leg1"
+               value="1" pattern="[A-Za-z0-9]+" />
       </div>
       <div class="form-group">
         <label class="form-label" for="legSeq2">
@@ -1048,8 +1048,8 @@
           Legacy Segment 2 Start
           <span class="tip" title="Flexfield Segment 2 counter (prefix is auto-randomised)">?</span>
         </label>
-        <input class="form-input" type="number" id="legSeq2" name="start_leg2"
-               value="1" min="1" />
+        <input class="form-input" type="text" id="legSeq2" name="start_leg2"
+               value="1" pattern="[A-Za-z0-9]+" />
       </div>
     </div>
   </div><!-- /card -->
