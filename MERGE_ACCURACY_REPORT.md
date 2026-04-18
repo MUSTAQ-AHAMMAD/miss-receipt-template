@@ -2,7 +2,301 @@
 
 ## Overview
 
-The CSV merger tool has been enhanced with comprehensive accuracy reporting to help identify and track all differences between input and output files during merge operations.
+The CSV merger tool generates comprehensive, **professional** accuracy reports that make it easy to identify and track all differences between input and output files during merge operations.
+
+## Professional Report Format
+
+The report follows the same professional standards used throughout the application, featuring:
+
+- **Executive Summary** with overall status at-a-glance
+- **Visual Hierarchy** using box-drawing characters (╔══╗ ║ ╚══╝)
+- **Status Indicators** (✓/✗/⚠/ℹ) for instant problem identification
+- **Professional Tables** for structured data presentation
+- **Prominent Issue Highlighting** with █ blocks when problems are detected
+
+## Report Structure
+
+### 1. Executive Summary
+
+The report starts with a comprehensive executive summary that shows:
+
+```
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  EXECUTIVE SUMMARY                                                           ║
+╠══════════════════════════════════════════════════════════════════════════════╣
+║  Overall Status: ✓ CLEAN MERGE - NO ISSUES DETECTED                         ║
+║------------------------------------------------------------------------------║
+║  Files Merged: 2                         Duplicates: 0                      ║
+║  Input Rows: 4                           Output Rows: 4                     ║
+║  Input Amount: 1,000.00 SAR              Output Amount: 1,000.00 SAR        ║
+╠══════════════════════════════════════════════════════════════════════════════╣
+║  ✓  Row Retention                                                     100.0%║
+║  ✓  Amount Retention                                                  100.0%║
+║  ✓  Cross-File Duplicates                                     0 transactions║
+║  ℹ  Unique Transactions                                                    4║
+╚══════════════════════════════════════════════════════════════════════════════╝
+```
+
+**Overall Status Indicators:**
+- `✓ CLEAN MERGE - NO ISSUES DETECTED` - Perfect merge, no duplicates
+- `ℹ DUPLICATES REMOVED` - Duplicates found and removed (normal operation)
+- `⚠ ISSUES DETECTED` - Cross-file duplicates or other issues requiring attention
+
+### 2. Problem Detection (When Issues Exist)
+
+When problems are detected, a prominent highlighted box appears immediately after the executive summary:
+
+```
+  ████████████████████████████████████████████████████████████████████████████
+  █                   ⚠ PROBLEMS DETECTED — ACTION REQUIRED                  █
+  ████████████████████████████████████████████████████████████████████████████
+  █  • DUPLICATE ROWS:                                                      █
+  █      2 duplicate rows were removed from the merge                       █
+  █      Amount removed: 700.00 SAR                                         █
+  █                                                                          █
+  █  • CROSS-FILE DUPLICATES:                                               █
+  █      2 transactions appear in multiple input files                      █
+  █      This may indicate overlapping date ranges or data export issues    █
+  █                                                                          █
+  █  RECOMMENDATION:                                                        █
+  █    → Review the duplicate transaction details below                     █
+  █    → Verify input files have correct date ranges                        █
+  █    → Check for overlapping data exports                                 █
+  ████████████████████████████████████████████████████████████████████████████
+```
+
+This makes problems **impossible to miss** and provides clear recommendations.
+
+### 3. Input Files Summary Table
+
+Professional table showing all input files with their statistics:
+
+```
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  INPUT FILES PROCESSED                                                       ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  ┌────┬────────────────────────────────┬────────────┬────────────┬──────────────┐
+  │ #  │ File Name                │ Rows        │ Txns        │ Amount (SAR)  │
+  ├────┼────────────────────────────────┼────────────┼────────────┼──────────────┤
+  │ 1  │ store1.csv                     │          4 │          4 │     1,000.00 │
+  │ 2  │ store2.csv                     │          3 │          3 │     1,200.00 │
+  │ 3  │ store3.csv                     │          2 │          2 │     1,300.00 │
+  ├────┴────────────────────────────────┼────────────┼────────────┼──────────────┤
+  │ TOTAL                              │          9 │          - │     3,500.00 │
+  └────────────────────────────────────┴────────────┴────────────┴──────────────┘
+```
+
+### 4. Merge Operation — Before & After
+
+Side-by-side comparison showing what changed:
+
+```
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  MERGE OPERATION — BEFORE & AFTER                                            ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  ┌──────────────────────────────────────┬──────────────────────────────────────┐
+  │ BEFORE MERGE                        │ AFTER MERGE                           │
+  ├──────────────────────────────────────┼──────────────────────────────────────┤
+  │ Files: 3                            │ Unique Transactions: 7                │
+  │ Total Rows: 9                       │ Final Rows: 7                         │
+  │ Total Amount: 3,500.00 SAR          │ Final Amount: 2,800.00 SAR            │
+  ├──────────────────────────────────────┴──────────────────────────────────────┤
+  │ DIFFERENCE                                                                 │
+  ├─────────────────────────────────────────────────────────────────────────────┤
+  │ Rows Removed: 2 (22.22%)                                                   │
+  │ Amount Removed: 700.00 SAR (20.00%)                                        │
+  └─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 5. Duplicate Transactions Analysis (If Present)
+
+Detailed table of duplicate transactions:
+
+```
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  DUPLICATE TRANSACTIONS ANALYSIS                                             ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  Total duplicate transactions found: 2
+
+  ┌────┬────────────────────┬────────────┬────────────────┬──────────────────────┐
+  │ #  │ Transaction   │ Dup Lines   │ Dup Amount      │ Found in Files         │
+  ├────┼────────────────────┼────────────┼────────────────┼──────────────────────┤
+  │ 1  │ BLK-0000003        │          1 │         300.00 │ 2 files              │
+  │ 2  │ BLK-0000004        │          1 │         400.00 │ 2 files              │
+  └────┴────────────────────┴────────────┴────────────────┴──────────────────────┘
+```
+
+### 6. Cross-File Duplicates (If Present)
+
+Lists transactions that appear in multiple input files:
+
+```
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  CROSS-FILE DUPLICATES — TRANSACTIONS IN MULTIPLE FILES                      ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  ⚠ WARNING: 2 transactions appear in multiple files
+
+  [1] BLK-0000003
+      → Appears in 2 files: store2.csv, store1.csv
+
+  [2] BLK-0000004
+      → Appears in 2 files: store2.csv, store1.csv
+```
+
+### 7. Final Verification
+
+Summary of verification checks:
+
+```
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  FINAL VERIFICATION                                                          ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  ℹ  Data Integrity:    2 duplicates removed
+  ⚠  File Overlap:      2 cross-file duplicates
+  ✓  Output File:       merged.csv
+  ✓  Report File:       merged_merge_report.txt
+```
+
+### 8. Conclusion
+
+Final status with timestamp:
+
+```
+  ════════════════════════════════════════════════════════════════════════════
+  ⚠  MERGE COMPLETED WITH WARNINGS
+  ⚠  Review duplicate transactions and cross-file overlaps above
+  ℹ  Consider checking input file date ranges
+  ✓  Finished: 2026-04-18 19:25:22
+  ════════════════════════════════════════════════════════════════════════════
+```
+
+## Status Indicators
+
+The report uses clear status indicators throughout:
+
+- **✓** - Check passed / No issues
+- **✗** - Critical failure detected
+- **⚠** - Warning / Attention required
+- **ℹ** - Informational
+
+## Benefits
+
+### Easy Problem Identification
+
+1. **Executive Summary** - See status at-a-glance before reading details
+2. **Problem Detection Box** - Impossible to miss when issues exist
+3. **Clear Indicators** - ✓/⚠/ℹ show exactly what needs attention
+4. **Structured Tables** - Easy to scan and compare data
+
+### Professional Presentation
+
+1. **Visual Hierarchy** - Box-drawing characters create clear sections
+2. **Aligned Columns** - Professional table formatting
+3. **Consistent Style** - Matches other reports in the application
+4. **Clean Layout** - Easy to read and understand
+
+### Actionable Information
+
+1. **Recommendations** - Clear next steps when issues are found
+2. **Detailed Analysis** - Transaction-level duplicate information
+3. **Cross-File Tracking** - Identifies which files contain duplicates
+4. **Metrics** - Percentages and counts for verification
+
+## Usage
+
+### Command Line
+
+```bash
+python csv_merger.py merged_output.csv file1.csv file2.csv file3.csv
+```
+
+The professional accuracy report is automatically saved as `merged_output_merge_report.txt`
+
+### Web UI
+
+1. Navigate to "Merge AR Invoices" mode
+2. Upload 2 or more CSV files
+3. Click "Merge"
+4. Download both the merged file and the professional accuracy report
+
+## Use Cases
+
+### 1. Quality Assurance
+- Quickly verify merge accuracy with executive summary
+- Confirm no unexpected data loss
+- Check duplicate handling is correct
+
+### 2. Debugging
+- Identify which files contain duplicate data
+- Find cross-file overlaps instantly
+- Review detailed duplicate transaction lists
+
+### 3. Auditing
+- Professional format suitable for documentation
+- Complete record of merge operations
+- Clear status indicators for compliance
+
+### 4. Reconciliation
+- Before/After comparison shows all changes
+- Amount tracking ensures financial accuracy
+- Percentage metrics validate expectations
+
+## Technical Details
+
+### Duplicate Detection Strategy
+
+The merger identifies duplicates based on:
+- Transaction Number
+- Transaction Line Description
+
+This ensures that the same transaction line from different files is only included once.
+
+### Report Display Limits
+
+To keep reports readable:
+- Duplicate transactions: Shows top 20 (configurable)
+- Cross-file duplicates: Shows top 15 (configurable)
+- Additional items noted with "... and N more" messages
+
+### File Name Handling
+
+Long file names are automatically truncated in tables:
+- Maximum 32 characters shown
+- Truncated names end with "..."
+- Full names used in detailed sections
+
+## Important Notes
+
+1. **Executive Summary First** - Always check the executive summary before diving into details
+2. **Status Indicators** - ✓/⚠/ℹ symbols show exactly what needs attention
+3. **Problem Box** - When present, this should be your first focus
+4. **Cross-File Duplicates** - May indicate overlapping date ranges in source files
+5. **First Occurrence Kept** - When duplicates are found, the first occurrence is retained
+
+## Troubleshooting
+
+### Report shows ⚠ ISSUES DETECTED
+
+Check the problem detection box immediately after the executive summary for:
+- Duplicate rows and amounts removed
+- Cross-file duplicate warnings
+- Actionable recommendations
+
+### Understanding Cross-File Duplicates
+
+This means the same transaction appears in multiple input files, which may indicate:
+- Files were exported with overlapping date ranges
+- The same data was exported multiple times
+- Files should be checked for proper filtering
+
+### Report shows ℹ DUPLICATES REMOVED but no cross-file duplicates
+
+This is normal - duplicates were found within the combined data and removed automatically. The output file contains unique transactions only.
 
 ## What's New
 
