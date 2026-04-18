@@ -2134,6 +2134,8 @@ class OracleFusionIntegration:
         
         ar_total       = ar_df["Transaction Line Amount"].sum()
         rcpt_total     = sum(df["Amount"].sum() for df in receipt_files.values())
+
+        # Calculate NORMAL payment total (Cash/Mada/Visa/MasterCard only, excluding BNPL)
         pay_norm_total = sum(
             amt
             for inv, methods in self.invoice_payments.items()
@@ -2142,8 +2144,17 @@ class OracleFusionIntegration:
             and m in RECEIPT_PAYMENT_METHODS
         )
 
-        diff = abs(rcpt_total - pay_norm_total)
-        amounts_match = diff < 0.01
+        # Calculate TOTAL payment amount (ALL methods including BNPL, AMEX, etc.)
+        pay_total = sum(
+            amt
+            for inv, methods in self.invoice_payments.items()
+            for m, amt in methods.items()
+        )
+
+        diff_normal = abs(rcpt_total - pay_norm_total)
+        diff_total = abs(ar_total - pay_total)
+        amounts_match = diff_normal < 0.01
+        totals_match = diff_total < 10.0  # Allow small rounding difference (< 10 SAR on ~700k is < 0.002%)
         
         seg1_unique = ar_df["Line Transactions Flexfield Segment 1"].nunique()
         seg2_unique = ar_df["Line Transactions Flexfield Segment 2"].nunique()
@@ -2174,9 +2185,12 @@ class OracleFusionIntegration:
             ("Line count match", match_flag),
             vl.SPACER_LINE,  # Visual spacer
             ("AR total amount", f"{ar_total:,.2f} SAR"),
-            ("Payment file total", f"{pay_norm_total:,.2f} SAR"),
+            ("Payment file total (ALL)", f"{pay_total:,.2f} SAR"),
+            ("AR vs Payment diff", f"{diff_total:,.2f} SAR " + ("✓ MATCH" if totals_match else "⚠ CHECK")),
+            vl.SPACER_LINE,  # Visual spacer
+            ("Payment file total (NORMAL)", f"{pay_norm_total:,.2f} SAR"),
             ("Receipt total", f"{rcpt_total:,.2f} SAR"),
-            ("Receipt vs payment diff", f"{diff:,.2f} SAR " + ("✓ MATCH" if amounts_match else "⚠ CHECK")),
+            ("Receipt vs payment diff", f"{diff_normal:,.2f} SAR " + ("✓ MATCH" if amounts_match else "⚠ CHECK")),
             vl.SPACER_LINE,  # Visual spacer
             ("Segment 1 unique values", f"{seg1_unique:,} " + ("✓ OK" if seg1_ok else "⚠ duplicates")),
             ("Segment 2 unique values", f"{seg2_unique:,} " + ("✓ OK" if seg2_ok else "⚠ duplicates")),
@@ -2189,10 +2203,15 @@ class OracleFusionIntegration:
 
         vl.add()
         vl.kv("AR total",                    f"{ar_total:,.2f} SAR")
+        vl.kv("Payment file total (ALL)",    f"{pay_total:,.2f} SAR")
+        vl.kv("AR vs Payment diff",
+               f"{diff_total:,.2f} SAR  " + ("✓ MATCH" if totals_match else "⚠ CHECK"))
+
+        vl.add()
         vl.kv("Payment file total (NORMAL)", f"{pay_norm_total:,.2f} SAR")
         vl.kv("Receipt total",               f"{rcpt_total:,.2f} SAR")
         vl.kv("Receipt vs payment diff",
-               f"{diff:,.2f} SAR  " + ("✓ MATCH" if amounts_match else "⚠ CHECK"))
+               f"{diff_normal:,.2f} SAR  " + ("✓ MATCH" if amounts_match else "⚠ CHECK"))
 
         vl.add()
         vl.kv("Segment 1 unique",
@@ -2204,9 +2223,9 @@ class OracleFusionIntegration:
 
         vl.add()
         vl.add("  ══════════════════════════════════════════════════════════════════════")
-        
+
         # Conditional completion message based on all checks
-        all_checks_passed = lines_match and amounts_match and seg1_ok and seg2_ok
+        all_checks_passed = lines_match and amounts_match and totals_match and seg1_ok and seg2_ok
         if all_checks_passed:
             vl.add("  ✓  VERIFICATION COMPLETE")
             vl.add("  ✓  All major verification points passed successfully")
