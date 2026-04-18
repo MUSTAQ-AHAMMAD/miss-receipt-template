@@ -2411,23 +2411,39 @@ class OracleFusionIntegration:
         diff = abs(rcpt_total - ar_total)
         amounts_match = diff < 0.01
 
+        # Extract and track transaction numbers from loaded AR Invoice
+        all_txn_nums = []
+        for txn_num in self.invoice_to_ar_txn.values():
+            if txn_num.startswith("BLKU-"):
+                try:
+                    num = int(txn_num.replace("BLKU-", ""))
+                    all_txn_nums.append(num)
+                except ValueError:
+                    pass
+
+        max_txn = max(all_txn_nums) if all_txn_nums else 0
+
+        # Store sequence information for display in UI
+        self.last_transaction_number = max_txn
+        self.next_transaction_number = max_txn + 1
+
         # Add to summary
-        vl.add_summary("AR Invoice Total", 
-                      f"{ar_total:,.2f} SAR", 
+        vl.add_summary("AR Invoice Total",
+                      f"{ar_total:,.2f} SAR",
                       "INFO")
-        vl.add_summary("Standard Receipt Total", 
-                      f"{rcpt_total:,.2f} SAR", 
+        vl.add_summary("Standard Receipt Total",
+                      f"{rcpt_total:,.2f} SAR",
                       "INFO")
-        vl.add_summary("Amount Reconciliation", 
-                      f"Diff: {diff:,.2f} SAR", 
+        vl.add_summary("Amount Reconciliation",
+                      f"Diff: {diff:,.2f} SAR",
                       "PASS" if amounts_match else "FAIL")
-        vl.add_summary("Total Invoices", 
-                      f"{len(self.invoice_ar_total):,}", 
+        vl.add_summary("Total Invoices",
+                      f"{len(self.invoice_ar_total):,}",
                       "INFO")
-        vl.add_summary("Receipt Files Generated", 
-                      f"{len(receipt_files):,}", 
+        vl.add_summary("Receipt Files Generated",
+                      f"{len(receipt_files):,}",
                       "INFO")
-        
+
         # Detailed verification in highlighted box
         vl.highlight_box("CRITICAL VERIFICATION CHECKS", [
             ("Total AR Invoice amount", f"{ar_total:,.2f} SAR"),
@@ -2441,9 +2457,15 @@ class OracleFusionIntegration:
         vl.kv("Total Standard Receipt amt", f"{rcpt_total:,.2f} SAR")
         vl.kv("Difference",
                f"{diff:,.2f} SAR  " + ("✓ MATCH" if amounts_match else "⚠ CHECK"))
+
+        if max_txn > 0:
+            vl.add()
+            vl.kv("Max Transaction Number found", f"BLKU-{max_txn:07d}")
+            vl.kv(">>> Next run START_TXN_SEQUENCE =", f"{max_txn + 1}  ← set this next run")
+
         vl.add()
         vl.add("  ══════════════════════════════════════════════════════════════════════")
-        
+
         # Conditional completion message based on verification result
         if amounts_match:
             vl.add("  ✓  VERIFICATION COMPLETE")
@@ -2451,7 +2473,7 @@ class OracleFusionIntegration:
         else:
             vl.add("  ⚠  VERIFICATION COMPLETE WITH WARNINGS")
             vl.add("  ⚠  Please review the amount discrepancies above")
-        
+
         vl.add(f"  ✓  Finished : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         vl.add("  ══════════════════════════════════════════════════════════════════════")
 
