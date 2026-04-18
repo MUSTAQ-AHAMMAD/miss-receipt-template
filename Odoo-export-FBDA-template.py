@@ -712,10 +712,7 @@ class InvoiceSequenceManager:
             try:
                 with open(self.sequence_file, "r", encoding="utf-8") as f:
                     data = json.load(f)
-                # Convert to alphanumeric for display
-                last_num = data.get('last_transaction_number', 0)
-                alphanumeric_display = TxnNumberGenerator._to_alphanumeric(last_num, 7)
-                print(f"  ✓ Loaded invoice sequence: BLKU-{alphanumeric_display}")
+                print(f"  ✓ Loaded invoice sequence: BLKU-{data.get('last_transaction_number', 0):07d}")
                 return data
             except Exception as e:
                 print(f"  ⚠ Error loading sequence file: {e} — starting fresh")
@@ -753,9 +750,7 @@ class InvoiceSequenceManager:
         try:
             with open(self.sequence_file, "w", encoding="utf-8") as f:
                 json.dump(self.data, f, indent=2)
-            # Convert to alphanumeric for display
-            alphanumeric_display = TxnNumberGenerator._to_alphanumeric(self.data['last_transaction_number'], 7)
-            print(f"  ✓ Invoice sequence saved: BLKU-{alphanumeric_display}")
+            print(f"  ✓ Invoice sequence saved: BLKU-{self.data['last_transaction_number']:07d}")
         except Exception as e:
             print(f"  ⚠ Error saving sequence file: {e}")
 
@@ -1179,55 +1174,11 @@ class TxnNumberGenerator:
         self._bnpl_cache:   Dict[Tuple[str, str, str], str] = {}
         self._bnpl_seq      = self._start
 
-    @staticmethod
-    def _to_alphanumeric(num: int, length: int = 7) -> str:
-        """
-        Convert a number to alphanumeric format using base-36 (0-9, A-Z).
-        Pads with leading zeros to ensure consistent length.
-
-        Args:
-            num: The number to convert
-            length: The minimum length of the result (default: 7)
-
-        Returns:
-            Alphanumeric string representation
-        """
-        if num == 0:
-            return '0' * length
-
-        # Base-36 conversion (0-9, A-Z)
-        digits = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-        result = ''
-        while num > 0:
-            result = digits[num % 36] + result
-            num //= 36
-
-        # Pad with zeros to ensure consistent length
-        return result.zfill(length)
-
-    @staticmethod
-    def _from_alphanumeric(alphanumeric: str) -> int:
-        """
-        Convert an alphanumeric string back to a number (base-36 to base-10).
-
-        Args:
-            alphanumeric: The alphanumeric string to convert
-
-        Returns:
-            Integer representation
-        """
-        digits = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-        result = 0
-        for char in alphanumeric.upper():
-            result = result * 36 + digits.index(char)
-        return result
-
     def get_normal(self, store_name: str, sale_date) -> str:
         ds  = format_date(sale_date)
         key = (store_name.upper().strip(), ds)
         if key not in self._normal_cache:
-            alphanumeric_id = self._to_alphanumeric(self._normal_seq, 7)
-            self._normal_cache[key] = f"BLKU-{alphanumeric_id}"
+            self._normal_cache[key] = f"BLKU-{self._normal_seq:07d}"
             self._normal_seq += 1
         return self._normal_cache[key]
 
@@ -1236,8 +1187,7 @@ class TxnNumberGenerator:
         ct  = customer_type.upper()
         key = (store_name.upper().strip(), ds, ct)
         if key not in self._bnpl_cache:
-            alphanumeric_id = self._to_alphanumeric(self._bnpl_seq, 4)
-            self._bnpl_cache[key] = f"BLKU-{alphanumeric_id}"
+            self._bnpl_cache[key] = f"BLKU-{self._bnpl_seq:04d}"
             self._bnpl_seq += 1
         return self._bnpl_cache[key]
 
@@ -1326,8 +1276,7 @@ class OracleFusionIntegration:
         vl.section("1. INPUT FILES & SEQUENCE SETTINGS")
 
         vl.kv("Transaction number start seq",  str(self.start_seq))
-        alphanumeric_start = TxnNumberGenerator._to_alphanumeric(self.start_seq, 7)
-        vl.kv("  NORMAL  first number",        f"BLKU-{alphanumeric_start}")
+        vl.kv("  NORMAL  first number",        f"BLKU-{self.start_seq:07d}")
         vl.kv("  TABBY   first number",        f"BLKU-{self.start_seq:04d}")
         vl.kv("  TAMARA  first number",        f"BLKU-{self.start_seq:04d}")
         vl.kv("Segment 1 prefix (this run)",   self._seg1_prefix)
@@ -1660,8 +1609,8 @@ class OracleFusionIntegration:
                 row["Customer Ordered Quantity"]              = ""
                 row["Unit Selling Price"]                     = round(unit_price, 2)
                 row["Line Transactions Flexfield Context"]    = AR_STATIC["Line Transactions Flexfield Context"]
-                row["Line Transactions Flexfield Segment 1"] = f"{self._seg1_prefix}{self.segment_seq_1:06d}"
-                row["Line Transactions Flexfield Segment 2"] = f"{self._seg2_prefix}{self.segment_seq_2:06d}"
+                row["Line Transactions Flexfield Segment 1"] = f"{self._seg1_prefix}{self.segment_seq_1:07d}"
+                row["Line Transactions Flexfield Segment 2"] = f"{self._seg2_prefix}{self.segment_seq_2:07d}"
                 self.segment_seq_1 += 1
                 self.segment_seq_2 += 1
 
@@ -1744,21 +1693,13 @@ class OracleFusionIntegration:
         vl.kv("Unique Invoices",
                f"{df['Sales Order Number'].nunique():,}")
         vl.add()
-        # Extract transaction numbers - now handles alphanumeric format
-        all_txn_nums = []
-        for t in df["Transaction Number"].unique():
-            if t.startswith("BLKU-"):
-                alphanumeric_part = t.replace("BLKU-", "")
-                try:
-                    # Convert alphanumeric back to numeric for tracking
-                    num = TxnNumberGenerator._from_alphanumeric(alphanumeric_part)
-                    all_txn_nums.append(num)
-                except (ValueError, IndexError):
-                    # Skip if conversion fails (malformed transaction number)
-                    pass
+        all_txn_nums = [
+            int(t.replace("BLKU-", ""))
+            for t in df["Transaction Number"].unique()
+            if t.startswith("BLKU-") and t.replace("BLKU-", "").isdigit()
+        ]
         max_txn = max(all_txn_nums) if all_txn_nums else 0
-        alphanumeric_max = TxnNumberGenerator._to_alphanumeric(max_txn, 7)
-        vl.kv("Max Transaction Number used",         f"BLKU-{alphanumeric_max}")
+        vl.kv("Max Transaction Number used",         f"BLKU-{max_txn:07d}")
         vl.kv(">>> Next run START_TXN_SEQUENCE =",   f"{max_txn + 1}  ← set this next run")
         
         # Update sequence manager if enabled
