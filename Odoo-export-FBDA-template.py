@@ -829,61 +829,484 @@ class VerificationLog:
         self.add()
 
     def write(self, path: Path):
+        """Write verification report to text file and generate CSV summaries"""
+        # Write main text report
         with open(path, "w", encoding="utf-8") as f:
-            # Header
-            f.write("=" * 72 + "\n")
-            f.write("  ORACLE FUSION INTEGRATION — VERIFICATION REPORT\n")
-            f.write(f"  Generated : {self.run_ts.strftime('%Y-%m-%d %H:%M:%S')}\n")
-            f.write("=" * 72 + "\n\n")
-            
-            # Executive Summary Section (if we have summary items)
+            # Professional Header with Company Branding
+            f.write("╔" + "═" * 90 + "╗\n")
+            f.write("║" + " " * 90 + "║\n")
+            f.write("║" + " " * 20 + "ORACLE FUSION FINANCIAL INTEGRATION" + " " * 35 + "║\n")
+            f.write("║" + " " * 25 + "VERIFICATION REPORT" + " " * 46 + "║\n")
+            f.write("║" + " " * 90 + "║\n")
+            f.write("╠" + "═" * 90 + "╣\n")
+            f.write(f"║  Report Generated    : {self.run_ts.strftime('%A, %B %d, %Y at %I:%M:%S %p'):<66}║\n")
+            f.write(f"║  Report Type         : {'Accounts Receivable & Receipt Validation':<66}║\n")
+            f.write(f"║  System Version      : {'v2.5.0 - Enhanced Verification':<66}║\n")
+            f.write("╚" + "═" * 90 + "╝\n\n")
+
+            # Executive Summary - Key Metrics Dashboard
             if self._summary_items:
-                f.write("╔" + "═" * 70 + "╗\n")
-                f.write("║" + " " * 18 + "VERIFICATION SUMMARY" + " " * 32 + "║\n")
-                f.write("╠" + "═" * 70 + "╣\n")
-                
                 pass_count = sum(1 for _, _, s in self._summary_items if s == "PASS")
                 fail_count = sum(1 for _, _, s in self._summary_items if s == "FAIL")
                 warn_count = sum(1 for _, _, s in self._summary_items if s == "WARN")
-                
-                overall_status = "✓ ALL CHECKS PASSED" if fail_count == 0 else "⚠ ISSUES DETECTED"
+                total_checks = len(self._summary_items)
+
+                f.write("╔" + "═" * 90 + "╗\n")
+                f.write("║" + " " * 30 + "EXECUTIVE SUMMARY" + " " * 43 + "║\n")
+                f.write("╠" + "═" * 90 + "╣\n")
+
+                # Overall Status with color indicators
+                if fail_count == 0 and warn_count == 0:
+                    status_msg = "✓ READY FOR ORACLE FUSION IMPORT"
+                    status_detail = "All validation checks passed successfully"
+                elif fail_count == 0:
+                    status_msg = "⚠ REVIEW RECOMMENDED"
+                    status_detail = f"{warn_count} warning(s) require review before import"
+                else:
+                    status_msg = "✗ ACTION REQUIRED"
+                    status_detail = f"{fail_count} critical issue(s) must be resolved"
+
+                f.write(f"║                                                                                          ║\n")
+                f.write(f"║  Overall Status      : {status_msg:<66}║\n")
+                f.write(f"║  Assessment          : {status_detail:<66}║\n")
+                f.write(f"║                                                                                          ║\n")
+                f.write("╠" + "─" * 90 + "╣\n")
+                f.write(f"║  Validation Metrics  :                                                                   ║\n")
+                f.write(f"║                                                                                          ║\n")
+
+                # Calculate percentage
+                pass_pct = (pass_count / total_checks * 100) if total_checks > 0 else 0
+
+                f.write(f"║      Total Checks           : {total_checks:>3}                                                            ║\n")
+                f.write(f"║      Passed  [✓]            : {pass_count:>3}   ({pass_pct:>5.1f}%)                                              ║\n")
+                f.write(f"║      Failed  [✗]            : {fail_count:>3}                                                            ║\n")
+                f.write(f"║      Warnings [⚠]           : {warn_count:>3}                                                            ║\n")
+                f.write(f"║                                                                                          ║\n")
+                f.write("╚" + "═" * 90 + "╝\n\n")
+
+            # Quick Checklist for Manual Verification
+            if self._summary_items:
+                f.write("╔" + "═" * 70 + "╗\n")
+                f.write("║" + " " * 15 + "QUICK VERIFICATION CHECKLIST" + " " * 27 + "║\n")
+                f.write("║" + " " * 15 + "(For Manual Review)" + " " * 36 + "║\n")
+                f.write("╠" + "═" * 70 + "╣\n")
+
+                pass_count = sum(1 for _, _, s in self._summary_items if s == "PASS")
+                fail_count = sum(1 for _, _, s in self._summary_items if s == "FAIL")
+                warn_count = sum(1 for _, _, s in self._summary_items if s == "WARN")
+
+                overall_status = "✓ ALL CHECKS PASSED" if fail_count == 0 else "⚠ ISSUES NEED REVIEW"
                 f.write(f"║  Overall Status: {overall_status:<51}║\n")
-                
+
                 # Calculate padding dynamically using class constants
                 stats_line = f"Passed: {pass_count:<3}  |  Failed: {fail_count:<3}  |  Warnings: {warn_count:<3}"
-                padding_needed = self.BOX_WIDTH - self.BORDER_CHARS - len(stats_line) - 2  # -2 for "║  " at start
+                padding_needed = self.BOX_WIDTH - self.BORDER_CHARS - len(stats_line) - 2
                 f.write(f"║  {stats_line}{' ' * padding_needed}║\n")
                 f.write("╠" + "═" * 70 + "╣\n")
-                
+
+                # Checklist format with checkboxes
                 for label, value, status in self._summary_items:
-                    icon = {"PASS": "✓", "FAIL": "✗", "WARN": "⚠", "INFO": "ℹ"}.get(status, "•")
+                    checkbox = {"PASS": "[✓]", "FAIL": "[✗]", "WARN": "[⚠]", "INFO": "[ℹ]"}.get(status, "[ ]")
                     # Truncate to fit in display width using class constants
-                    # Take first (MAX_WIDTH - len(SUFFIX)) chars and add SUFFIX to make exactly MAX_WIDTH chars total
                     suffix_len = len(self.TRUNCATE_SUFFIX)
                     label_truncated = (label[:self.MAX_LABEL_WIDTH - suffix_len] + self.TRUNCATE_SUFFIX) if len(label) > self.MAX_LABEL_WIDTH else label
                     value_truncated = (value[:self.MAX_VALUE_WIDTH - suffix_len] + self.TRUNCATE_SUFFIX) if len(value) > self.MAX_VALUE_WIDTH else value
-                    f.write(f"║  {icon} {label_truncated:<{self.MAX_LABEL_WIDTH}} {value_truncated:<{self.MAX_VALUE_WIDTH}} ║\n")
-                
+                    f.write(f"║  {checkbox} {label_truncated:<{self.MAX_LABEL_WIDTH}} {value_truncated:<{self.MAX_VALUE_WIDTH - 1}}║\n")
+
                 f.write("╚" + "═" * 70 + "╝\n\n")
-            
-            # Detailed Sections
+
+            # Detailed Sections with improved formatting
+            f.write("\n" + "╔" + "═" * 90 + "╗\n")
+            f.write("║" + " " * 30 + "DETAILED VERIFICATION" + " " * 39 + "║\n")
+            f.write("╚" + "═" * 90 + "╝\n\n")
+
             for title, lines in self.sections:
                 # Highlight major verification sections using class constant
                 is_major = any(kw in title.upper() for kw in self.MAJOR_SECTION_KEYWORDS)
-                
+
                 if is_major:
-                    f.write("╔" + "═" * 70 + "╗\n")
-                    f.write(f"║  {title:<67} ║\n")
-                    f.write("╚" + "═" * 70 + "╝\n")
+                    f.write("\n╔" + "═" * 90 + "╗\n")
+                    f.write(f"║  {title:<87} ║\n")
+                    f.write("╚" + "═" * 90 + "╝\n")
                 else:
-                    f.write(f"{'─'*72}\n")
-                    f.write(f"  {title}\n")
-                    f.write(f"{'─'*72}\n")
-                
+                    f.write(f"\n{'━'*90}\n")
+                    f.write(f"▶ {title}\n")
+                    f.write(f"{'━'*90}\n")
+
                 for line in lines:
                     f.write(line + "\n")
                 f.write("\n")
+
+            # Professional Footer
+            f.write("\n" + "╔" + "═" * 90 + "╗\n")
+            f.write("║" + " " * 90 + "║\n")
+            f.write("║" + " " * 25 + "END OF VERIFICATION REPORT" + " " * 39 + "║\n")
+            f.write("║" + " " * 90 + "║\n")
+            f.write("║  For questions or support, please contact your system administrator.                    ║\n")
+            f.write("║  This is an automated report generated by Oracle Fusion Integration System.             ║\n")
+            f.write("║" + " " * 90 + "║\n")
+            f.write("╚" + "═" * 90 + "╝\n")
+
         print(f"  ✓ Verification report : {path}")
+
+        # Generate CSV summary for Excel analysis
+        self._write_csv_summary(path)
+
+        # Generate HTML report for professional presentation
+        self._write_html_report(path)
+
+    def _write_csv_summary(self, base_path: Path):
+        """Generate enhanced CSV summary file for Excel analysis"""
+        csv_path = base_path.with_name(base_path.stem + "_Summary.csv")
+
+        try:
+            import csv
+            with open(csv_path, "w", encoding="utf-8-sig", newline="") as f:
+                writer = csv.writer(f)
+
+                # Professional header
+                writer.writerow(["Oracle Fusion Integration - Verification Summary"])
+                writer.writerow([f"Generated: {self.run_ts.strftime('%Y-%m-%d %H:%M:%S')}"])
+                writer.writerow([])
+
+                # Summary statistics
+                pass_count = sum(1 for _, _, s in self._summary_items if s == "PASS")
+                fail_count = sum(1 for _, _, s in self._summary_items if s == "FAIL")
+                warn_count = sum(1 for _, _, s in self._summary_items if s == "WARN")
+
+                writer.writerow(["Summary Statistics"])
+                writer.writerow(["Total Checks", "Passed", "Failed", "Warnings"])
+                writer.writerow([len(self._summary_items), pass_count, fail_count, warn_count])
+                writer.writerow([])
+
+                # Overall status
+                if fail_count == 0 and warn_count == 0:
+                    status = "READY FOR IMPORT"
+                elif fail_count == 0:
+                    status = "REVIEW RECOMMENDED"
+                else:
+                    status = "ACTION REQUIRED"
+                writer.writerow(["Overall Status", status])
+                writer.writerow([])
+
+                # Detailed verification items
+                writer.writerow(["Verification Details"])
+                writer.writerow(["Item", "Value", "Status", "Result"])
+
+                # Write summary items
+                for label, value, status in self._summary_items:
+                    result = {"PASS": "✓ PASS", "FAIL": "✗ FAIL", "WARN": "⚠ WARNING", "INFO": "ℹ INFO"}.get(status, status)
+                    writer.writerow([label, value, status, result])
+
+            print(f"  ✓ CSV Summary         : {csv_path}")
+        except Exception as e:
+            print(f"  ⚠ Could not generate CSV summary: {e}")
+
+    def _write_html_report(self, base_path: Path):
+        """Generate professional HTML report for web viewing"""
+        html_path = base_path.with_name(base_path.stem + "_Report.html")
+
+        try:
+            pass_count = sum(1 for _, _, s in self._summary_items if s == "PASS")
+            fail_count = sum(1 for _, _, s in self._summary_items if s == "FAIL")
+            warn_count = sum(1 for _, _, s in self._summary_items if s == "WARN")
+            total_checks = len(self._summary_items)
+
+            # Overall status
+            if fail_count == 0 and warn_count == 0:
+                status_class = "success"
+                status_msg = "✓ READY FOR ORACLE FUSION IMPORT"
+                status_detail = "All validation checks passed successfully"
+            elif fail_count == 0:
+                status_class = "warning"
+                status_msg = "⚠ REVIEW RECOMMENDED"
+                status_detail = f"{warn_count} warning(s) require review before import"
+            else:
+                status_class = "error"
+                status_msg = "✗ ACTION REQUIRED"
+                status_detail = f"{fail_count} critical issue(s) must be resolved"
+
+            pass_pct = (pass_count / total_checks * 100) if total_checks > 0 else 0
+
+            html_content = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oracle Fusion - Verification Report</title>
+    <style>
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        body {{
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: #333;
+        }}
+        .container {{
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }}
+        .header {{
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }}
+        .header h1 {{
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }}
+        .header h2 {{
+            font-size: 20px;
+            font-weight: 300;
+            opacity: 0.9;
+        }}
+        .metadata {{
+            background: #f8f9fa;
+            padding: 20px 40px;
+            border-bottom: 2px solid #e0e0e0;
+        }}
+        .metadata-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }}
+        .metadata-item {{
+            display: flex;
+            align-items: center;
+        }}
+        .metadata-label {{
+            font-weight: 600;
+            color: #555;
+            margin-right: 10px;
+        }}
+        .metadata-value {{
+            color: #333;
+        }}
+        .executive-summary {{
+            padding: 40px;
+            background: white;
+        }}
+        .status-card {{
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+        }}
+        .status-card.success {{
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }}
+        .status-card.warning {{
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }}
+        .status-card.error {{
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+        }}
+        .status-card h3 {{
+            font-size: 28px;
+            margin-bottom: 10px;
+        }}
+        .status-card p {{
+            font-size: 16px;
+            opacity: 0.95;
+        }}
+        .metrics {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }}
+        .metric-card {{
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }}
+        .metric-value {{
+            font-size: 36px;
+            font-weight: 700;
+            color: #1e3c72;
+            margin-bottom: 5px;
+        }}
+        .metric-label {{
+            font-size: 14px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }}
+        .checklist {{
+            padding: 40px;
+            background: #fafafa;
+        }}
+        .section-title {{
+            font-size: 24px;
+            color: #1e3c72;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }}
+        .checklist-items {{
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }}
+        .checklist-item {{
+            padding: 15px 25px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            transition: background 0.2s;
+        }}
+        .checklist-item:hover {{
+            background: #f8f9fa;
+        }}
+        .checklist-item:last-child {{
+            border-bottom: none;
+        }}
+        .checkbox {{
+            font-size: 20px;
+            margin-right: 15px;
+            min-width: 30px;
+        }}
+        .checkbox.pass {{ color: #38ef7d; }}
+        .checkbox.fail {{ color: #fee140; }}
+        .checkbox.warn {{ color: #f5576c; }}
+        .checkbox.info {{ color: #667eea; }}
+        .item-label {{
+            flex: 1;
+            font-weight: 500;
+            color: #333;
+        }}
+        .item-value {{
+            color: #666;
+            margin-left: 20px;
+            font-family: 'Courier New', monospace;
+        }}
+        .footer {{
+            background: #1e3c72;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }}
+        .footer p {{
+            margin: 5px 0;
+            opacity: 0.9;
+        }}
+        @media print {{
+            body {{ background: white; padding: 0; }}
+            .container {{ box-shadow: none; }}
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ORACLE FUSION FINANCIAL INTEGRATION</h1>
+            <h2>Verification Report</h2>
+        </div>
+
+        <div class="metadata">
+            <div class="metadata-grid">
+                <div class="metadata-item">
+                    <span class="metadata-label">Generated:</span>
+                    <span class="metadata-value">{self.run_ts.strftime('%A, %B %d, %Y at %I:%M:%S %p')}</span>
+                </div>
+                <div class="metadata-item">
+                    <span class="metadata-label">Report Type:</span>
+                    <span class="metadata-value">AR & Receipt Validation</span>
+                </div>
+                <div class="metadata-item">
+                    <span class="metadata-label">System Version:</span>
+                    <span class="metadata-value">v2.5.0 - Enhanced</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="executive-summary">
+            <h2 class="section-title">Executive Summary</h2>
+
+            <div class="status-card {status_class}">
+                <h3>{status_msg}</h3>
+                <p>{status_detail}</p>
+            </div>
+
+            <div class="metrics">
+                <div class="metric-card">
+                    <div class="metric-value">{total_checks}</div>
+                    <div class="metric-label">Total Checks</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">{pass_count}</div>
+                    <div class="metric-label">Passed</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">{fail_count}</div>
+                    <div class="metric-label">Failed</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">{warn_count}</div>
+                    <div class="metric-label">Warnings</div>
+                </div>
+                <div class="metric-card" style="border-left-color: #38ef7d;">
+                    <div class="metric-value">{pass_pct:.1f}%</div>
+                    <div class="metric-label">Success Rate</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="checklist">
+            <h2 class="section-title">Verification Checklist</h2>
+            <div class="checklist-items">
+"""
+
+            # Add checklist items
+            for label, value, status in self._summary_items:
+                checkbox_map = {
+                    "PASS": ('<span class="checkbox pass">✓</span>', "pass"),
+                    "FAIL": ('<span class="checkbox fail">✗</span>', "fail"),
+                    "WARN": ('<span class="checkbox warn">⚠</span>', "warn"),
+                    "INFO": ('<span class="checkbox info">ℹ</span>', "info")
+                }
+                checkbox_html, status_class = checkbox_map.get(status, ('<span class="checkbox">•</span>', ""))
+
+                html_content += f"""
+                <div class="checklist-item">
+                    {checkbox_html}
+                    <span class="item-label">{label}</span>
+                    <span class="item-value">{value}</span>
+                </div>
+"""
+
+            html_content += """
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>END OF VERIFICATION REPORT</strong></p>
+            <p>For questions or support, please contact your system administrator.</p>
+            <p>This is an automated report generated by Oracle Fusion Integration System.</p>
+        </div>
+    </div>
+</body>
+</html>
+"""
+
+            with open(html_path, "w", encoding="utf-8") as f:
+                f.write(html_content)
+
+            print(f"  ✓ HTML Report         : {html_path}")
+        except Exception as e:
+            print(f"  ⚠ Could not generate HTML report: {e}")
 
     def print_summary(self):
         print("\n" + "=" * 72)
@@ -1783,6 +2206,7 @@ class OracleFusionIntegration:
 
         receipt_files:       Dict[str, pd.DataFrame] = {}
         receipt_detail_rows: List[Dict]              = []
+        skipped_no_ar_txn = 0
 
         for (store, date_str, method), total in sorted(agg_amount.items()):
             ar_txn           = agg_ar_txn.get((store, date_str), "")
@@ -1791,10 +2215,16 @@ class OracleFusionIntegration:
             customer_account = meta["BILL_TO_ACCOUNT"]
             customer_site    = meta["SITE_NUMBER"]
 
-            _, bank_acct_number = self.receipt_methods.get_bank_account(store, method)
+            bank_name, bank_acct_number = self.receipt_methods.get_bank_account(store, method)
 
-            receipt_number = (f"{method}-{ar_txn}" if ar_txn
-                              else f"{method}-RCPT-{date_str}")
+            # AR invoice number is mandatory for receipt generation
+            if not ar_txn:
+                vl.add(f"  ⚠ WARNING: Missing AR transaction number for {store} on {date_str}")
+                vl.add(f"            Skipping receipt generation for {method} payment")
+                skipped_no_ar_txn += 1
+                continue
+
+            receipt_number = f"{method}-{ar_txn}"
 
             safe_store_part  = safe_filename(store)
             safe_method_part = safe_filename(method)
@@ -1825,25 +2255,29 @@ class OracleFusionIntegration:
                 "inv_count":      agg_inv_count.get((store, date_str, method), 0),
                 "amount":         total,
                 "receipt_number": receipt_number,
+                "bank_name":      bank_name,
+                "bank_account":   bank_acct_number,
             })
 
         vl.section("8. STANDARD RECEIPT RECORDS — DETAIL")
         vl.kv("BNPL invoices skipped",       f"{bnpl_skipped:,}")
         vl.kv("Unknown method rows skipped", f"{unknown_method_skipped:,}")
+        vl.kv("Skipped (no AR txn number)",  f"{skipped_no_ar_txn:,}")
         vl.kv("Receipt files to write",      f"{len(receipt_files):,}")
         vl.add()
-        vl.table_row("File", "# Inv", "Amount (SAR)", "Receipt Number",
-                     widths=(60, 7, 16, 35))
+        vl.add("  RECEIPT DETAILS WITH BANK ACCOUNT MAPPING:")
+        vl.table_row("File", "Store", "Method", "Amount (SAR)", "Bank Account",
+                     widths=(40, 15, 10, 16, 35))
         vl.divider(width=120)
         receipt_grand = 0.0
         for r in receipt_detail_rows:
-            vl.table_row(r["filename"], r["inv_count"],
-                         f"{r['amount']:,.2f}", r["receipt_number"],
-                         widths=(60, 7, 16, 35))
+            vl.table_row(r["filename"], r["store"], r["method"],
+                         f"{r['amount']:,.2f}", r["bank_account"],
+                         widths=(40, 15, 10, 16, 35))
             receipt_grand += r["amount"]
         vl.divider(width=120)
-        vl.table_row("GRAND TOTAL", "", f"{receipt_grand:,.2f}", "",
-                     widths=(60, 7, 16, 35))
+        vl.table_row("GRAND TOTAL", "", "", f"{receipt_grand:,.2f}", "",
+                     widths=(40, 15, 10, 16, 35))
 
         vl.add()
         method_totals:      Dict[str, float] = defaultdict(float)
@@ -1893,6 +2327,7 @@ class OracleFusionIntegration:
         misc_files:       Dict[str, pd.DataFrame] = {}
         misc_detail_rows: List[Dict]              = []
         seq = 1
+        skipped_no_ar_txn_misc = 0
 
         for (store, date_str, method), total_payment in sorted(agg_amount.items()):
             misc_amount = self.bank_charges.calc_misc_amount(total_payment, method, store)
@@ -1904,9 +2339,18 @@ class OracleFusionIntegration:
             org_id         = cfg.get("org_id", "300000001421038") if cfg else "300000001421038"
             activity       = cfg.get("activity", "Misc Activity")  if cfg else "Misc Activity"
             method_id      = cfg.get("method_id", "")              if cfg else ""
-            _, bank_num    = self.receipt_methods.get_bank_account(store, method)
-            receipt_number = (f"MISC-{method}-{ar_txn}" if ar_txn
-                              else f"MISC-{method}-{seq:08d}")
+            charge_rate    = cfg.get("rate", 0.0)                  if cfg else 0.0
+
+            bank_name, bank_num = self.receipt_methods.get_bank_account(store, method)
+
+            # AR invoice number is mandatory for misc receipt generation
+            if not ar_txn:
+                vl.add(f"  ⚠ WARNING: Missing AR transaction number for {store} on {date_str}")
+                vl.add(f"            Skipping misc receipt generation for {method} payment")
+                skipped_no_ar_txn_misc += 1
+                continue
+
+            receipt_number = f"MISC-{method}-{ar_txn}"
 
             safe_store_part  = safe_filename(store)
             safe_method_part = safe_filename(method)
@@ -1935,26 +2379,32 @@ class OracleFusionIntegration:
                 "date":          date_str,
                 "method":        method,
                 "payment_total": total_payment,
+                "charge_rate":   charge_rate,
                 "misc_amount":   misc_amount,
+                "bank_account":  bank_num,
             })
             seq += 1
 
         vl.section("8b. MISCELLANEOUS RECEIPT RECORDS — DETAIL")
+        vl.kv("Skipped (no AR txn number)",  f"{skipped_no_ar_txn_misc:,}")
         vl.kv("Misc receipt files to write", f"{len(misc_files):,}")
         if misc_detail_rows:
-            vl.table_row("File", "Payment Total", "Misc Amount",
-                         widths=(65, 16, 16))
+            vl.add("  MISC RECEIPT CALCULATION DETAILS:")
+            vl.table_row("Store", "Method", "Payment Total", "Rate %", "Misc Amount", "Bank Acct",
+                         widths=(15, 10, 16, 8, 16, 30))
             vl.divider(width=100)
             misc_grand = 0.0
             for r in misc_detail_rows:
-                vl.table_row(r["filename"],
+                vl.table_row(r["store"], r["method"],
                              f"{r['payment_total']:,.2f}",
+                             f"{r['charge_rate']:.2f}",
                              f"{r['misc_amount']:,.4f}",
-                             widths=(65, 16, 16))
+                             r["bank_account"],
+                             widths=(15, 10, 16, 8, 16, 30))
                 misc_grand += r["misc_amount"]
             vl.divider(width=100)
-            vl.table_row("GRAND TOTAL", "", f"{misc_grand:,.4f}",
-                         widths=(65, 16, 16))
+            vl.table_row("GRAND TOTAL", "", "", "", f"{misc_grand:,.4f}", "",
+                         widths=(15, 10, 16, 8, 16, 30))
         else:
             vl.add("  No misc receipts generated.")
 
@@ -2052,7 +2502,7 @@ class OracleFusionIntegration:
         output_lines = len(ar_df)
         lines_match  = output_lines == input_lines
         match_flag   = "✓ OK" if lines_match else "⚠ MISMATCH"
-        
+
         ar_total       = ar_df["Transaction Line Amount"].sum()
         rcpt_total     = sum(df["Amount"].sum() for df in receipt_files.values())
 
@@ -2076,29 +2526,35 @@ class OracleFusionIntegration:
         diff_total = abs(ar_total - pay_total)
         amounts_match = diff_normal < 0.01
         totals_match = diff_total < 10.0  # Allow small rounding difference (< 10 SAR on ~700k is < 0.002%)
-        
+
         seg1_unique = ar_df["Line Transactions Flexfield Segment 1"].nunique()
         seg2_unique = ar_df["Line Transactions Flexfield Segment 2"].nunique()
         seg1_ok = len(ar_df) == seg1_unique
         seg2_ok = len(ar_df) == seg2_unique
-        
+
         # Add to summary
-        vl.add_summary("Line Count Verification", 
-                      f"{output_lines:,} rows", 
+        vl.add_summary("Line Count Verification",
+                      f"{output_lines:,} rows",
                       "PASS" if lines_match else "FAIL")
-        vl.add_summary("Amount Reconciliation", 
-                      f"{rcpt_total:,.2f} SAR", 
+        vl.add_summary("Amount Reconciliation",
+                      f"{rcpt_total:,.2f} SAR",
                       "PASS" if amounts_match else "FAIL")
-        vl.add_summary("Segment 1 Uniqueness", 
-                      f"{seg1_unique:,} unique", 
+        vl.add_summary("AR vs Payment Match",
+                      f"Diff: {diff_total:,.2f} SAR",
+                      "PASS" if totals_match else "WARN")
+        vl.add_summary("Segment 1 Uniqueness",
+                      f"{seg1_unique:,} unique",
                       "PASS" if seg1_ok else "FAIL")
-        vl.add_summary("Segment 2 Uniqueness", 
-                      f"{seg2_unique:,} unique", 
+        vl.add_summary("Segment 2 Uniqueness",
+                      f"{seg2_unique:,} unique",
                       "PASS" if seg2_ok else "FAIL")
-        vl.add_summary("Total Invoices Processed", 
-                      f"{len(self.invoice_payments):,}", 
+        vl.add_summary("Total Invoices Processed",
+                      f"{len(self.invoice_payments):,}",
                       "INFO")
-        
+        vl.add_summary("Receipt Files Generated",
+                      f"{len(receipt_files):,} files",
+                      "INFO")
+
         # Detailed verification in highlighted box
         vl.highlight_box("CRITICAL VERIFICATION CHECKS", [
             ("Input line item rows", f"{input_lines:,}"),
@@ -2116,8 +2572,56 @@ class OracleFusionIntegration:
             ("Segment 1 unique values", f"{seg1_unique:,} " + ("✓ OK" if seg1_ok else "⚠ duplicates")),
             ("Segment 2 unique values", f"{seg2_unique:,} " + ("✓ OK" if seg2_ok else "⚠ duplicates")),
         ])
-        
-        # Additional details
+
+        # NEW: Payment Method Reconciliation for Manual Checking
+        vl.section("PAYMENT METHOD RECONCILIATION (FOR MANUAL REVIEW)")
+        vl.add("  This section breaks down amounts by payment method to help verify totals:")
+        vl.add()
+
+        # Calculate payment method breakdowns
+        method_payments = defaultdict(float)
+        method_receipts = defaultdict(float)
+        method_invoice_counts = defaultdict(int)
+
+        for inv, methods in self.invoice_payments.items():
+            for method, amount in methods.items():
+                method_payments[method] += amount
+                method_invoice_counts[method] += 1
+
+        for filename, df in receipt_files.items():
+            # Extract method from filename or DataFrame
+            if "ReceiptMethod" in df.columns and len(df) > 0:
+                method = df["ReceiptMethod"].iloc[0]
+                method_receipts[method] += df["Amount"].sum()
+
+        vl.table_row("Payment Method", "Invoices", "Payment Total", "Receipt Total", "Difference", "Status",
+                     widths=(15, 10, 18, 18, 18, 10))
+        vl.divider(width=100)
+
+        all_methods = sorted(set(list(method_payments.keys()) + list(method_receipts.keys())))
+        for method in all_methods:
+            pay_amt = method_payments.get(method, 0.0)
+            rcpt_amt = method_receipts.get(method, 0.0)
+            diff = abs(pay_amt - rcpt_amt)
+            inv_count = method_invoice_counts.get(method, 0)
+
+            # Check if this method should have receipts
+            if method in RECEIPT_PAYMENT_METHODS:
+                status = "✓ OK" if diff < 0.01 else "⚠ CHECK"
+            elif method.upper() in NO_RECEIPT_PAYMENT_METHODS:
+                status = "BNPL (No Rcpt)"
+            else:
+                status = "Not Tracked"
+
+            vl.table_row(method, f"{inv_count:,}", f"{pay_amt:,.2f}", f"{rcpt_amt:,.2f}",
+                        f"{diff:,.2f}", status,
+                        widths=(15, 10, 18, 18, 18, 10))
+
+        vl.divider(width=100)
+        vl.add()
+
+        # Additional details (original detailed section)
+        vl.section("DETAILED VERIFICATION BREAKDOWN")
         vl.kv("Input line item rows", f"{input_lines:,}")
         vl.kv("Output AR rows",       f"{output_lines:,}")
         vl.kv("Difference",           f"{output_lines - input_lines:+,}  {match_flag}")
@@ -2150,13 +2654,15 @@ class OracleFusionIntegration:
         if all_checks_passed:
             vl.add("  ✓  VERIFICATION COMPLETE")
             vl.add("  ✓  All major verification points passed successfully")
+            vl.add("  ✓  Ready for Oracle Fusion import")
         else:
             vl.add("  ⚠  VERIFICATION COMPLETE WITH WARNINGS")
             vl.add("  ⚠  Please review the verification points above")
-        
+            vl.add("  ⚠  Check Payment Method Reconciliation section for details")
+
         vl.add(f"  ✓  Finished : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         vl.add("  ══════════════════════════════════════════════════════════════════════")
-        
+
         # Add date-wise comparison if available
         if hasattr(self, '_date_comparison') and self._date_comparison:
             vl.add()
