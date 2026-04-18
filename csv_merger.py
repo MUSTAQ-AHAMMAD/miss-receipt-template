@@ -179,123 +179,183 @@ def main():
         # Write comprehensive merge accuracy report
         report_path = output_file.replace(".csv", "_merge_report.txt")
         with open(report_path, "w", encoding="utf-8") as f:
-            f.write("=" * 80 + "\n")
-            f.write("  AR INVOICE CSV MERGE ACCURACY REPORT\n")
-            f.write(f"  Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-            f.write("=" * 80 + "\n\n")
+            # Determine overall status
+            has_duplicates = stats['duplicates_removed'] > 0
+            has_cross_file_dups = len(stats.get('cross_file_duplicates', [])) > 0
+            has_issues = has_duplicates or has_cross_file_dups
 
-            f.write("INPUT FILES PROCESSED:\n")
-            f.write("-" * 80 + "\n")
-            total_input_rows = 0
-            total_input_amount = 0.0
-            for i, file_info in enumerate(stats["files_processed"], 1):
-                f.write(f"  [{i}] {file_info['file']}\n")
-                f.write(f"      Rows:         {file_info['rows']:>10,}\n")
-                f.write(f"      Transactions: {file_info['unique_transactions']:>10,}\n")
-                f.write(f"      Amount:       {file_info['amount']:>10,.2f} SAR\n\n")
-                total_input_rows += file_info['rows']
-                total_input_amount += file_info['amount']
-
-            f.write(f"  TOTAL INPUT:\n")
-            f.write(f"      Rows:         {total_input_rows:>10,}\n")
-            f.write(f"      Amount:       {total_input_amount:>10,.2f} SAR\n\n")
-
-            f.write("=" * 80 + "\n")
-            f.write("MERGE OPERATION SUMMARY:\n")
-            f.write("=" * 80 + "\n\n")
-
-            f.write("BEFORE MERGE:\n")
-            f.write("-" * 80 + "\n")
-            f.write(f"  Total files:              {stats['total_files']}\n")
-            f.write(f"  Total rows (combined):    {stats['total_rows']:,}\n")
-            f.write(f"  Total amount (combined):  {stats['total_amount']:,.2f} SAR\n\n")
-
-            f.write("AFTER MERGE:\n")
-            f.write("-" * 80 + "\n")
-            f.write(f"  Final rows:               {stats['final_rows']:,}\n")
-            f.write(f"  Unique transactions:      {stats['unique_transactions']:,}\n")
-            f.write(f"  Final amount:             {stats['final_amount']:,.2f} SAR\n\n")
-
-            f.write("DIFFERENCES DETECTED:\n")
-            f.write("-" * 80 + "\n")
-            f.write(f"  Duplicate rows removed:   {stats['duplicates_removed']:,}\n")
-            f.write(f"  Amount removed:           {stats['amount_difference']:,.2f} SAR\n")
-            f.write(f"  Accuracy:                 {((stats['final_rows'] / stats['total_rows']) * 100) if stats['total_rows'] > 0 else 0:.2f}% rows retained\n\n")
-
-            # Detailed duplicate analysis
-            if stats.get('duplicate_details'):
-                f.write("=" * 80 + "\n")
-                f.write("DETAILED DUPLICATE ANALYSIS:\n")
-                f.write("=" * 80 + "\n\n")
-                f.write(f"  Total duplicate transactions: {len(stats['duplicate_details'])}\n\n")
-
-                for i, dup in enumerate(stats['duplicate_details'][:50], 1):  # Limit to first 50
-                    f.write(f"  [{i}] Transaction: {dup['transaction']}\n")
-                    f.write(f"      Duplicate lines:  {dup['duplicate_lines']}\n")
-                    f.write(f"      Duplicate amount: {dup['duplicate_amount']:,.2f} SAR\n")
-                    f.write(f"      Found in files:   {', '.join(dup['found_in_files'])}\n\n")
-
-                if len(stats['duplicate_details']) > 50:
-                    f.write(f"  ... and {len(stats['duplicate_details']) - 50} more duplicate transactions\n\n")
-
-            # Cross-file duplicate analysis
-            if stats.get('cross_file_duplicates'):
-                f.write("=" * 80 + "\n")
-                f.write("CROSS-FILE DUPLICATE ANALYSIS:\n")
-                f.write("=" * 80 + "\n\n")
-                f.write(f"  Transactions appearing in multiple files: {len(stats['cross_file_duplicates'])}\n\n")
-
-                for i, dup in enumerate(stats['cross_file_duplicates'][:30], 1):  # Limit to first 30
-                    f.write(f"  [{i}] Transaction: {dup['transaction']}\n")
-                    f.write(f"      Appears in {dup['count']} files: {', '.join(dup['appears_in'])}\n\n")
-
-                if len(stats['cross_file_duplicates']) > 30:
-                    f.write(f"  ... and {len(stats['cross_file_duplicates']) - 30} more cross-file duplicates\n\n")
-
-            f.write("=" * 80 + "\n")
-            f.write("ACCURACY VERIFICATION:\n")
-            f.write("=" * 80 + "\n\n")
-
-            # Calculate accuracy metrics
+            # Calculate metrics
             row_retention = (stats['final_rows'] / stats['total_rows'] * 100) if stats['total_rows'] > 0 else 0
             amount_retention = (stats['final_amount'] / stats['total_amount'] * 100) if stats['total_amount'] > 0 else 0
 
-            f.write(f"  ✓ Row count verification:\n")
-            f.write(f"      Input:    {stats['total_rows']:,} rows\n")
-            f.write(f"      Output:   {stats['final_rows']:,} rows\n")
-            f.write(f"      Removed:  {stats['duplicates_removed']:,} duplicates ({100 - row_retention:.2f}%)\n")
-            f.write(f"      Status:   {'✓ ACCURATE' if stats['duplicates_removed'] >= 0 else '✗ ISSUE DETECTED'}\n\n")
+            # HEADER
+            f.write("╔" + "═" * 78 + "╗\n")
+            f.write("║" + "  AR INVOICE CSV MERGE — ACCURACY REPORT".center(78) + "║\n")
+            f.write("║" + f"  Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}".ljust(78) + "║\n")
+            f.write("╚" + "═" * 78 + "╝\n\n")
 
-            f.write(f"  ✓ Amount verification:\n")
-            f.write(f"      Input:    {stats['total_amount']:,.2f} SAR\n")
-            f.write(f"      Output:   {stats['final_amount']:,.2f} SAR\n")
-            f.write(f"      Removed:  {stats['amount_difference']:,.2f} SAR ({100 - amount_retention:.2f}%)\n")
-            f.write(f"      Status:   {'✓ ACCURATE' if abs(stats['amount_difference']) < 0.01 or stats['duplicates_removed'] > 0 else '✗ ISSUE DETECTED'}\n\n")
+            # EXECUTIVE SUMMARY
+            f.write("╔" + "═" * 78 + "╗\n")
+            f.write("║" + "  EXECUTIVE SUMMARY".ljust(78) + "║\n")
+            f.write("╠" + "═" * 78 + "╣\n")
 
-            f.write(f"  ✓ Transaction uniqueness:\n")
-            f.write(f"      Unique transactions: {stats['unique_transactions']:,}\n")
-            f.write(f"      Cross-file duplicates: {len(stats.get('cross_file_duplicates', [])):,}\n")
-            f.write(f"      Status:   ✓ VERIFIED\n\n")
-
-            f.write("=" * 80 + "\n")
-            f.write("CONCLUSION:\n")
-            f.write("=" * 80 + "\n\n")
-
-            if stats['duplicates_removed'] == 0 and len(stats.get('cross_file_duplicates', [])) == 0:
-                f.write("  ✓ All files merged successfully with NO DUPLICATES detected.\n")
-                f.write("  ✓ All input rows were unique and retained in the output.\n")
+            # Overall status
+            if not has_issues:
+                status_line = "║  Overall Status: ✓ CLEAN MERGE - NO ISSUES DETECTED"
+            elif has_duplicates and not has_cross_file_dups:
+                status_line = "║  Overall Status: ℹ DUPLICATES REMOVED"
             else:
-                f.write(f"  ✓ Merge completed with {stats['duplicates_removed']:,} duplicate rows removed.\n")
-                if stats.get('cross_file_duplicates'):
-                    f.write(f"  ⚠ {len(stats['cross_file_duplicates']):,} transactions appear in multiple input files.\n")
-                f.write("  ✓ Output file contains unique transactions only.\n")
+                status_line = "║  Overall Status: ⚠ ISSUES DETECTED"
+            f.write(status_line.ljust(78) + "║\n")
 
-            f.write(f"\n  Output file: {output_file}\n")
-            f.write(f"  Accuracy report: {report_path}\n\n")
+            # Quick stats
+            f.write("║" + "-" * 78 + "║\n")
+            f.write(f"║  Files Merged: {stats['total_files']}".ljust(41) + f"  Duplicates: {stats['duplicates_removed']:,}".ljust(37) + "║\n")
+            f.write(f"║  Input Rows: {stats['total_rows']:,}".ljust(41) + f"  Output Rows: {stats['final_rows']:,}".ljust(37) + "║\n")
+            f.write(f"║  Input Amount: {stats['total_amount']:,.2f} SAR".ljust(41) + f"  Output Amount: {stats['final_amount']:,.2f} SAR".ljust(37) + "║\n")
+            f.write("╠" + "═" * 78 + "╣\n")
 
-            f.write("=" * 80 + "\n")
+            # Key metrics
+            f.write(f"║  {'✓' if not has_duplicates else 'ℹ'}  Row Retention".ljust(45) + f"{row_retention:.1f}%".rjust(33) + "║\n")
+            f.write(f"║  {'✓' if not has_duplicates else 'ℹ'}  Amount Retention".ljust(45) + f"{amount_retention:.1f}%".rjust(33) + "║\n")
+            f.write(f"║  {'✓' if not has_cross_file_dups else '⚠'}  Cross-File Duplicates".ljust(45) + f"{len(stats.get('cross_file_duplicates', [])):,} transactions".rjust(33) + "║\n")
+            f.write(f"║  ℹ  Unique Transactions".ljust(45) + f"{stats['unique_transactions']:,}".rjust(33) + "║\n")
+            f.write("╚" + "═" * 78 + "╝\n\n")
 
-        print(f"  📄 Detailed merge accuracy report saved: {report_path}")
+            # PROBLEMS DETECTED (if any)
+            if has_issues:
+                f.write("  " + "█" * 76 + "\n")
+                f.write("  █" + "  ⚠ PROBLEMS DETECTED — ACTION REQUIRED".center(74) + "█\n")
+                f.write("  " + "█" * 76 + "\n")
+
+                if has_duplicates:
+                    f.write("  █  • DUPLICATE ROWS:".ljust(76) + "█\n")
+                    f.write(f"  █      {stats['duplicates_removed']:,} duplicate rows were removed from the merge".ljust(76) + "█\n")
+                    f.write(f"  █      Amount removed: {stats['amount_difference']:,.2f} SAR".ljust(76) + "█\n")
+                    f.write("  █" + " " * 74 + "█\n")
+
+                if has_cross_file_dups:
+                    f.write("  █  • CROSS-FILE DUPLICATES:".ljust(76) + "█\n")
+                    f.write(f"  █      {len(stats['cross_file_duplicates']):,} transactions appear in multiple input files".ljust(76) + "█\n")
+                    f.write("  █      This may indicate overlapping date ranges or data export issues".ljust(76) + "█\n")
+                    f.write("  █" + " " * 74 + "█\n")
+
+                f.write("  █  RECOMMENDATION:".ljust(76) + "█\n")
+                f.write("  █    → Review the duplicate transaction details below".ljust(76) + "█\n")
+                f.write("  █    → Verify input files have correct date ranges".ljust(76) + "█\n")
+                f.write("  █    → Check for overlapping data exports".ljust(76) + "█\n")
+                f.write("  " + "█" * 76 + "\n\n")
+
+            # INPUT FILES SUMMARY TABLE
+            f.write("╔" + "═" * 78 + "╗\n")
+            f.write("║" + "  INPUT FILES PROCESSED".ljust(78) + "║\n")
+            f.write("╚" + "═" * 78 + "╝\n\n")
+
+            # Table header
+            f.write("  ┌" + "─" * 4 + "┬" + "─" * 32 + "┬" + "─" * 12 + "┬" + "─" * 12 + "┬" + "─" * 14 + "┐\n")
+            f.write("  │ #  │ File Name".ljust(34) + "│ Rows".ljust(14) + "│ Txns".ljust(14) + "│ Amount (SAR)".ljust(16) + "│\n")
+            f.write("  ├" + "─" * 4 + "┼" + "─" * 32 + "┼" + "─" * 12 + "┼" + "─" * 12 + "┼" + "─" * 14 + "┤\n")
+
+            for i, file_info in enumerate(stats["files_processed"], 1):
+                fname = file_info['file'][:29] + "..." if len(file_info['file']) > 32 else file_info['file']
+                f.write(f"  │ {i:<2} │ {fname:<30} │ {file_info['rows']:>10,} │ {file_info['unique_transactions']:>10,} │ {file_info['amount']:>12,.2f} │\n")
+
+            # Table footer with totals
+            f.write("  ├" + "─" * 4 + "┴" + "─" * 32 + "┼" + "─" * 12 + "┼" + "─" * 12 + "┼" + "─" * 14 + "┤\n")
+            f.write(f"  │ TOTAL".ljust(39) + f"│ {stats['total_rows']:>10,} │ {'-':>10} │ {stats['total_amount']:>12,.2f} │\n")
+            f.write("  └" + "─" * 36 + "┴" + "─" * 12 + "┴" + "─" * 12 + "┴" + "─" * 14 + "┘\n\n")
+
+            # MERGE OPERATION DETAILS
+            f.write("╔" + "═" * 78 + "╗\n")
+            f.write("║" + "  MERGE OPERATION — BEFORE & AFTER".ljust(78) + "║\n")
+            f.write("╚" + "═" * 78 + "╝\n\n")
+
+            f.write("  ┌" + "─" * 38 + "┬" + "─" * 38 + "┐\n")
+            f.write("  │ BEFORE MERGE".ljust(40) + "│ AFTER MERGE".ljust(40) + "│\n")
+            f.write("  ├" + "─" * 38 + "┼" + "─" * 38 + "┤\n")
+            f.write(f"  │ Files: {stats['total_files']}".ljust(40) + f"│ Unique Transactions: {stats['unique_transactions']:,}".ljust(40) + "│\n")
+            f.write(f"  │ Total Rows: {stats['total_rows']:,}".ljust(40) + f"│ Final Rows: {stats['final_rows']:,}".ljust(40) + "│\n")
+            f.write(f"  │ Total Amount: {stats['total_amount']:,.2f} SAR".ljust(40) + f"│ Final Amount: {stats['final_amount']:,.2f} SAR".ljust(40) + "│\n")
+            f.write("  ├" + "─" * 38 + "┴" + "─" * 38 + "┤\n")
+            f.write(f"  │ DIFFERENCE".ljust(79) + "│\n")
+            f.write("  ├" + "─" * 77 + "┤\n")
+            f.write(f"  │ Rows Removed: {stats['duplicates_removed']:,} ({100 - row_retention:.2f}%)".ljust(79) + "│\n")
+            f.write(f"  │ Amount Removed: {stats['amount_difference']:,.2f} SAR ({100 - amount_retention:.2f}%)".ljust(79) + "│\n")
+            f.write("  └" + "─" * 77 + "┘\n\n")
+
+            # DUPLICATE ANALYSIS (if any)
+            if stats.get('duplicate_details'):
+                f.write("╔" + "═" * 78 + "╗\n")
+                f.write("║" + "  DUPLICATE TRANSACTIONS ANALYSIS".ljust(78) + "║\n")
+                f.write("╚" + "═" * 78 + "╝\n\n")
+                f.write(f"  Total duplicate transactions found: {len(stats['duplicate_details'])}\n\n")
+
+                # Show top duplicates
+                display_count = min(20, len(stats['duplicate_details']))
+                f.write("  ┌" + "─" * 4 + "┬" + "─" * 20 + "┬" + "─" * 12 + "┬" + "─" * 16 + "┬" + "─" * 22 + "┐\n")
+                f.write("  │ #  │ Transaction".ljust(23) + "│ Dup Lines".ljust(14) + "│ Dup Amount".ljust(18) + "│ Found in Files".ljust(25) + "│\n")
+                f.write("  ├" + "─" * 4 + "┼" + "─" * 20 + "┼" + "─" * 12 + "┼" + "─" * 16 + "┼" + "─" * 22 + "┤\n")
+
+                for i, dup in enumerate(stats['duplicate_details'][:display_count], 1):
+                    txn = dup['transaction'][:17] + "..." if len(str(dup['transaction'])) > 20 else str(dup['transaction'])
+                    files_str = f"{len(dup['found_in_files'])} files"
+                    f.write(f"  │ {i:<2} │ {txn:<18} │ {dup['duplicate_lines']:>10} │ {dup['duplicate_amount']:>14,.2f} │ {files_str:<20} │\n")
+
+                f.write("  └" + "─" * 4 + "┴" + "─" * 20 + "┴" + "─" * 12 + "┴" + "─" * 16 + "┴" + "─" * 22 + "┘\n")
+
+                if len(stats['duplicate_details']) > display_count:
+                    f.write(f"\n  ... and {len(stats['duplicate_details']) - display_count} more duplicate transactions\n")
+                f.write("\n")
+
+            # CROSS-FILE DUPLICATES (if any)
+            if stats.get('cross_file_duplicates'):
+                f.write("╔" + "═" * 78 + "╗\n")
+                f.write("║" + "  CROSS-FILE DUPLICATES — TRANSACTIONS IN MULTIPLE FILES".ljust(78) + "║\n")
+                f.write("╚" + "═" * 78 + "╝\n\n")
+                f.write(f"  ⚠ WARNING: {len(stats['cross_file_duplicates'])} transactions appear in multiple files\n\n")
+
+                display_count = min(15, len(stats['cross_file_duplicates']))
+                for i, dup in enumerate(stats['cross_file_duplicates'][:display_count], 1):
+                    f.write(f"  [{i}] {dup['transaction']}\n")
+                    f.write(f"      → Appears in {dup['count']} files: {', '.join(dup['appears_in'][:3])}")
+                    if len(dup['appears_in']) > 3:
+                        f.write(f" + {len(dup['appears_in']) - 3} more")
+                    f.write("\n\n")
+
+                if len(stats['cross_file_duplicates']) > display_count:
+                    f.write(f"  ... and {len(stats['cross_file_duplicates']) - display_count} more cross-file duplicates\n\n")
+
+            # FINAL VERIFICATION
+            f.write("╔" + "═" * 78 + "╗\n")
+            f.write("║" + "  FINAL VERIFICATION".ljust(78) + "║\n")
+            f.write("╚" + "═" * 78 + "╝\n\n")
+
+            integrity_status = 'CLEAN' if not has_duplicates else f'{stats["duplicates_removed"]:,} duplicates removed'
+            f.write(f"  {'✓' if not has_duplicates else 'ℹ'}  Data Integrity:    {integrity_status}\n")
+
+            overlap_count = len(stats.get('cross_file_duplicates', []))
+            overlap_status = 'NONE DETECTED' if not has_cross_file_dups else f'{overlap_count} cross-file duplicates'
+            f.write(f"  {'✓' if not has_cross_file_dups else '⚠'}  File Overlap:      {overlap_status}\n")
+            f.write(f"  ✓  Output File:       {Path(output_file).name}\n")
+            f.write(f"  ✓  Report File:       {Path(report_path).name}\n\n")
+
+            # CONCLUSION
+            f.write("  " + "═" * 76 + "\n")
+            if not has_issues:
+                f.write("  ✓  MERGE COMPLETED SUCCESSFULLY\n")
+                f.write("  ✓  All files merged cleanly with no duplicates detected\n")
+            elif has_duplicates and not has_cross_file_dups:
+                f.write("  ℹ  MERGE COMPLETED WITH DUPLICATES REMOVED\n")
+                f.write(f"  ℹ  {stats['duplicates_removed']:,} duplicate rows were automatically removed\n")
+                f.write("  ✓  Output file contains unique transactions only\n")
+            else:
+                f.write("  ⚠  MERGE COMPLETED WITH WARNINGS\n")
+                f.write("  ⚠  Review duplicate transactions and cross-file overlaps above\n")
+                f.write("  ℹ  Consider checking input file date ranges\n")
+            f.write(f"  ✓  Finished: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+            f.write("  " + "═" * 76 + "\n")
+
+        print(f"  📄 Professional merge accuracy report saved: {report_path}")
         
     except Exception as e:
         print(f"\n❌ Error: {e}")
