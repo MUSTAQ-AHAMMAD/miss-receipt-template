@@ -1211,11 +1211,13 @@ class OracleFusionIntegration:
         start_seq:          int = 1,
         start_legacy_seq_1: int = 1,
         start_legacy_seq_2: int = 1,
+        seg1_prefix:        Optional[str] = None,
+        seg2_prefix:        Optional[str] = None,
         use_sequence_manager: bool = False,
     ):
         self.output_dir         = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
-        
+
         # Invoice sequence manager for auto-incrementing
         self.seq_manager = None
         if use_sequence_manager:
@@ -1238,9 +1240,16 @@ class OracleFusionIntegration:
         self.segment_seq_1      = self.start_legacy_seq_1
         self.segment_seq_2      = self.start_legacy_seq_2
 
-        # ── Random alphanumeric prefix per run — no cross-run conflicts ──
-        self._seg1_prefix       = _generate_run_prefix(8)
-        self._seg2_prefix       = _generate_run_prefix(8)
+        # ── Use user-provided prefixes if available, otherwise generate random ones ──
+        if seg1_prefix:
+            self._seg1_prefix   = seg1_prefix
+        else:
+            self._seg1_prefix   = _generate_run_prefix(8)
+
+        if seg2_prefix:
+            self._seg2_prefix   = seg2_prefix
+        else:
+            self._seg2_prefix   = _generate_run_prefix(8)
 
         self.metadata_cache:    Optional[MetadataCache]       = None
         self.register_cache:    Optional[RegisterCache]       = None
