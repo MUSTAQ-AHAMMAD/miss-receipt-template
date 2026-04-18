@@ -241,11 +241,37 @@ def _run_integration(sid: str, cfg: dict):
                     return max(1, int(digits))
                 return default
 
+            def parse_alphanumeric(value):
+                """Parse alphanumeric input to extract prefix and numeric parts
+                Returns: (prefix, numeric_value)
+                Example: 'ABC123' -> ('ABC', 123)
+                         '456' -> ('', 456)
+                         'XYZ' -> ('XYZ', 1)
+                """
+                if isinstance(value, int):
+                    return ('', max(1, value))
+                value_str = str(value).strip()
+                if not value_str:
+                    return ('', 1)
+
+                # Extract alphabetic prefix and numeric suffix
+                prefix = ''.join(filter(str.isalpha, value_str))
+                digits = ''.join(filter(str.isdigit, value_str))
+
+                numeric_val = int(digits) if digits else 1
+                return (prefix, max(1, numeric_val))
+
+            # Parse segment inputs to extract prefixes
+            seg1_prefix, seg1_num = parse_alphanumeric(cfg.get("start_leg1", 1))
+            seg2_prefix, seg2_num = parse_alphanumeric(cfg.get("start_leg2", 1))
+
             integration = mod.OracleFusionIntegration(
                 output_dir           = sess["output_dir"],
                 start_seq            = parse_sequence(cfg.get("start_seq", 1)),
-                start_legacy_seq_1   = parse_sequence(cfg.get("start_leg1", 1)),
-                start_legacy_seq_2   = parse_sequence(cfg.get("start_leg2", 1)),
+                start_legacy_seq_1   = seg1_num,
+                start_legacy_seq_2   = seg2_num,
+                seg1_prefix          = seg1_prefix if seg1_prefix else None,
+                seg2_prefix          = seg2_prefix if seg2_prefix else None,
                 use_sequence_manager = use_seq_mgr,
             )
 
@@ -351,7 +377,7 @@ def _run_integration(sid: str, cfg: dict):
                 # Send transaction sequence info to UI
                 if hasattr(integration, 'last_transaction_number'):
                     stat("Last Transaction Number", f"BLKU-{integration.last_transaction_number:07d}")
-                    stat("Next Transaction Number", f"{integration.next_transaction_number}")
+                    stat("Next Transaction Number", f"BLKU-{integration.next_transaction_number:07d}")
 
             else:
                 # ── AR INVOICE MODE (default) ──
@@ -390,7 +416,7 @@ def _run_integration(sid: str, cfg: dict):
                 # Send transaction sequence info to UI
                 if hasattr(integration, 'last_transaction_number'):
                     stat("Last Transaction Number", f"BLKU-{integration.last_transaction_number:07d}")
-                    stat("Next Transaction Number", f"{integration.next_transaction_number}")
+                    stat("Next Transaction Number", f"BLKU-{integration.next_transaction_number:07d}")
 
             progress(95, "Creating download ZIP…")
             zip_path = str(Path(sess["work_dir"]) / "oracle_fusion_output.zip")
