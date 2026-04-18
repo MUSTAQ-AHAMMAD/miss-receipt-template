@@ -1609,8 +1609,8 @@ class OracleFusionIntegration:
                 row["Customer Ordered Quantity"]              = ""
                 row["Unit Selling Price"]                     = round(unit_price, 2)
                 row["Line Transactions Flexfield Context"]    = AR_STATIC["Line Transactions Flexfield Context"]
-                row["Line Transactions Flexfield Segment 1"] = f"{self._seg1_prefix}{self.segment_seq_1:06d}"
-                row["Line Transactions Flexfield Segment 2"] = f"{self._seg2_prefix}{self.segment_seq_2:06d}"
+                row["Line Transactions Flexfield Segment 1"] = f"{self._seg1_prefix}{self.segment_seq_1:07d}"
+                row["Line Transactions Flexfield Segment 2"] = f"{self._seg2_prefix}{self.segment_seq_2:07d}"
                 self.segment_seq_1 += 1
                 self.segment_seq_2 += 1
 
