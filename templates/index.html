@@ -1385,19 +1385,23 @@
 
   // ─── Stats ────────────────────────────────────────────────────────
   const STAT_ICONS = {
-    'Standard Receipts':   'fa-receipt',
-    'Misc Receipts':       'fa-file-invoice-dollar',
-    'AR Invoice Lines':    'fa-list-ol',
-    'AR Invoice Total':    'fa-coins',
-    'Input Sheet Total':   'fa-table',
-    'Total Match':         'fa-scale-balanced',
+    'Standard Receipts':          'fa-receipt',
+    'Misc Receipts':              'fa-file-invoice-dollar',
+    'AR Invoice Lines':           'fa-list-ol',
+    'AR Invoice Total':           'fa-coins',
+    'Input Sheet Total':          'fa-table',
+    'Total Match':                'fa-scale-balanced',
+    'Last Transaction Number':    'fa-hashtag',
+    'Next Transaction Number':    'fa-arrow-right',
   };
 
   const STAT_COLORS = {
-    'AR Invoice Total':  'var(--accent-blue)',
-    'Input Sheet Total': 'var(--accent-cyan)',
-    'Total Match':       '',  // determined dynamically
-    'AR Invoice Lines':  'var(--accent-violet)',
+    'AR Invoice Total':           'var(--accent-blue)',
+    'Input Sheet Total':          'var(--accent-cyan)',
+    'Total Match':                '',  // determined dynamically
+    'AR Invoice Lines':           'var(--accent-violet)',
+    'Last Transaction Number':    'var(--accent-green)',
+    'Next Transaction Number':    'var(--accent-amber)',
   };
 
   function renderStats() {
