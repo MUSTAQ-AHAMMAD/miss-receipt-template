@@ -2625,15 +2625,15 @@ def main():
     print(f"  Payments file   : {payments_path}")
 
     INPUT = {
-        "line_items":      "ARABMALL Sales line 5 to 31 March.xlsx",
-        "payments":        "ARABMALL Payment line 5 to 31 March.xlsx",
+        "line_items":      "ZAHRAN sale line 5 to 31 March.xlsx",
+        "payments":        "ZAHRAN payment line 5 to 31 March.xlsx",
         "metadata":        "FUSION_SALES_METADATA_202604121703.csv",
         "registers":       "VENDHQ_REGISTERS_202604121654.csv",
         "receipt_methods": "Receipt_Methods.csv",
         "bank_charges":    "Bank_Charges.csv",
     }
 
-    START_TXN_SEQUENCE  = 587   # ← update from report "Next run START_TXN_SEQUENCE ="
+    START_TXN_SEQUENCE  = 500   # ← update from report "Next run START_TXN_SEQUENCE ="
     START_LEGACY_SEQ_1  = 1   # ← counter only; prefix is auto-randomised each run
     START_LEGACY_SEQ_2  = 1   # ← counter only; prefix is auto-randomised each run
 
