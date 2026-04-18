@@ -647,20 +647,17 @@ LINE_ITEMS_COL_MAP = {
         "Base Quantity",
         "Quantity",
     ],
-    # NOTE: Despite the misleading name "Subtotal w/o Tax", this mapping actually
-    # prioritizes TAX-INCLUSIVE columns ("Order Lines/Subtotal") because:
-    # 1. Payment totals include tax (customers pay the full amount)
-    # 2. Oracle Fusion AR Invoices represent actual customer payments
-    # 3. Odoo exports both columns, and we need the one that matches payment totals
-    # The name is kept for backward compatibility with existing code that references
-    # this logical column name throughout the codebase (app.py, etc.)
+    # Line item amounts should be read WITHOUT tax, then adjusted by payment factor.
+    # This ensures we're working with base amounts and the payment adjustment
+    # correctly scales them to match actual cash collected (which includes tax).
+    # The system will calculate: adjusted_amount = base_amount * (payment_total / sales_total)
     "Subtotal w/o Tax": [
-        "Order Lines/Subtotal",          # Tax-inclusive (PRIMARY - matches payments)
-        "Subtotal",                      # Tax-inclusive fallback
-        "Order Lines/Subtotal w/o Tax",  # Tax-exclusive fallback
+        "Order Lines/Subtotal w/o Tax",  # Tax-exclusive (PRIMARY - correct base amount)
         "Order Lines/Subtotal excl tax",
         "Order Lines/Price excl. tax",
         "Subtotal w/o Tax",
+        "Order Lines/Subtotal",          # Tax-inclusive fallback (if no w/o tax column)
+        "Subtotal",                      # Generic fallback
     ],
     "Sale Date": [
         "Order Lines/Order Ref/Date",

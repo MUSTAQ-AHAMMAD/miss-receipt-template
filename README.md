@@ -190,7 +190,8 @@ requirements.txt                Python dependencies
 - For orders with 100% discount but payment (tips/service charges), a "Service Charge" line is added
 - Input Sheet Total = sum of all payments (authoritative source)
 - AR Invoice Total = payment-adjusted amounts (matches Input Sheet Total exactly)
-- **Column Used**: Reads from "Subtotal" (WITH tax), not "Subtotal w/o Tax"
+- **Column Used**: Reads from "Subtotal w/o Tax" (base amounts), then applies payment adjustment factor
+- The adjustment factor = (total payments / total sales) ensures AR totals match actual cash collected
 - If using Odoo exports, ensure your payment sheet accurately reflects actual cash collected
 - Use data validator: `python data_validator.py ar ar_invoice.csv source_file.xlsx`
 - Review verification report for detailed breakdown
