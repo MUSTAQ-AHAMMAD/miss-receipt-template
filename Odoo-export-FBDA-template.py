@@ -1632,53 +1632,6 @@ class OracleFusionIntegration:
 
                 records.append(row)
 
-            # ── Add service charge line if needed ──
-            if add_service_charge:
-                service_row: Dict = {col: "" for col in self.AR_COLUMNS}
-                
-                service_row["Transaction Batch Source Name"]     = AR_STATIC["Transaction Batch Source Name"]
-                service_row["Transaction Type Name"]             = AR_STATIC["Transaction Type Name"]
-                service_row["Payment Terms"]                     = AR_STATIC["Payment Terms"]
-                service_row["Transaction Date"]                  = format_datetime(sale_date)
-                service_row["Accounting Date"]                   = format_datetime(sale_date)
-                service_row["Transaction Number"]                = txn_num
-                service_row["Bill-to Customer Account Number"]   = bill_to_account
-                service_row["Bill-to Customer Site Number"]      = bill_to_site
-                service_row["Transaction Line Type"]             = AR_STATIC["Transaction Line Type"]
-                service_row["Transaction Line Description"]      = "Service Charge"
-                service_row["Currency Code"]                     = AR_STATIC["Currency Code"]
-                service_row["Currency Conversion Type"]          = AR_STATIC["Currency Conversion Type"]
-                service_row["Currency Conversion Date"]          = format_date(sale_date)
-                service_row["Currency Conversion Rate"]          = AR_STATIC["Currency Conversion Rate"]
-                service_row["Transaction Line Amount"]           = round(service_charge_amount, 2)
-                service_row["Transaction Line Quantity"]         = 1
-                service_row["Customer Ordered Quantity"]         = ""
-                service_row["Unit Selling Price"]                = round(service_charge_amount, 2)
-                service_row["Line Transactions Flexfield Context"] = AR_STATIC["Line Transactions Flexfield Context"]
-                service_row["Line Transactions Flexfield Segment 1"] = f"{self._seg1_prefix}{self.segment_seq_1:06d}"
-                service_row["Line Transactions Flexfield Segment 2"] = f"{self._seg2_prefix}{self.segment_seq_2:06d}"
-                self.segment_seq_1 += 1
-                self.segment_seq_2 += 1
-                service_row["Tax Classification Code"]           = DEFAULT_TAX_CODE
-                service_row["Sales Order Number"]                = inv
-                service_row["Unit of Measure Code"]              = ""
-                service_row["Unit of Measure Name"]              = "Each"
-                service_row["Default Taxation Country"]          = AR_STATIC["Default Taxation Country"]
-                service_row["Comments"]                          = AR_STATIC["Comments"]
-                service_row["END"]                               = AR_STATIC["END"]
-                service_row["Memo Line Name"]                    = "Service Charge"
-                service_row["Inventory Item Number"]             = ""
-                
-                records.append(service_row)
-                
-                # Update tracking
-                ss = store_stats[store]
-                ss["amount"] += service_charge_amount
-                ss["lines"] += 1
-                txn_registry[txn_num]["lines"] += 1
-                txn_registry[txn_num]["amount"] += service_charge_amount
-                self.invoice_ar_total[inv] += service_charge_amount
-
         df = pd.DataFrame(records, columns=self.AR_COLUMNS)
 
         # Section 4
