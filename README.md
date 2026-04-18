@@ -26,7 +26,12 @@ A professional web UI for automating Oracle Fusion Standard Receipt and Miscella
 #### 2. **CSV Merger Tool**
 - Merge multiple AR Invoice CSV files into one consolidated file
 - Automatic duplicate detection and removal
-- Generates merge report with statistics
+- **Comprehensive Accuracy Report**: Detailed before/after comparison showing:
+  - Per-file statistics (rows, transactions, amounts)
+  - Duplicate detection with transaction-level details
+  - Cross-file duplicate tracking (shows which files contain same transactions)
+  - Amount verification (tracks exactly what was removed)
+  - Accuracy metrics and verification status
 - Accessible via "Merge AR Invoices" mode in web UI
 - Command-line: `python csv_merger.py output.csv file1.csv file2.csv ...`
 
