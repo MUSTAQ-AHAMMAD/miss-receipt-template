@@ -227,11 +227,25 @@ def _run_integration(sid: str, cfg: dict):
             # Enable sequence manager if auto-increment is requested
             use_seq_mgr = cfg.get("auto_increment", "false").lower() == "true"
 
+            # Convert sequence values to integers, handling alphanumeric input
+            def parse_sequence(value, default=1):
+                """Parse sequence value - extract numeric part or convert to int"""
+                if isinstance(value, int):
+                    return max(1, value)
+                value_str = str(value).strip()
+                if not value_str:
+                    return default
+                # Try to extract digits from alphanumeric input
+                digits = ''.join(filter(str.isdigit, value_str))
+                if digits:
+                    return max(1, int(digits))
+                return default
+
             integration = mod.OracleFusionIntegration(
                 output_dir           = sess["output_dir"],
-                start_seq            = int(cfg.get("start_seq", 1)),
-                start_legacy_seq_1   = int(cfg.get("start_leg1", 1)),
-                start_legacy_seq_2   = int(cfg.get("start_leg2", 1)),
+                start_seq            = parse_sequence(cfg.get("start_seq", 1)),
+                start_legacy_seq_1   = parse_sequence(cfg.get("start_leg1", 1)),
+                start_legacy_seq_2   = parse_sequence(cfg.get("start_leg2", 1)),
                 use_sequence_manager = use_seq_mgr,
             )
 
