@@ -829,41 +829,44 @@ class VerificationLog:
         self.add()
 
     def write(self, path: Path):
+        """Write verification report to text file and generate CSV summaries"""
+        # Write main text report
         with open(path, "w", encoding="utf-8") as f:
             # Header
             f.write("=" * 72 + "\n")
             f.write("  ORACLE FUSION INTEGRATION — VERIFICATION REPORT\n")
             f.write(f"  Generated : {self.run_ts.strftime('%Y-%m-%d %H:%M:%S')}\n")
             f.write("=" * 72 + "\n\n")
-            
-            # Executive Summary Section (if we have summary items)
+
+            # Quick Checklist for Manual Verification (NEW!)
             if self._summary_items:
                 f.write("╔" + "═" * 70 + "╗\n")
-                f.write("║" + " " * 18 + "VERIFICATION SUMMARY" + " " * 32 + "║\n")
+                f.write("║" + " " * 15 + "QUICK VERIFICATION CHECKLIST" + " " * 27 + "║\n")
+                f.write("║" + " " * 15 + "(For Manual Review)" + " " * 36 + "║\n")
                 f.write("╠" + "═" * 70 + "╣\n")
-                
+
                 pass_count = sum(1 for _, _, s in self._summary_items if s == "PASS")
                 fail_count = sum(1 for _, _, s in self._summary_items if s == "FAIL")
                 warn_count = sum(1 for _, _, s in self._summary_items if s == "WARN")
-                
-                overall_status = "✓ ALL CHECKS PASSED" if fail_count == 0 else "⚠ ISSUES DETECTED"
+
+                overall_status = "✓ ALL CHECKS PASSED" if fail_count == 0 else "⚠ ISSUES NEED REVIEW"
                 f.write(f"║  Overall Status: {overall_status:<51}║\n")
-                
+
                 # Calculate padding dynamically using class constants
                 stats_line = f"Passed: {pass_count:<3}  |  Failed: {fail_count:<3}  |  Warnings: {warn_count:<3}"
-                padding_needed = self.BOX_WIDTH - self.BORDER_CHARS - len(stats_line) - 2  # -2 for "║  " at start
+                padding_needed = self.BOX_WIDTH - self.BORDER_CHARS - len(stats_line) - 2
                 f.write(f"║  {stats_line}{' ' * padding_needed}║\n")
                 f.write("╠" + "═" * 70 + "╣\n")
-                
+
+                # Checklist format with checkboxes
                 for label, value, status in self._summary_items:
-                    icon = {"PASS": "✓", "FAIL": "✗", "WARN": "⚠", "INFO": "ℹ"}.get(status, "•")
+                    checkbox = {"PASS": "[✓]", "FAIL": "[✗]", "WARN": "[⚠]", "INFO": "[ℹ]"}.get(status, "[ ]")
                     # Truncate to fit in display width using class constants
-                    # Take first (MAX_WIDTH - len(SUFFIX)) chars and add SUFFIX to make exactly MAX_WIDTH chars total
                     suffix_len = len(self.TRUNCATE_SUFFIX)
                     label_truncated = (label[:self.MAX_LABEL_WIDTH - suffix_len] + self.TRUNCATE_SUFFIX) if len(label) > self.MAX_LABEL_WIDTH else label
                     value_truncated = (value[:self.MAX_VALUE_WIDTH - suffix_len] + self.TRUNCATE_SUFFIX) if len(value) > self.MAX_VALUE_WIDTH else value
-                    f.write(f"║  {icon} {label_truncated:<{self.MAX_LABEL_WIDTH}} {value_truncated:<{self.MAX_VALUE_WIDTH}} ║\n")
-                
+                    f.write(f"║  {checkbox} {label_truncated:<{self.MAX_LABEL_WIDTH}} {value_truncated:<{self.MAX_VALUE_WIDTH - 1}}║\n")
+
                 f.write("╚" + "═" * 70 + "╝\n\n")
             
             # Detailed Sections
@@ -883,7 +886,33 @@ class VerificationLog:
                 for line in lines:
                     f.write(line + "\n")
                 f.write("\n")
+
         print(f"  ✓ Verification report : {path}")
+
+        # Generate CSV summary for Excel analysis (NEW!)
+        self._write_csv_summary(path)
+
+    def _write_csv_summary(self, base_path: Path):
+        """Generate CSV summary file for easy Excel analysis"""
+        csv_path = base_path.with_name(base_path.stem + "_Summary.csv")
+
+        try:
+            import csv
+            with open(csv_path, "w", encoding="utf-8-sig", newline="") as f:
+                writer = csv.writer(f)
+
+                # Write header
+                writer.writerow(["Verification Item", "Value", "Status", "Result"])
+                writer.writerow([])  # Empty row
+
+                # Write summary items
+                for label, value, status in self._summary_items:
+                    result = {"PASS": "PASS", "FAIL": "FAIL", "WARN": "WARNING", "INFO": "INFO"}.get(status, status)
+                    writer.writerow([label, value, status, result])
+
+            print(f"  ✓ CSV Summary         : {csv_path}")
+        except Exception as e:
+            print(f"  ⚠ Could not generate CSV summary: {e}")
 
     def print_summary(self):
         print("\n" + "=" * 72)
@@ -2079,7 +2108,7 @@ class OracleFusionIntegration:
         output_lines = len(ar_df)
         lines_match  = output_lines == input_lines
         match_flag   = "✓ OK" if lines_match else "⚠ MISMATCH"
-        
+
         ar_total       = ar_df["Transaction Line Amount"].sum()
         rcpt_total     = sum(df["Amount"].sum() for df in receipt_files.values())
 
@@ -2103,29 +2132,35 @@ class OracleFusionIntegration:
         diff_total = abs(ar_total - pay_total)
         amounts_match = diff_normal < 0.01
         totals_match = diff_total < 10.0  # Allow small rounding difference (< 10 SAR on ~700k is < 0.002%)
-        
+
         seg1_unique = ar_df["Line Transactions Flexfield Segment 1"].nunique()
         seg2_unique = ar_df["Line Transactions Flexfield Segment 2"].nunique()
         seg1_ok = len(ar_df) == seg1_unique
         seg2_ok = len(ar_df) == seg2_unique
-        
+
         # Add to summary
-        vl.add_summary("Line Count Verification", 
-                      f"{output_lines:,} rows", 
+        vl.add_summary("Line Count Verification",
+                      f"{output_lines:,} rows",
                       "PASS" if lines_match else "FAIL")
-        vl.add_summary("Amount Reconciliation", 
-                      f"{rcpt_total:,.2f} SAR", 
+        vl.add_summary("Amount Reconciliation",
+                      f"{rcpt_total:,.2f} SAR",
                       "PASS" if amounts_match else "FAIL")
-        vl.add_summary("Segment 1 Uniqueness", 
-                      f"{seg1_unique:,} unique", 
+        vl.add_summary("AR vs Payment Match",
+                      f"Diff: {diff_total:,.2f} SAR",
+                      "PASS" if totals_match else "WARN")
+        vl.add_summary("Segment 1 Uniqueness",
+                      f"{seg1_unique:,} unique",
                       "PASS" if seg1_ok else "FAIL")
-        vl.add_summary("Segment 2 Uniqueness", 
-                      f"{seg2_unique:,} unique", 
+        vl.add_summary("Segment 2 Uniqueness",
+                      f"{seg2_unique:,} unique",
                       "PASS" if seg2_ok else "FAIL")
-        vl.add_summary("Total Invoices Processed", 
-                      f"{len(self.invoice_payments):,}", 
+        vl.add_summary("Total Invoices Processed",
+                      f"{len(self.invoice_payments):,}",
                       "INFO")
-        
+        vl.add_summary("Receipt Files Generated",
+                      f"{len(receipt_files):,} files",
+                      "INFO")
+
         # Detailed verification in highlighted box
         vl.highlight_box("CRITICAL VERIFICATION CHECKS", [
             ("Input line item rows", f"{input_lines:,}"),
@@ -2143,8 +2178,56 @@ class OracleFusionIntegration:
             ("Segment 1 unique values", f"{seg1_unique:,} " + ("✓ OK" if seg1_ok else "⚠ duplicates")),
             ("Segment 2 unique values", f"{seg2_unique:,} " + ("✓ OK" if seg2_ok else "⚠ duplicates")),
         ])
-        
-        # Additional details
+
+        # NEW: Payment Method Reconciliation for Manual Checking
+        vl.section("PAYMENT METHOD RECONCILIATION (FOR MANUAL REVIEW)")
+        vl.add("  This section breaks down amounts by payment method to help verify totals:")
+        vl.add()
+
+        # Calculate payment method breakdowns
+        method_payments = defaultdict(float)
+        method_receipts = defaultdict(float)
+        method_invoice_counts = defaultdict(int)
+
+        for inv, methods in self.invoice_payments.items():
+            for method, amount in methods.items():
+                method_payments[method] += amount
+                method_invoice_counts[method] += 1
+
+        for filename, df in receipt_files.items():
+            # Extract method from filename or DataFrame
+            if "ReceiptMethod" in df.columns and len(df) > 0:
+                method = df["ReceiptMethod"].iloc[0]
+                method_receipts[method] += df["Amount"].sum()
+
+        vl.table_row("Payment Method", "Invoices", "Payment Total", "Receipt Total", "Difference", "Status",
+                     widths=(15, 10, 18, 18, 18, 10))
+        vl.divider(width=100)
+
+        all_methods = sorted(set(list(method_payments.keys()) + list(method_receipts.keys())))
+        for method in all_methods:
+            pay_amt = method_payments.get(method, 0.0)
+            rcpt_amt = method_receipts.get(method, 0.0)
+            diff = abs(pay_amt - rcpt_amt)
+            inv_count = method_invoice_counts.get(method, 0)
+
+            # Check if this method should have receipts
+            if method in RECEIPT_PAYMENT_METHODS:
+                status = "✓ OK" if diff < 0.01 else "⚠ CHECK"
+            elif method.upper() in NO_RECEIPT_PAYMENT_METHODS:
+                status = "BNPL (No Rcpt)"
+            else:
+                status = "Not Tracked"
+
+            vl.table_row(method, f"{inv_count:,}", f"{pay_amt:,.2f}", f"{rcpt_amt:,.2f}",
+                        f"{diff:,.2f}", status,
+                        widths=(15, 10, 18, 18, 18, 10))
+
+        vl.divider(width=100)
+        vl.add()
+
+        # Additional details (original detailed section)
+        vl.section("DETAILED VERIFICATION BREAKDOWN")
         vl.kv("Input line item rows", f"{input_lines:,}")
         vl.kv("Output AR rows",       f"{output_lines:,}")
         vl.kv("Difference",           f"{output_lines - input_lines:+,}  {match_flag}")
@@ -2177,13 +2260,15 @@ class OracleFusionIntegration:
         if all_checks_passed:
             vl.add("  ✓  VERIFICATION COMPLETE")
             vl.add("  ✓  All major verification points passed successfully")
+            vl.add("  ✓  Ready for Oracle Fusion import")
         else:
             vl.add("  ⚠  VERIFICATION COMPLETE WITH WARNINGS")
             vl.add("  ⚠  Please review the verification points above")
-        
+            vl.add("  ⚠  Check Payment Method Reconciliation section for details")
+
         vl.add(f"  ✓  Finished : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         vl.add("  ══════════════════════════════════════════════════════════════════════")
-        
+
         # Add date-wise comparison if available
         if hasattr(self, '_date_comparison') and self._date_comparison:
             vl.add()
