@@ -617,20 +617,21 @@ def download(sid: str):
 
 @app.route("/api/merge-csv", methods=["POST"])
 def merge_csv_files():
-    """Merge multiple AR Invoice CSV files"""
+    """Merge multiple AR Invoice CSV files and return both merged file and report"""
     try:
         import csv_merger
-        
+        import zipfile
+
         # Create a temporary session for the merge
         sid = _new_session()
         sess = _session(sid)
         work_dir = Path(sess["work_dir"])
-        
+
         # Save all uploaded files
         files = request.files.getlist("csv_files")
         if not files or len(files) < 2:
             return jsonify({"error": "Please upload at least 2 CSV files"}), 400
-        
+
         input_paths = []
         for f in files:
             if f and f.filename:
@@ -638,19 +639,29 @@ def merge_csv_files():
                 dest = work_dir / safe_name
                 f.save(str(dest))
                 input_paths.append(str(dest))
-        
+
         # Merge the files
         output_path = work_dir / "merged_ar_invoice.csv"
         stats = csv_merger.merge_ar_invoices(input_paths, str(output_path))
-        
-        # Return the merged file
+
+        # The report is automatically saved as merged_ar_invoice_merge_report.txt
+        report_path = work_dir / "merged_ar_invoice_merge_report.txt"
+
+        # Create a ZIP file containing both the merged CSV and the report
+        zip_path = work_dir / "merged_output.zip"
+        with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
+            zf.write(output_path, "merged_ar_invoice.csv")
+            if report_path.exists():
+                zf.write(report_path, "merge_accuracy_report.txt")
+
+        # Return the ZIP file
         return send_file(
-            str(output_path),
+            str(zip_path),
             as_attachment=True,
-            download_name="merged_ar_invoice.csv",
-            mimetype="text/csv",
+            download_name="merged_ar_invoice_with_report.zip",
+            mimetype="application/zip",
         )
-    
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
