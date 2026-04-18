@@ -1791,7 +1791,7 @@ class OracleFusionIntegration:
             customer_account = meta["BILL_TO_ACCOUNT"]
             customer_site    = meta["SITE_NUMBER"]
 
-            _, bank_acct_number = self.receipt_methods.get_bank_account(store, method)
+            bank_name, bank_acct_number = self.receipt_methods.get_bank_account(store, method)
 
             receipt_number = (f"{method}-{ar_txn}" if ar_txn
                               else f"{method}-RCPT-{date_str}")
@@ -1825,6 +1825,8 @@ class OracleFusionIntegration:
                 "inv_count":      agg_inv_count.get((store, date_str, method), 0),
                 "amount":         total,
                 "receipt_number": receipt_number,
+                "bank_name":      bank_name,
+                "bank_account":   bank_acct_number,
             })
 
         vl.section("8. STANDARD RECEIPT RECORDS — DETAIL")
@@ -1832,18 +1834,19 @@ class OracleFusionIntegration:
         vl.kv("Unknown method rows skipped", f"{unknown_method_skipped:,}")
         vl.kv("Receipt files to write",      f"{len(receipt_files):,}")
         vl.add()
-        vl.table_row("File", "# Inv", "Amount (SAR)", "Receipt Number",
-                     widths=(60, 7, 16, 35))
+        vl.add("  RECEIPT DETAILS WITH BANK ACCOUNT MAPPING:")
+        vl.table_row("File", "Store", "Method", "Amount (SAR)", "Bank Account",
+                     widths=(40, 15, 10, 16, 35))
         vl.divider(width=120)
         receipt_grand = 0.0
         for r in receipt_detail_rows:
-            vl.table_row(r["filename"], r["inv_count"],
-                         f"{r['amount']:,.2f}", r["receipt_number"],
-                         widths=(60, 7, 16, 35))
+            vl.table_row(r["filename"], r["store"], r["method"],
+                         f"{r['amount']:,.2f}", r["bank_account"],
+                         widths=(40, 15, 10, 16, 35))
             receipt_grand += r["amount"]
         vl.divider(width=120)
-        vl.table_row("GRAND TOTAL", "", f"{receipt_grand:,.2f}", "",
-                     widths=(60, 7, 16, 35))
+        vl.table_row("GRAND TOTAL", "", "", f"{receipt_grand:,.2f}", "",
+                     widths=(40, 15, 10, 16, 35))
 
         vl.add()
         method_totals:      Dict[str, float] = defaultdict(float)
@@ -1904,7 +1907,9 @@ class OracleFusionIntegration:
             org_id         = cfg.get("org_id", "300000001421038") if cfg else "300000001421038"
             activity       = cfg.get("activity", "Misc Activity")  if cfg else "Misc Activity"
             method_id      = cfg.get("method_id", "")              if cfg else ""
-            _, bank_num    = self.receipt_methods.get_bank_account(store, method)
+            charge_rate    = cfg.get("rate", 0.0)                  if cfg else 0.0
+
+            bank_name, bank_num = self.receipt_methods.get_bank_account(store, method)
             receipt_number = (f"MISC-{method}-{ar_txn}" if ar_txn
                               else f"MISC-{method}-{seq:08d}")
 
@@ -1935,26 +1940,31 @@ class OracleFusionIntegration:
                 "date":          date_str,
                 "method":        method,
                 "payment_total": total_payment,
+                "charge_rate":   charge_rate,
                 "misc_amount":   misc_amount,
+                "bank_account":  bank_num,
             })
             seq += 1
 
         vl.section("8b. MISCELLANEOUS RECEIPT RECORDS — DETAIL")
         vl.kv("Misc receipt files to write", f"{len(misc_files):,}")
         if misc_detail_rows:
-            vl.table_row("File", "Payment Total", "Misc Amount",
-                         widths=(65, 16, 16))
+            vl.add("  MISC RECEIPT CALCULATION DETAILS:")
+            vl.table_row("Store", "Method", "Payment Total", "Rate %", "Misc Amount", "Bank Acct",
+                         widths=(15, 10, 16, 8, 16, 30))
             vl.divider(width=100)
             misc_grand = 0.0
             for r in misc_detail_rows:
-                vl.table_row(r["filename"],
+                vl.table_row(r["store"], r["method"],
                              f"{r['payment_total']:,.2f}",
+                             f"{r['charge_rate']:.2f}",
                              f"{r['misc_amount']:,.4f}",
-                             widths=(65, 16, 16))
+                             r["bank_account"],
+                             widths=(15, 10, 16, 8, 16, 30))
                 misc_grand += r["misc_amount"]
             vl.divider(width=100)
-            vl.table_row("GRAND TOTAL", "", f"{misc_grand:,.4f}",
-                         widths=(65, 16, 16))
+            vl.table_row("GRAND TOTAL", "", "", "", f"{misc_grand:,.4f}", "",
+                         widths=(15, 10, 16, 8, 16, 30))
         else:
             vl.add("  No misc receipts generated.")
 
