@@ -1029,11 +1029,55 @@ class TxnNumberGenerator:
         self._bnpl_cache:   Dict[Tuple[str, str, str], str] = {}
         self._bnpl_seq      = self._start
 
+    @staticmethod
+    def _to_alphanumeric(num: int, length: int = 7) -> str:
+        """
+        Convert a number to alphanumeric format using base-36 (0-9, A-Z).
+        Pads with leading zeros to ensure consistent length.
+
+        Args:
+            num: The number to convert
+            length: The minimum length of the result (default: 7)
+
+        Returns:
+            Alphanumeric string representation
+        """
+        if num == 0:
+            return '0' * length
+
+        # Base-36 conversion (0-9, A-Z)
+        digits = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        result = ''
+        while num > 0:
+            result = digits[num % 36] + result
+            num //= 36
+
+        # Pad with zeros to ensure consistent length
+        return result.zfill(length)
+
+    @staticmethod
+    def _from_alphanumeric(alphanumeric: str) -> int:
+        """
+        Convert an alphanumeric string back to a number (base-36 to base-10).
+
+        Args:
+            alphanumeric: The alphanumeric string to convert
+
+        Returns:
+            Integer representation
+        """
+        digits = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        result = 0
+        for char in alphanumeric.upper():
+            result = result * 36 + digits.index(char)
+        return result
+
     def get_normal(self, store_name: str, sale_date) -> str:
         ds  = format_date(sale_date)
         key = (store_name.upper().strip(), ds)
         if key not in self._normal_cache:
-            self._normal_cache[key] = f"BLK-{self._normal_seq:07d}"
+            alphanumeric_id = self._to_alphanumeric(self._normal_seq, 7)
+            self._normal_cache[key] = f"BLK-{alphanumeric_id}"
             self._normal_seq += 1
         return self._normal_cache[key]
 
@@ -1042,7 +1086,8 @@ class TxnNumberGenerator:
         ct  = customer_type.upper()
         key = (store_name.upper().strip(), ds, ct)
         if key not in self._bnpl_cache:
-            self._bnpl_cache[key] = f"BLK-{self._bnpl_seq:04d}"
+            alphanumeric_id = self._to_alphanumeric(self._bnpl_seq, 4)
+            self._bnpl_cache[key] = f"BLK-{alphanumeric_id}"
             self._bnpl_seq += 1
         return self._bnpl_cache[key]
 
@@ -1118,9 +1163,11 @@ class OracleFusionIntegration:
         vl.section("1. INPUT FILES & SEQUENCE SETTINGS")
 
         vl.kv("Transaction number start seq",  str(self.start_seq))
-        vl.kv("  NORMAL  first number",        f"BLK-{self.start_seq:07d}")
-        vl.kv("  TABBY   first number",        f"BLK-{self.start_seq:04d}")
-        vl.kv("  TAMARA  first number",        f"BLK-{self.start_seq:04d}")
+        alphanumeric_start = TxnNumberGenerator._to_alphanumeric(self.start_seq, 7)
+        vl.kv("  NORMAL  first number",        f"BLK-{alphanumeric_start}")
+        alphanumeric_start_bnpl = TxnNumberGenerator._to_alphanumeric(self.start_seq, 4)
+        vl.kv("  TABBY   first number",        f"BLK-{alphanumeric_start_bnpl}")
+        vl.kv("  TAMARA  first number",        f"BLK-{alphanumeric_start_bnpl}")
         vl.kv("Segment 1 prefix (this run)",   self._seg1_prefix)
         vl.kv("Segment 2 prefix (this run)",   self._seg2_prefix)
         vl.kv("LEGACY Segment 1 start seq",    str(self.start_legacy_seq_1))
@@ -1545,13 +1592,21 @@ class OracleFusionIntegration:
                f"{df['Sales Order Number'].nunique():,}")
         vl.add()
         # ── Log max transaction number for next-run sequencing ──
-        all_txn_nums = [
-            int(t.replace("BLK-", ""))
-            for t in df["Transaction Number"].unique()
-            if t.startswith("BLK-") and t.replace("BLK-", "").isdigit()
-        ]
+        # Extract transaction numbers - now handles alphanumeric format
+        all_txn_nums = []
+        for t in df["Transaction Number"].unique():
+            if t.startswith("BLK-"):
+                alphanumeric_part = t.replace("BLK-", "")
+                try:
+                    # Convert alphanumeric back to numeric for tracking
+                    num = TxnNumberGenerator._from_alphanumeric(alphanumeric_part)
+                    all_txn_nums.append(num)
+                except (ValueError, IndexError):
+                    # Skip if conversion fails (malformed transaction number)
+                    pass
         max_txn = max(all_txn_nums) if all_txn_nums else 0
-        vl.kv("Max Transaction Number used",         f"BLK-{max_txn:07d}")
+        alphanumeric_max = TxnNumberGenerator._to_alphanumeric(max_txn, 7)
+        vl.kv("Max Transaction Number used",         f"BLK-{alphanumeric_max}")
         vl.kv(">>> Next run START_TXN_SEQUENCE =",   f"{max_txn + 1}  ← set this next run")
         vl.add()
         vl.kv("Rows with EMPTY Bill-to Account",
