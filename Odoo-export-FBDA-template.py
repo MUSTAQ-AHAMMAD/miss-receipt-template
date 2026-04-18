@@ -1783,6 +1783,7 @@ class OracleFusionIntegration:
 
         receipt_files:       Dict[str, pd.DataFrame] = {}
         receipt_detail_rows: List[Dict]              = []
+        skipped_no_ar_txn = 0
 
         for (store, date_str, method), total in sorted(agg_amount.items()):
             ar_txn           = agg_ar_txn.get((store, date_str), "")
@@ -1793,8 +1794,14 @@ class OracleFusionIntegration:
 
             bank_name, bank_acct_number = self.receipt_methods.get_bank_account(store, method)
 
-            receipt_number = (f"{method}-{ar_txn}" if ar_txn
-                              else f"{method}-RCPT-{date_str}")
+            # AR invoice number is mandatory for receipt generation
+            if not ar_txn:
+                vl.add(f"  ⚠ WARNING: Missing AR transaction number for {store} on {date_str}")
+                vl.add(f"            Skipping receipt generation for {method} payment")
+                skipped_no_ar_txn += 1
+                continue
+
+            receipt_number = f"{method}-{ar_txn}"
 
             safe_store_part  = safe_filename(store)
             safe_method_part = safe_filename(method)
@@ -1832,6 +1839,7 @@ class OracleFusionIntegration:
         vl.section("8. STANDARD RECEIPT RECORDS — DETAIL")
         vl.kv("BNPL invoices skipped",       f"{bnpl_skipped:,}")
         vl.kv("Unknown method rows skipped", f"{unknown_method_skipped:,}")
+        vl.kv("Skipped (no AR txn number)",  f"{skipped_no_ar_txn:,}")
         vl.kv("Receipt files to write",      f"{len(receipt_files):,}")
         vl.add()
         vl.add("  RECEIPT DETAILS WITH BANK ACCOUNT MAPPING:")
@@ -1896,6 +1904,7 @@ class OracleFusionIntegration:
         misc_files:       Dict[str, pd.DataFrame] = {}
         misc_detail_rows: List[Dict]              = []
         seq = 1
+        skipped_no_ar_txn_misc = 0
 
         for (store, date_str, method), total_payment in sorted(agg_amount.items()):
             misc_amount = self.bank_charges.calc_misc_amount(total_payment, method, store)
@@ -1910,8 +1919,15 @@ class OracleFusionIntegration:
             charge_rate    = cfg.get("rate", 0.0)                  if cfg else 0.0
 
             bank_name, bank_num = self.receipt_methods.get_bank_account(store, method)
-            receipt_number = (f"MISC-{method}-{ar_txn}" if ar_txn
-                              else f"MISC-{method}-{seq:08d}")
+
+            # AR invoice number is mandatory for misc receipt generation
+            if not ar_txn:
+                vl.add(f"  ⚠ WARNING: Missing AR transaction number for {store} on {date_str}")
+                vl.add(f"            Skipping misc receipt generation for {method} payment")
+                skipped_no_ar_txn_misc += 1
+                continue
+
+            receipt_number = f"MISC-{method}-{ar_txn}"
 
             safe_store_part  = safe_filename(store)
             safe_method_part = safe_filename(method)
@@ -1947,6 +1963,7 @@ class OracleFusionIntegration:
             seq += 1
 
         vl.section("8b. MISCELLANEOUS RECEIPT RECORDS — DETAIL")
+        vl.kv("Skipped (no AR txn number)",  f"{skipped_no_ar_txn_misc:,}")
         vl.kv("Misc receipt files to write", f"{len(misc_files):,}")
         if misc_detail_rows:
             vl.add("  MISC RECEIPT CALCULATION DETAILS:")
