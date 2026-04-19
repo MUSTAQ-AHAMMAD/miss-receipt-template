@@ -17,13 +17,23 @@ A professional web UI for automating Oracle Fusion Standard Receipt and Miscella
 
 ### New Advanced Features ✨
 
-#### 1. **Automatic Invoice Number Sequencing**
+#### 1. **Upload Log Management System** 🆕
+- Complete tracking of receipt uploads to Oracle Fusion
+- Detailed API request and response logging
+- Upload status dashboard with filtering
+- Comprehensive error reporting with row-level precision
+- Retry tracking and history
+- Export upload logs to text reports
+- Accessible via "Upload Logs" page in web UI
+- REST API for programmatic access
+
+#### 2. **Automatic Invoice Number Sequencing**
 - Automatically persists last used invoice numbers
 - Auto-continues from previous run without manual input
 - Stores transaction numbers, segment 1, and segment 2 sequences
 - Enable via "Auto-Increment Invoice Numbers" checkbox in UI
 
-#### 2. **CSV Merger Tool**
+#### 3. **CSV Merger Tool**
 - Merge multiple AR Invoice CSV files into one consolidated file
 - Automatic duplicate detection and removal
 - **Comprehensive Accuracy Report**: Detailed before/after comparison showing:
@@ -35,7 +45,7 @@ A professional web UI for automating Oracle Fusion Standard Receipt and Miscella
 - Accessible via "Merge AR Invoices" mode in web UI
 - Command-line: `python csv_merger.py output.csv file1.csv file2.csv ...`
 
-#### 3. **Comprehensive Report Generator**
+#### 4. **Comprehensive Report Generator**
 - **AR Invoice Analysis**: SKU breakdown, discount tracking, store summaries
 - **Sub-Inventory Report**: Invoice-wise and total breakdown by sub-inventory
 - Detailed validation and accuracy metrics
@@ -43,7 +53,7 @@ A professional web UI for automating Oracle Fusion Standard Receipt and Miscella
 - Accessible via "Generate Reports" mode in web UI
 - Command-line: `python report_generator.py ar <ar_invoice.csv>`
 
-#### 4. **Data Validation Tool**
+#### 5. **Data Validation Tool**
 - Validates AR Invoice accuracy and consistency
 - Checks SKU/discount item handling
 - Verifies amount/quantity sign consistency
@@ -52,8 +62,6 @@ A professional web UI for automating Oracle Fusion Standard Receipt and Miscella
 - Command-line: `python data_validator.py ar <ar_invoice.csv> [source_file]`
 
 ## Quick Start
-
-### 1. Install dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -216,6 +224,23 @@ requirements.txt                Python dependencies
 - `GET /api/download/<sid>` - Download output ZIP
 - `POST /api/merge-csv` - Merge multiple AR Invoice CSVs
 - `POST /api/generate-report` - Generate comprehensive reports
+
+### Upload Log Management APIs
+
+- `GET /api/upload-logs/history` - Get upload history with filters (status, type, limit)
+- `GET /api/upload-logs/details/<id>` - Get detailed upload info including API logs
+- `GET /api/upload-logs/stats` - Get summary statistics
+- `POST /api/upload-logs/export` - Export logs to text report
+- `POST /api/upload-logs/test-upload` - Test upload functionality (mock mode)
+- `POST /api/upload-logs/batch-upload` - Upload all receipts from directory
+
+### Web Pages
+
+- `/` - Main application interface
+- `/upload-logs` - Upload logs dashboard
+- `/test-report` - View test report
+
+See [UPLOAD_LOG_MANAGEMENT_GUIDE.md](UPLOAD_LOG_MANAGEMENT_GUIDE.md) for detailed API documentation.
 
 ## License
 

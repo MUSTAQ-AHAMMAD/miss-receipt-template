@@ -467,6 +467,17 @@ def index():
     return response
 
 
+@app.route("/upload-logs")
+def upload_logs_page():
+    """Serve upload logs dashboard page"""
+    response = render_template("upload_logs.html")
+    response = app.make_response(response)
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
+
 @app.route("/test-report")
 def test_report():
     p = Path(__file__).parent / "TEST_REPORT.html"
@@ -913,18 +924,18 @@ def generate_summary_pdf():
     """Generate an HTML summary from AR Invoice data for browser-based PDF conversion"""
     try:
         import pdf_report_generator
-        
+
         sid = _new_session()
         sess = _session(sid)
-        
+
         # Get the uploaded AR Invoice file
         ar_file = _save_upload(sid, "ar_invoice")
         if not ar_file:
             return jsonify({"error": "AR Invoice file required"}), 400
-        
+
         # Generate HTML (not actual PDF, for browser conversion)
         html_content = pdf_report_generator.generate_invoice_summary_pdf(ar_file)
-        
+
         # Return HTML for browser to convert to PDF
         return Response(
             html_content,
@@ -933,11 +944,182 @@ def generate_summary_pdf():
                 'Content-Disposition': 'inline; filename="ar_invoice_summary.html"'
             }
         )
-    
+
     except Exception as e:
         import logging
         logging.error(f"Error generating summary: {e}", exc_info=True)
         return jsonify({"error": "Failed to generate summary"}), 500
+
+
+# ---------------------------------------------------------------------------
+# Upload Logs API Endpoints
+# ---------------------------------------------------------------------------
+
+@app.route("/api/upload-logs/history", methods=["GET"])
+def get_upload_history():
+    """Get upload history with optional filters"""
+    try:
+        from upload_logger import UploadLogger
+
+        logger = UploadLogger()
+
+        # Get query parameters
+        limit = int(request.args.get("limit", 100))
+        status = request.args.get("status")  # SUCCESS, FAILED, PENDING
+        receipt_type = request.args.get("type")  # STANDARD, MISC
+
+        # Get history
+        history = logger.get_upload_history(
+            limit=limit,
+            status=status,
+            receipt_type=receipt_type
+        )
+
+        return jsonify({
+            "history": history,
+            "count": len(history)
+        })
+
+    except Exception as e:
+        import logging
+        logging.error(f"Error fetching upload history: {e}", exc_info=True)
+        return jsonify({"error": "Failed to fetch upload history"}), 500
+
+
+@app.route("/api/upload-logs/details/<int:upload_id>", methods=["GET"])
+def get_upload_details(upload_id: int):
+    """Get detailed information about a specific upload including API logs"""
+    try:
+        from upload_logger import UploadLogger
+
+        logger = UploadLogger()
+        details = logger.get_upload_details(upload_id)
+
+        if not details:
+            return jsonify({"error": "Upload not found"}), 404
+
+        return jsonify(details)
+
+    except Exception as e:
+        import logging
+        logging.error(f"Error fetching upload details: {e}", exc_info=True)
+        return jsonify({"error": "Failed to fetch upload details"}), 500
+
+
+@app.route("/api/upload-logs/stats", methods=["GET"])
+def get_upload_stats():
+    """Get summary statistics of all uploads"""
+    try:
+        from upload_logger import UploadLogger
+
+        logger = UploadLogger()
+        stats = logger.get_summary_stats()
+
+        return jsonify(stats)
+
+    except Exception as e:
+        import logging
+        logging.error(f"Error fetching upload stats: {e}", exc_info=True)
+        return jsonify({"error": "Failed to fetch upload stats"}), 500
+
+
+@app.route("/api/upload-logs/export", methods=["POST"])
+def export_upload_logs():
+    """Export upload logs to a text report"""
+    try:
+        from upload_logger import UploadLogger
+
+        logger = UploadLogger()
+        status = request.form.get("status")  # Optional filter
+
+        # Create export file
+        sid = _new_session()
+        sess = _session(sid)
+        export_path = Path(sess["work_dir"]) / "upload_logs_report.txt"
+
+        logger.export_report(str(export_path), status=status)
+
+        if not export_path.exists():
+            return jsonify({"error": "Failed to create export"}), 500
+
+        return send_file(
+            str(export_path),
+            as_attachment=True,
+            download_name=f"upload_logs_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
+            mimetype="text/plain"
+        )
+
+    except Exception as e:
+        import logging
+        logging.error(f"Error exporting upload logs: {e}", exc_info=True)
+        return jsonify({"error": "Failed to export upload logs"}), 500
+
+
+@app.route("/api/upload-logs/test-upload", methods=["POST"])
+def test_upload():
+    """Test upload functionality with mock data"""
+    try:
+        from upload_manager import UploadManager
+
+        # Get uploaded file or use path
+        file_path = request.form.get("file_path")
+        receipt_type = request.form.get("receipt_type", "STANDARD")
+        session_id = request.form.get("session_id")
+
+        if not file_path:
+            return jsonify({"error": "file_path is required"}), 400
+
+        # Create upload manager (in mock mode for testing)
+        manager = UploadManager()
+
+        # Attempt upload
+        success, error_msg, upload_id = manager.upload_receipt_file(
+            file_path=file_path,
+            receipt_type=receipt_type,
+            session_id=session_id
+        )
+
+        return jsonify({
+            "success": success,
+            "error": error_msg,
+            "upload_id": upload_id
+        })
+
+    except Exception as e:
+        import logging
+        logging.error(f"Error testing upload: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/upload-logs/batch-upload", methods=["POST"])
+def batch_upload():
+    """Upload all receipts from a directory"""
+    try:
+        from upload_manager import UploadManager
+
+        receipt_dir = request.form.get("receipt_dir")
+        receipt_type = request.form.get("receipt_type")  # Optional
+        session_id = request.form.get("session_id")
+
+        if not receipt_dir:
+            return jsonify({"error": "receipt_dir is required"}), 400
+
+        # Create upload manager
+        manager = UploadManager()
+
+        # Upload batch
+        results = manager.upload_batch(
+            receipt_dir=receipt_dir,
+            receipt_type=receipt_type,
+            session_id=session_id
+        )
+
+        return jsonify(results)
+
+    except Exception as e:
+        import logging
+        logging.error(f"Error in batch upload: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
 
 
 # ---------------------------------------------------------------------------
