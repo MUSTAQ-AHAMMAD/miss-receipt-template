@@ -1621,9 +1621,6 @@ class BankChargesCache:
 
 class MetadataCache:
 
-    _SITE_COL_ALIASES = ("STD_RCPT_NO", "BILL_TO_SITE_NUMBER", "SITE_NUMBER",
-                          "Address_SITE_NUMBER", "ADDRESS_SITE_NUMBER")
-
     def __init__(self, metadata_path: str):
         self.path            = metadata_path
         self.primary:        Dict[Tuple[str, str], dict] = {}
@@ -1635,8 +1632,16 @@ class MetadataCache:
         df = pd.read_csv(self.path, encoding="utf-8-sig", dtype=str)
         df = normalise_dataframe_columns(df)
 
+        # Find STD_RCPT_NO for receipt generation
+        receipt_site_col = None
+        if "STD_RCPT_NO" in df.columns:
+            receipt_site_col = "STD_RCPT_NO"
+
+        # Find general site number column (prioritize Address_SITE_NUMBER for AR invoices)
+        general_site_aliases = ("Address_SITE_NUMBER", "ADDRESS_SITE_NUMBER",
+                               "BILL_TO_SITE_NUMBER", "SITE_NUMBER")
         site_col_found = None
-        for alias in self._SITE_COL_ALIASES:
+        for alias in general_site_aliases:
             if alias in df.columns:
                 site_col_found = alias
                 break
@@ -1644,7 +1649,7 @@ class MetadataCache:
         if site_col_found is None:
             raise ValueError(
                 f"Metadata CSV missing site-number column. "
-                f"Expected one of: {self._SITE_COL_ALIASES}. "
+                f"Expected one of: {general_site_aliases}. "
                 f"Available: {list(df.columns)}"
             )
 
@@ -1666,6 +1671,7 @@ class MetadataCache:
             entry = {
                 "BILL_TO_ACCOUNT":  safe_str(row.get("BILL_TO_ACCOUNT")),
                 "SITE_NUMBER":      safe_str(row.get("SITE_NUMBER")),
+                "STD_RCPT_NO":      safe_str(row.get(receipt_site_col, row.get("SITE_NUMBER"))),
                 "BILL_TO_NAME":     safe_str(row.get("BILL_TO_NAME")),
                 "BUSINESS_UNIT":    safe_str(row.get("BUSINESS_UNIT", "AlQurashi-KSA")),
                 "CUSTOMER_TYPE":    safe_str(row.get("CUSTOMER_TYPE")),
@@ -1694,7 +1700,7 @@ class MetadataCache:
             return row, "type_only"
 
         return {
-            "BILL_TO_ACCOUNT": "", "SITE_NUMBER": "",
+            "BILL_TO_ACCOUNT": "", "SITE_NUMBER": "", "STD_RCPT_NO": "",
             "BILL_TO_NAME": store_name, "BUSINESS_UNIT": "AlQurashi-KSA",
             "CUSTOMER_TYPE": customer_type, "SUBINVENTORY": store_name,
             "REGION": "SA", "COST_CENTER_CODE": "",
@@ -2360,7 +2366,7 @@ class OracleFusionIntegration:
             meta, _          = self.metadata_cache.get(store, "NORMAL")
             business_unit    = meta["BUSINESS_UNIT"]
             customer_account = meta["BILL_TO_ACCOUNT"]
-            customer_site    = meta["SITE_NUMBER"]
+            customer_site    = meta["STD_RCPT_NO"]  # Use STD_RCPT_NO for receipt generation
 
             bank_name, bank_acct_number = self.receipt_methods.get_bank_account(store, method)
 
