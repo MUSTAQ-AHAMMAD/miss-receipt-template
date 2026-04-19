@@ -1035,176 +1035,323 @@ class VerificationLog:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oracle Fusion - Verification Report</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+
         body {{
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
-            color: #333;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f0f2f5;
+            padding: 0;
+            color: #1a1a1a;
+            line-height: 1.6;
         }}
+
         .container {{
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             background: white;
-            border-radius: 10px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 0 60px rgba(0,0,0,0.08);
+        }}
+
+        .header {{
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            color: white;
+            padding: 60px 50px;
+            position: relative;
             overflow: hidden;
         }}
-        .header {{
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 40px;
-            text-align: center;
+
+        .header::before {{
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
         }}
+
         .header h1 {{
-            font-size: 32px;
-            margin-bottom: 10px;
-            font-weight: 600;
+            font-size: 42px;
+            margin-bottom: 12px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            position: relative;
+            z-index: 1;
         }}
+
         .header h2 {{
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 300;
-            opacity: 0.9;
+            opacity: 0.95;
+            letter-spacing: 0.5px;
+            position: relative;
+            z-index: 1;
         }}
+
         .metadata {{
-            background: #f8f9fa;
-            padding: 20px 40px;
-            border-bottom: 2px solid #e0e0e0;
+            background: linear-gradient(to right, #fafbfc 0%, #f5f7fa 100%);
+            padding: 30px 50px;
+            border-bottom: 1px solid #e1e8ed;
         }}
+
         .metadata-grid {{
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
         }}
+
         .metadata-item {{
             display: flex;
             align-items: center;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            border: 1px solid #e8eaed;
+            transition: all 0.3s ease;
         }}
+
+        .metadata-item:hover {{
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }}
+
         .metadata-label {{
             font-weight: 600;
-            color: #555;
-            margin-right: 10px;
+            color: #5f6368;
+            margin-right: 12px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }}
+
         .metadata-value {{
-            color: #333;
+            color: #202124;
+            font-weight: 500;
         }}
+
         .executive-summary {{
-            padding: 40px;
+            padding: 50px;
             background: white;
         }}
+
         .status-card {{
-            padding: 30px;
-            border-radius: 8px;
-            margin-bottom: 30px;
+            padding: 40px;
+            border-radius: 12px;
+            margin-bottom: 40px;
             text-align: center;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            position: relative;
+            overflow: hidden;
         }}
+
+        .status-card::before {{
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+        }}
+
         .status-card.success {{
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
             color: white;
         }}
+
         .status-card.warning {{
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            background: linear-gradient(135deg, #f2994a 0%, #f2c94c 100%);
             color: white;
         }}
+
         .status-card.error {{
-            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
             color: white;
         }}
+
         .status-card h3 {{
-            font-size: 28px;
-            margin-bottom: 10px;
+            font-size: 32px;
+            margin-bottom: 12px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }}
+
         .status-card p {{
-            font-size: 16px;
+            font-size: 17px;
             opacity: 0.95;
+            font-weight: 400;
         }}
+
         .metrics {{
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
         }}
+
         .metric-card {{
-            background: #f8f9fa;
-            padding: 25px;
-            border-radius: 8px;
+            background: linear-gradient(135deg, #fafbfc 0%, #ffffff 100%);
+            padding: 30px 25px;
+            border-radius: 12px;
             text-align: center;
-            border-left: 4px solid #667eea;
+            border: 2px solid #e8eaed;
+            transition: all 0.3s ease;
+            position: relative;
         }}
+
+        .metric-card::before {{
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #667eea 0%, #764ba2 100%);
+            border-radius: 12px 0 0 12px;
+        }}
+
+        .metric-card:hover {{
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }}
+
         .metric-value {{
-            font-size: 36px;
+            font-size: 44px;
             font-weight: 700;
-            color: #1e3c72;
-            margin-bottom: 5px;
+            color: #202124;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }}
+
         .metric-label {{
-            font-size: 14px;
-            color: #666;
+            font-size: 12px;
+            color: #5f6368;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.2px;
+            font-weight: 600;
         }}
+
         .checklist {{
-            padding: 40px;
-            background: #fafafa;
+            padding: 50px;
+            background: linear-gradient(to bottom, #fafbfc 0%, #f5f7fa 100%);
         }}
+
         .section-title {{
-            font-size: 24px;
-            color: #1e3c72;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
+            font-size: 28px;
+            color: #202124;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
             border-bottom: 3px solid #667eea;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            position: relative;
         }}
+
+        .section-title::after {{
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(to right, #667eea, #764ba2);
+        }}
+
         .checklist-items {{
             background: white;
-            border-radius: 8px;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            border: 1px solid #e8eaed;
         }}
+
         .checklist-item {{
-            padding: 15px 25px;
-            border-bottom: 1px solid #e0e0e0;
+            padding: 20px 30px;
+            border-bottom: 1px solid #f0f2f5;
             display: flex;
             align-items: center;
-            transition: background 0.2s;
+            transition: all 0.2s ease;
         }}
+
         .checklist-item:hover {{
-            background: #f8f9fa;
+            background: #fafbfc;
+            padding-left: 35px;
         }}
+
         .checklist-item:last-child {{
             border-bottom: none;
         }}
+
         .checkbox {{
-            font-size: 20px;
-            margin-right: 15px;
-            min-width: 30px;
+            font-size: 24px;
+            margin-right: 20px;
+            min-width: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }}
-        .checkbox.pass {{ color: #38ef7d; }}
-        .checkbox.fail {{ color: #fee140; }}
-        .checkbox.warn {{ color: #f5576c; }}
+
+        .checkbox.pass {{ color: #00b09b; }}
+        .checkbox.fail {{ color: #eb3349; }}
+        .checkbox.warn {{ color: #f2994a; }}
         .checkbox.info {{ color: #667eea; }}
+
         .item-label {{
             flex: 1;
             font-weight: 500;
-            color: #333;
+            color: #202124;
+            font-size: 15px;
         }}
+
         .item-value {{
-            color: #666;
-            margin-left: 20px;
-            font-family: 'Courier New', monospace;
+            color: #5f6368;
+            margin-left: 25px;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
+            font-size: 14px;
+            background: #f8f9fa;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid #e8eaed;
         }}
+
         .footer {{
-            background: #1e3c72;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
             color: white;
-            padding: 30px;
+            padding: 40px;
             text-align: center;
         }}
+
         .footer p {{
-            margin: 5px 0;
-            opacity: 0.9;
+            margin: 8px 0;
+            opacity: 0.95;
+            font-size: 14px;
         }}
+
+        .footer strong {{
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+        }}
+
         @media print {{
             body {{ background: white; padding: 0; }}
             .container {{ box-shadow: none; }}
+            .metric-card, .checklist-item {{ page-break-inside: avoid; }}
+        }}
+
+        @media (max-width: 768px) {{
+            .header h1 {{ font-size: 28px; }}
+            .header h2 {{ font-size: 18px; }}
+            .metrics {{ grid-template-columns: 1fr; }}
+            .metadata-grid {{ grid-template-columns: 1fr; }}
+            .executive-summary, .checklist {{ padding: 30px 20px; }}
         }}
     </style>
 </head>
