@@ -1621,7 +1621,7 @@ class BankChargesCache:
 
 class MetadataCache:
 
-    _SITE_COL_ALIASES = ("BILL_TO_SITE_NUMBER", "SITE_NUMBER",
+    _SITE_COL_ALIASES = ("STD_RCPT_NO", "BILL_TO_SITE_NUMBER", "SITE_NUMBER",
                           "Address_SITE_NUMBER", "ADDRESS_SITE_NUMBER")
 
     def __init__(self, metadata_path: str):
