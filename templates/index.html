@@ -964,7 +964,7 @@
     </div>
 
     <!-- Auto-loaded reference files -->
-    <div style="margin-top:20px; padding:16px 20px; background:rgba(16,185,129,.06); border:1px solid rgba(16,185,129,.20); border-radius:12px;">
+    <div id="auto-loaded-files" style="margin-top:20px; padding:16px 20px; background:rgba(16,185,129,.06); border:1px solid rgba(16,185,129,.20); border-radius:12px;">
       <div style="font-size:.78rem; font-weight:600; color:var(--accent-green); letter-spacing:.06em; text-transform:uppercase; margin-bottom:10px;">
         <i class="fa-solid fa-circle-check" style="margin-right:6px;"></i>
         Auto-loaded from server root
@@ -1519,6 +1519,10 @@
     // Hide config section for merge, report, and view-reports modes
     const configCard = document.querySelector('.card:has(#configForm)');
     if (configCard) configCard.style.display = (mode === 'merge' || mode === 'report' || mode === 'view-reports') ? 'none' : '';
+
+    // Hide auto-loaded files section for merge, report, and view-reports modes
+    const autoLoadedFiles = document.getElementById('auto-loaded-files');
+    if (autoLoadedFiles) autoLoadedFiles.style.display = (mode === 'merge' || mode === 'report' || mode === 'view-reports') ? 'none' : '';
 
     // Show/hide AR Invoice legend badge
     const arLegend = document.getElementById('legend-ar-invoice');
