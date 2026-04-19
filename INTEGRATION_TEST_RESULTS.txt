@@ -1,0 +1,43 @@
+================================================================================
+DETAILED INTEGRATION TEST RESULTS
+Generated: 2026-04-19 14:01:51
+================================================================================
+
+Total Tests: 10
+Passed: 10
+Failed: 0
+Warnings: 0
+Skipped: 0
+Success Rate: 100.0%
+
+--------------------------------------------------------------------------------
+
+[PASS] Receipt Method Columns
+
+[PASS] Receipt Method Mapping
+  Note: 9 methods, 1 orgs
+
+[PASS] Bank Charges Config
+  Note: 8 configurations
+
+[PASS] Metadata Mapping
+  Note: 193 stores
+
+[PASS] Standard Receipt Logic
+  Note: All logic checks passed
+
+[PASS] Misc Receipt Logic
+  Note: All logic checks passed
+
+[PASS] Edge Cases
+  Note: 5/5 cases handled
+
+[PASS] Standard Receipt Organization
+  Note: Organized by method
+
+[PASS] Misc Receipt Organization
+  Note: Receipts/Misc directory
+
+[PASS] Verification Reporting
+  Note: 5/5 features found
+
