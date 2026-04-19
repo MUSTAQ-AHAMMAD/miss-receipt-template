@@ -318,66 +318,89 @@ class ComprehensiveReportGenerator:
         print(f"  ✅ Text report saved: {txt_path}")
     
     def _write_formatted_report(self, f, data: dict, title: str):
-        """Write formatted text report"""
-        f.write("=" * 72 + "\n")
-        f.write(f"  {title.upper().replace('_', ' ')}\n")
-        f.write(f"  Generated: {data.get('generated_at', '')}\n")
-        f.write("=" * 72 + "\n\n")
-        
-        # Write summary statistics
+        """Write formatted text report with professional styling"""
+        # Professional header with box drawing
+        f.write("╔" + "═" * 90 + "╗\n")
+        f.write("║" + " " * 90 + "║\n")
+        report_title = title.upper().replace('_', ' ')
+        title_padding = (90 - len(report_title)) // 2
+        f.write("║" + " " * title_padding + report_title + " " * (90 - title_padding - len(report_title)) + "║\n")
+        generated_text = f"Generated: {data.get('generated_at', '')}"
+        gen_padding = (90 - len(generated_text)) // 2
+        f.write("║" + " " * gen_padding + generated_text + " " * (90 - gen_padding - len(generated_text)) + "║\n")
+        f.write("║" + " " * 90 + "║\n")
+        f.write("╚" + "═" * 90 + "╝\n\n")
+
+        # Write summary statistics with enhanced formatting
         if "total_rows" in data:
-            f.write("SUMMARY:\n")
-            f.write("-" * 72 + "\n")
-            f.write(f"  Total rows: {data['total_rows']:,}\n")
-            f.write(f"  Total amount: {data['total_amount']:,.2f} SAR\n")
-            f.write(f"  Unique transactions: {data.get('unique_transactions', 0):,}\n")
-            f.write(f"  Unique invoices: {data.get('unique_invoices', 0):,}\n\n")
-        
-        # Write discount analysis
+            f.write("╔" + "═" * 90 + "╗\n")
+            f.write("║  EXECUTIVE SUMMARY" + " " * 71 + "║\n")
+            f.write("╠" + "═" * 90 + "╣\n")
+            f.write(f"║  Total Records            : {data['total_rows']:>20,} rows" + " " * 38 + "║\n")
+            f.write(f"║  Total Amount             : {data['total_amount']:>20,.2f} SAR" + " " * 36 + "║\n")
+            f.write(f"║  Unique Transactions      : {data.get('unique_transactions', 0):>20,}" + " " * 43 + "║\n")
+            f.write(f"║  Unique Invoices          : {data.get('unique_invoices', 0):>20,}" + " " * 43 + "║\n")
+            f.write("╚" + "═" * 90 + "╝\n\n")
+
+        # Write discount analysis with enhanced box
         if "discount_analysis" in data:
             disc = data["discount_analysis"]
-            f.write("DISCOUNT ITEMS ANALYSIS:\n")
-            f.write("-" * 72 + "\n")
-            f.write(f"  Discount lines: {disc['discount_lines']:,}\n")
-            f.write(f"  Discount amount: {disc['discount_amount']:,.2f} SAR\n")
-            f.write(f"  Regular lines: {disc['regular_lines']:,}\n")
-            f.write(f"  Regular amount: {disc['regular_amount']:,.2f} SAR\n")
-            f.write(f"  Discount percentage: {disc['discount_percentage']:.2f}%\n\n")
-        
-        # Write SKU analysis
+            f.write("╔" + "═" * 90 + "╗\n")
+            f.write("║  DISCOUNT ITEMS ANALYSIS" + " " * 65 + "║\n")
+            f.write("╠" + "═" * 90 + "╣\n")
+            f.write(f"║  Discount Lines           : {disc['discount_lines']:>20,}" + " " * 43 + "║\n")
+            f.write(f"║  Discount Amount          : {disc['discount_amount']:>20,.2f} SAR" + " " * 36 + "║\n")
+            f.write(f"║  Regular Lines            : {disc['regular_lines']:>20,}" + " " * 43 + "║\n")
+            f.write(f"║  Regular Amount           : {disc['regular_amount']:>20,.2f} SAR" + " " * 36 + "║\n")
+            f.write(f"║  Discount Percentage      : {disc['discount_percentage']:>20.2f}%" + " " * 42 + "║\n")
+            f.write("╚" + "═" * 90 + "╝\n\n")
+
+        # Write SKU analysis with professional table
         if "sku_analysis" in data:
             sku = data["sku_analysis"]
-            f.write("SKU ANALYSIS:\n")
-            f.write("-" * 72 + "\n")
-            f.write(f"  Unique SKUs: {sku['unique_skus']:,}\n")
-            f.write(f"  Missing SKUs (discount items): {sku['missing_skus']:,}\n\n")
-            
+            f.write("╔" + "═" * 90 + "╗\n")
+            f.write("║  SKU ANALYSIS" + " " * 76 + "║\n")
+            f.write("╠" + "═" * 90 + "╣\n")
+            f.write(f"║  Unique SKUs              : {sku['unique_skus']:>20,}" + " " * 43 + "║\n")
+            f.write(f"║  Missing SKUs (Discount)  : {sku['missing_skus']:>20,}" + " " * 43 + "║\n")
+
             if sku.get("top_10_skus"):
-                f.write("  Top 10 SKUs by Amount:\n")
+                f.write("╠" + "─" * 90 + "╣\n")
+                f.write("║  Top 10 SKUs by Amount:" + " " * 66 + "║\n")
+                f.write("╠" + "─" * 90 + "╣\n")
+                f.write("║  Rank  SKU                       Quantity          Amount (SAR)        ║\n")
+                f.write("╠" + "─" * 90 + "╣\n")
                 for i, item in enumerate(sku["top_10_skus"], 1):
-                    f.write(f"    {i:2d}. {item['SKU']:<20} "
-                           f"Qty: {item['Total Quantity']:8.0f}  "
-                           f"Amount: {item['Total Amount']:12,.2f} SAR\n")
-                f.write("\n")
-        
-        # Write sub-inventory totals
+                    sku_str = str(item['SKU'])[:25]  # Truncate long SKUs
+                    line = f"║  {i:2d}.   {sku_str:<25} {item['Total Quantity']:>12,.0f} {item['Total Amount']:>18,.2f}      ║\n"
+                    f.write(line)
+            f.write("╚" + "═" * 90 + "╝\n\n")
+
+        # Write sub-inventory totals with professional table
         if "subinventory_totals" in data:
-            f.write("SUB-INVENTORY TOTALS:\n")
-            f.write("-" * 72 + "\n")
+            f.write("╔" + "═" * 90 + "╗\n")
+            f.write("║  SUB-INVENTORY BREAKDOWN" + " " * 65 + "║\n")
+            f.write("╠" + "═" * 90 + "╣\n")
+            f.write("║  Sub-Inventory                Invoices  Transactions     Amount (SAR)    ║\n")
+            f.write("╠" + "─" * 90 + "╣\n")
             for item in data["subinventory_totals"]:
-                f.write(f"  {item['SubInventory']:<30} "
-                       f"Invoices: {item['Invoices']:5,}  "
-                       f"Amount: {item['Total Amount']:12,.2f} SAR\n")
-            f.write("\n")
-        
-        # Write receipts by method
+                subinv = str(item['SubInventory'])[:25]  # Truncate if too long
+                line = f"║  {subinv:<25} {item['Invoices']:>10,} {item['Transactions']:>13,} {item['Total Amount']:>16,.2f}  ║\n"
+                f.write(line)
+            f.write("╚" + "═" * 90 + "╝\n\n")
+
+        # Write receipts by method with enhanced formatting
         if "receipts_by_method" in data:
-            f.write("RECEIPTS BY PAYMENT METHOD:\n")
-            f.write("-" * 72 + "\n")
+            f.write("╔" + "═" * 90 + "╗\n")
+            f.write("║  RECEIPTS BY PAYMENT METHOD" + " " * 62 + "║\n")
+            f.write("╠" + "═" * 90 + "╣\n")
+            f.write("║  Payment Method            Files                        Amount (SAR)    ║\n")
+            f.write("╠" + "─" * 90 + "╣\n")
             for method, stats in data["receipts_by_method"].items():
-                f.write(f"  {method}:\n")
-                f.write(f"    Files: {stats['files']:,}\n")
-                f.write(f"    Total Amount: {stats['total_amount']:,.2f} SAR\n\n")
+                method_str = str(method)[:23]
+                line = f"║  {method_str:<23} {stats['files']:>10,}                 {stats['total_amount']:>16,.2f}  ║\n"
+                f.write(line)
+            f.write("╚" + "═" * 90 + "╝\n\n")
 
 
 def main():

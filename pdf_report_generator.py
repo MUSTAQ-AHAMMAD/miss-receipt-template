@@ -15,25 +15,25 @@ import io
 def generate_pdf_from_text(text_content: str, title: str = "Report") -> bytes:
     """
     Generate HTML content from text for browser-based PDF conversion.
-    
+
     Note: This function returns HTML encoded as UTF-8 bytes, not actual PDF bytes.
     The HTML is designed to be displayed in a browser where users can use
     the browser's "Print to PDF" function to generate the final PDF.
-    
+
     Args:
         text_content: The text content to convert to HTML
         title: Title for the HTML document
-        
+
     Returns:
         HTML content as UTF-8 encoded bytes (not actual PDF)
     """
     import html
-    
+
     # Escape HTML special characters to prevent XSS
     escaped_content = html.escape(text_content)
     escaped_title = html.escape(title)
-    
-    # Create HTML wrapper for the text content
+
+    # Create HTML wrapper for the text content with enhanced professional styling
     html_content = f"""
     <!DOCTYPE html>
     <html>
@@ -41,58 +41,136 @@ def generate_pdf_from_text(text_content: str, title: str = "Report") -> bytes:
         <meta charset="UTF-8">
         <title>{escaped_title}</title>
         <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+            * {{
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }}
+
             body {{
-                font-family: 'Courier New', monospace;
-                margin: 2cm;
-                font-size: 10pt;
-                line-height: 1.4;
-                color: #333;
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                margin: 0;
+                padding: 40px;
+                font-size: 11pt;
+                line-height: 1.6;
+                color: #1a1a1a;
+                background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             }}
+
+            .page {{
+                max-width: 900px;
+                margin: 0 auto;
+                background: white;
+                padding: 50px;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+                border-radius: 8px;
+            }}
+
+            .header {{
+                text-align: center;
+                margin-bottom: 40px;
+                padding: 40px 30px;
+                background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+                color: white;
+                border-radius: 8px;
+                box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            }}
+
             h1 {{
-                color: #2563eb;
-                border-bottom: 2px solid #2563eb;
-                padding-bottom: 10px;
-                margin-bottom: 20px;
+                font-size: 32px;
+                font-weight: 700;
+                margin-bottom: 12px;
+                letter-spacing: -0.5px;
+                text-shadow: 0 2px 4px rgba(0,0,0,0.2);
             }}
+
+            .timestamp {{
+                font-size: 14px;
+                opacity: 0.95;
+                font-weight: 300;
+                letter-spacing: 0.5px;
+            }}
+
             pre {{
                 white-space: pre-wrap;
                 word-wrap: break-word;
-                background-color: #f8f9fa;
-                padding: 15px;
-                border-radius: 5px;
-                border-left: 4px solid #2563eb;
+                background: linear-gradient(to right, #fafbfc 0%, #f5f7fa 100%);
+                padding: 30px;
+                border-radius: 8px;
+                border-left: 4px solid #667eea;
+                font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
+                font-size: 10pt;
+                line-height: 1.5;
+                color: #202124;
+                box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);
             }}
-            .header {{
-                text-align: center;
-                margin-bottom: 30px;
-                padding: 20px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                border-radius: 10px;
-            }}
+
             .footer {{
-                margin-top: 30px;
-                padding-top: 10px;
-                border-top: 1px solid #ccc;
+                margin-top: 40px;
+                padding: 30px;
+                border-top: 2px solid #e1e8ed;
                 text-align: center;
-                font-size: 8pt;
-                color: #666;
+                background: linear-gradient(to right, #fafbfc 0%, #f5f7fa 100%);
+                border-radius: 8px;
+            }}
+
+            .footer p {{
+                font-size: 10pt;
+                color: #5f6368;
+                margin: 8px 0;
+                font-weight: 500;
+            }}
+
+            .footer strong {{
+                color: #202124;
+                font-weight: 700;
+            }}
+
+            @media print {{
+                body {{
+                    background: white;
+                    padding: 0;
+                }}
+
+                .page {{
+                    box-shadow: none;
+                    padding: 20px;
+                    max-width: 100%;
+                }}
+
+                .header {{
+                    background: #0f2027 !important;
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
+                }}
+
+                pre {{
+                    background: #fafbfc !important;
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
+                }}
             }}
         </style>
     </head>
     <body>
-        <div class="header">
-            <h1>{escaped_title}</h1>
-            <p>Generated on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
-        </div>
-        <pre>{escaped_content}</pre>
-        <div class="footer">
-            <p>Oracle Fusion Financial Integration - Report Generator</p>
+        <div class="page">
+            <div class="header">
+                <h1>{escaped_title}</h1>
+                <p class="timestamp">Generated on {datetime.now().strftime('%A, %B %d, %Y at %I:%M:%S %p')}</p>
+            </div>
+            <pre>{escaped_content}</pre>
+            <div class="footer">
+                <p><strong>Oracle Fusion Financial Integration</strong></p>
+                <p>Professional Report Generator • Enterprise Edition</p>
+                <p>For questions or support, contact your system administrator</p>
+            </div>
         </div>
     </body>
     </html>
     """
-    
+
     return html_content.encode('utf-8')
 
 
