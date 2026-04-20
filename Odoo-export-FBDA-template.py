@@ -2047,13 +2047,52 @@ class OracleFusionIntegration:
 
         self.payments["Order Ref"] = self.payments["Order Ref"].apply(clean_order_ref)
 
+        # Track payment method mappings for diagnosis
+        raw_payment_methods: Dict[str, int] = defaultdict(int)
+        normalized_payment_methods: Dict[str, float] = defaultdict(float)
+
         for _, row in self.payments.iterrows():
             inv    = row["Order Ref"]
-            method = normalise_payment(safe_str(row.get("Payment Method", "Cash")))
+            raw_method = safe_str(row.get("Payment Method", "Cash"))
+            method = normalise_payment(raw_method)
             amount = safe_float(row.get("Amount", 0))
+
+            # Track for diagnostics
+            raw_payment_methods[raw_method] += 1
+            normalized_payment_methods[method] += amount
+
             if not inv or amount == 0:
                 continue
             self.invoice_payments[inv][method] += amount
+
+        # Log payment method normalization results
+        vl.section("1e. PAYMENT METHOD NORMALIZATION DIAGNOSTIC")
+        vl.add("  Raw payment methods found in input:")
+        for raw_method, count in sorted(raw_payment_methods.items()):
+            normalized = normalise_payment(raw_method)
+            vl.add(f"    '{raw_method}' (count: {count:,}) → normalized to → '{normalized}'")
+
+        vl.add("\n  Payment method totals after normalization:")
+        total_payments = 0.0
+        for method, amount in sorted(normalized_payment_methods.items(), key=lambda x: -x[1]):
+            total_payments += amount
+            # Classify method type
+            if method in RECEIPT_PAYMENT_METHODS:
+                category = "✓ STANDARD RECEIPT"
+            elif method in CARD_PAYMENT_METHODS:
+                category = "✓ CARD (MISC RCPT)"
+            elif method.upper() in NO_RECEIPT_PAYMENT_METHODS:
+                category = "⊗ BNPL (NO RCPT)"
+            else:
+                category = "⚠ NOT IN ANY CATEGORY"
+
+            vl.add(f"    {method:<20} {amount:>16,.2f} SAR  [{category}]")
+        vl.add(f"    {'TOTAL':<20} {total_payments:>16,.2f} SAR")
+
+        vl.add("\n  Payment method categories:")
+        vl.add(f"    RECEIPT_PAYMENT_METHODS    = {RECEIPT_PAYMENT_METHODS}")
+        vl.add(f"    CARD_PAYMENT_METHODS       = {CARD_PAYMENT_METHODS}")
+        vl.add(f"    NO_RECEIPT_PAYMENT_METHODS = {NO_RECEIPT_PAYMENT_METHODS}")
 
         for inv, methods in self.invoice_payments.items():
             if "TAMARA" in methods:
@@ -2332,10 +2371,17 @@ class OracleFusionIntegration:
         bnpl_skipped           = 0
         unknown_method_skipped = 0
 
+        # Detailed tracking for diagnostics
+        skipped_methods_detail: Dict[str, float] = defaultdict(float)
+        accepted_methods_detail: Dict[str, float] = defaultdict(float)
+        bnpl_methods_detail: Dict[str, float] = defaultdict(float)
+
         for inv, methods in self.invoice_payments.items():
             ctype = self.invoice_ctype.get(inv, "NORMAL")
             if ctype in ("TABBY", "TAMARA"):
                 bnpl_skipped += 1
+                for method, amount in methods.items():
+                    bnpl_methods_detail[method] += amount
                 continue
 
             store     = self.invoice_store.get(inv, "UNKNOWN")
@@ -2349,10 +2395,13 @@ class OracleFusionIntegration:
 
             for method, amount in methods.items():
                 if method.upper() in NO_RECEIPT_PAYMENT_METHODS:
+                    bnpl_methods_detail[method] += amount
                     continue
                 if method not in RECEIPT_PAYMENT_METHODS:
                     unknown_method_skipped += 1
+                    skipped_methods_detail[method] += amount
                     continue
+                accepted_methods_detail[method] += amount
                 key = (store, date_str, method)
                 agg_amount[key]    += amount
                 agg_inv_count[key] += 1
@@ -2417,6 +2466,32 @@ class OracleFusionIntegration:
         vl.kv("Unknown method rows skipped", f"{unknown_method_skipped:,}")
         vl.kv("Skipped (no AR txn number)",  f"{skipped_no_ar_txn:,}")
         vl.kv("Receipt files to write",      f"{len(receipt_files):,}")
+
+        # CRITICAL DIAGNOSTIC: Show which methods were skipped and why
+        vl.add("\n  ⚠ PAYMENT METHOD PROCESSING BREAKDOWN:")
+        vl.add("\n  ✓ ACCEPTED for Standard Receipts (in RECEIPT_PAYMENT_METHODS):")
+        if accepted_methods_detail:
+            for method, amount in sorted(accepted_methods_detail.items(), key=lambda x: -x[1]):
+                vl.add(f"    {method:<20} {amount:>16,.2f} SAR")
+        else:
+            vl.add("    (none)")
+
+        vl.add("\n  ⚠ SKIPPED - Not in RECEIPT_PAYMENT_METHODS:")
+        if skipped_methods_detail:
+            skipped_total = sum(skipped_methods_detail.values())
+            for method, amount in sorted(skipped_methods_detail.items(), key=lambda x: -x[1]):
+                vl.add(f"    {method:<20} {amount:>16,.2f} SAR  ← NOT GENERATING RECEIPTS!")
+            vl.add(f"    {'TOTAL SKIPPED':<20} {skipped_total:>16,.2f} SAR")
+        else:
+            vl.add("    (none)")
+
+        vl.add("\n  ⊗ BNPL Methods (excluded by design):")
+        if bnpl_methods_detail:
+            for method, amount in sorted(bnpl_methods_detail.items(), key=lambda x: -x[1]):
+                vl.add(f"    {method:<20} {amount:>16,.2f} SAR")
+        else:
+            vl.add("    (none)")
+
         vl.add()
         vl.add("  RECEIPT DETAILS WITH BANK ACCOUNT MAPPING:")
         vl.table_row("File", "Store", "Method", "Amount (SAR)", "Bank Account",
@@ -2461,6 +2536,11 @@ class OracleFusionIntegration:
         agg_amount: Dict[Tuple[str, str, str], float] = defaultdict(float)
         agg_ar_txn: Dict[Tuple[str, str], str]        = {}
 
+        # Detailed tracking for diagnostics
+        card_methods_accepted: Dict[str, float] = defaultdict(float)
+        card_methods_skipped: Dict[str, float] = defaultdict(float)
+        zero_amount_skipped: Dict[str, float] = defaultdict(float)
+
         for inv, methods in self.invoice_payments.items():
             ctype = self.invoice_ctype.get(inv, "NORMAL")
             if ctype in ("TABBY", "TAMARA"):
@@ -2473,8 +2553,13 @@ class OracleFusionIntegration:
             if sd_key not in agg_ar_txn and ar_txn:
                 agg_ar_txn[sd_key] = ar_txn
             for method, amount in methods.items():
-                if method not in CARD_PAYMENT_METHODS or amount <= 0:
+                if amount <= 0:
+                    zero_amount_skipped[method] += 1
                     continue
+                if method not in CARD_PAYMENT_METHODS:
+                    card_methods_skipped[method] += amount
+                    continue
+                card_methods_accepted[method] += amount
                 agg_amount[(store, date_str, method)] += amount
 
         misc_files:       Dict[str, pd.DataFrame] = {}
@@ -2541,6 +2626,27 @@ class OracleFusionIntegration:
         vl.section("8b. MISCELLANEOUS RECEIPT RECORDS — DETAIL")
         vl.kv("Skipped (no AR txn number)",  f"{skipped_no_ar_txn_misc:,}")
         vl.kv("Misc receipt files to write", f"{len(misc_files):,}")
+
+        # CRITICAL DIAGNOSTIC: Show which card methods were processed
+        vl.add("\n  ⚠ CARD PAYMENT METHOD PROCESSING BREAKDOWN:")
+        vl.add("\n  ✓ ACCEPTED for Misc Receipts (in CARD_PAYMENT_METHODS):")
+        if card_methods_accepted:
+            for method, amount in sorted(card_methods_accepted.items(), key=lambda x: -x[1]):
+                vl.add(f"    {method:<20} {amount:>16,.2f} SAR")
+        else:
+            vl.add("    (none)")
+
+        vl.add("\n  ⚠ SKIPPED - Not in CARD_PAYMENT_METHODS:")
+        if card_methods_skipped:
+            skipped_total = sum(card_methods_skipped.values())
+            for method, amount in sorted(card_methods_skipped.items(), key=lambda x: -x[1]):
+                vl.add(f"    {method:<20} {amount:>16,.2f} SAR  ← NOT GENERATING MISC RECEIPTS!")
+            vl.add(f"    {'TOTAL SKIPPED':<20} {skipped_total:>16,.2f} SAR")
+        else:
+            vl.add("    (none)")
+
+        vl.add()
+
         if misc_detail_rows:
             vl.add("  MISC RECEIPT CALCULATION DETAILS:")
             vl.table_row("Store", "Method", "Payment Total", "Rate %", "Misc Amount", "Bank Acct",
