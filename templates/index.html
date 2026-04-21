@@ -744,6 +744,12 @@
         Generate from Odoo Exports
         <span style="font-size:.7rem;opacity:.7;display:block;margin-top:2px;">Sales Lines + Payment Lines → AR Invoice + receipts</span>
       </button>
+      <button id="mode-btn-journal" class="mode-btn"
+              onclick="setMode('journal')">
+        <i class="fa-solid fa-book"></i>
+        Generate Journal Template
+        <span style="font-size:.7rem;opacity:.7;display:block;margin-top:2px;">AR Invoice → Oracle Fusion Journal Import for TAMARA/TABBY</span>
+      </button>
       <button id="mode-btn-merge" class="mode-btn"
               onclick="setMode('merge')">
         <i class="fa-solid fa-code-merge"></i>
@@ -880,6 +886,101 @@
         </div>
       </div>
     </div><!-- /uploads-sales_payment -->
+
+    <!-- ── Journal Template Generation mode ── -->
+    <div id="uploads-journal" style="display:none;">
+      <div style="padding:20px; background:rgba(16,185,129,.08); border:1px solid rgba(16,185,129,.25); border-radius:12px; margin-bottom:20px;">
+        <h4 style="margin-bottom:10px; color:var(--accent-green);"><i class="fa-solid fa-book"></i> Generate Journal Template for TAMARA/TABBY</h4>
+        <p style="font-size:.85rem; color:var(--text-muted); margin-bottom:16px;">
+          Upload an AR Invoice CSV file to generate Oracle Fusion Journal Import templates for TAMARA and TABBY payment method transactions.
+          The system will automatically filter TAMARA/TABBY transactions and create balanced debit/credit journal entries.
+        </p>
+      </div>
+
+      <div class="upload-grid">
+        <!-- AR Invoice -->
+        <div class="file-zone" id="zone-journal-ar" ondragover="onDragOver(event,'journal-ar')" ondragleave="onDragLeave('journal-ar')" ondrop="onDrop(event,'journal-ar')">
+          <input type="file" id="file-journal-ar" accept=".csv" onchange="onFileChange('journal-ar',this)" />
+          <div class="fz-header">
+            <div class="fz-icon required"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+            <div>
+              <div class="fz-title">AR Invoice CSV</div>
+              <div class="fz-subtitle">Oracle Fusion AR Invoice with TAMARA/TABBY transactions</div>
+              <span class="fz-badge req">Required</span>
+            </div>
+          </div>
+          <div class="fz-msg">
+            <p>Click to browse or drag & drop</p>
+            <small>CSV file containing AR Invoice data with payment methods</small>
+          </div>
+        </div>
+
+        <!-- Journal Config (Optional) -->
+        <div class="file-zone" id="zone-journal-config-file" ondragover="onDragOver(event,'journal-config-file')" ondragleave="onDragLeave('journal-config-file')" ondrop="onDrop(event,'journal-config-file')">
+          <input type="file" id="file-journal-config-file" accept=".csv" onchange="onFileChange('journal-config-file',this)" />
+          <div class="fz-header">
+            <div class="fz-icon"><i class="fa-solid fa-cog"></i></div>
+            <div>
+              <div class="fz-title">Journal Config CSV</div>
+              <div class="fz-subtitle">Business unit configuration (auto-loaded from server if not provided)</div>
+              <span class="fz-badge opt">Optional</span>
+            </div>
+          </div>
+          <div class="fz-msg">
+            <p>Click to browse or drag & drop</p>
+            <small>JOURNAL_CONFIG.csv - leave empty to use server default</small>
+          </div>
+        </div>
+
+        <!-- Journal Account Mapping (Optional) -->
+        <div class="file-zone" id="zone-journal-mapping-file" ondragover="onDragOver(event,'journal-mapping-file')" ondragleave="onDragLeave('journal-mapping-file')" ondrop="onDrop(event,'journal-mapping-file')">
+          <input type="file" id="file-journal-mapping-file" accept=".csv" onchange="onFileChange('journal-mapping-file',this)" />
+          <div class="fz-header">
+            <div class="fz-icon"><i class="fa-solid fa-map"></i></div>
+            <div>
+              <div class="fz-title">Account Mapping CSV</div>
+              <div class="fz-subtitle">Payment method account mapping (auto-loaded from server if not provided)</div>
+              <span class="fz-badge opt">Optional</span>
+            </div>
+          </div>
+          <div class="fz-msg">
+            <p>Click to browse or drag & drop</p>
+            <small>JOURNAL_ACCOUNT_MAPPING.csv - leave empty to use server default</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Journal Template Parameters -->
+      <div style="margin-top:24px; padding:20px; background:var(--bg-card); border:1px solid var(--border); border-radius:12px;">
+        <h5 style="margin-bottom:16px; color:var(--accent-blue); font-size:.95rem;">
+          <i class="fa-solid fa-sliders"></i> Journal Template Parameters
+        </h5>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fa-solid fa-calendar" style="color:var(--accent-blue)"></i>
+              Period Name
+              <span class="tip" title="Oracle GL period name (e.g., Mar-26 for March 2026)">?</span>
+            </label>
+            <input type="text" id="journalPeriodName" class="form-input" value="Mar-26"
+                   placeholder="e.g., Mar-26" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fa-solid fa-hashtag" style="color:var(--accent-blue)"></i>
+              Interface Group ID
+              <span class="tip" title="Unique identifier for this journal import file">?</span>
+            </label>
+            <input type="text" id="journalInterfaceGroupId" class="form-input" value="114"
+                   placeholder="e.g., 114" />
+          </div>
+        </div>
+        <div style="margin-top:12px; padding:12px; background:rgba(16,185,129,.08); border:1px solid rgba(16,185,129,.25); border-radius:8px; font-size:.82rem; color:var(--text-muted);">
+          <i class="fa-solid fa-info-circle" style="color:var(--accent-green);"></i>
+          <strong>Note:</strong> The system will automatically detect TAMARA and TABBY transactions from the AR Invoice and generate balanced debit/credit journal entries based on the account mapping configuration.
+        </div>
+      </div>
+    </div><!-- /uploads-journal -->
 
     <!-- ── CSV Merge mode ── -->
     <div id="uploads-merge" style="display:none;">
@@ -1277,31 +1378,6 @@
   let eventSource = null;
   let currentMode = 'ar_invoice';  // 'ar_invoice' | 'sales_payment'
 
-  // ─── Mode Toggle ──────────────────────────────────────────────────
-  function setMode(mode) {
-    currentMode = mode;
-
-    // Update button styles for all modes
-    ['ar_invoice', 'sales_payment', 'merge', 'report'].forEach(m => {
-      const btn = document.getElementById('mode-btn-' + m);
-      if (btn) btn.classList.toggle('mode-btn-active', m === mode);
-    });
-
-    // Show/hide upload panels
-    document.getElementById('uploads-ar_invoice').style.display  = mode === 'ar_invoice'    ? '' : 'none';
-    document.getElementById('uploads-sales_payment').style.display = mode === 'sales_payment' ? '' : 'none';
-    document.getElementById('uploads-merge').style.display = mode === 'merge' ? '' : 'none';
-    document.getElementById('uploads-report').style.display = mode === 'report' ? '' : 'none';
-
-    // Show/hide pipeline
-    document.getElementById('pipeline-ar_invoice').style.display    = mode === 'ar_invoice'    ? '' : 'none';
-    document.getElementById('pipeline-sales_payment').style.display = mode === 'sales_payment' ? '' : 'none';
-
-    // Show/hide AR Invoice legend badge
-    const arLegend = document.getElementById('legend-ar-invoice');
-    if (arLegend) arLegend.style.display = mode === 'sales_payment' ? '' : 'none';
-  }
-
   // ─── Journal Template Toggle ──────────────────────────────────────
   function toggleJournalFields() {
     const checkbox = document.getElementById('generateJournal');
@@ -1410,17 +1486,26 @@
     for (const [field, file] of Object.entries(fileMap)) {
       fd.append(field, file);
     }
-    fd.append('org_name',   document.getElementById('orgName').value);
-    fd.append('start_seq',  document.getElementById('startSeq').value);
-    fd.append('start_leg1', document.getElementById('legSeq1').value);
-    fd.append('start_leg2', document.getElementById('legSeq2').value);
-    fd.append('auto_increment', document.getElementById('autoIncrement').checked ? 'true' : 'false');
 
-    // Journal template parameters
-    fd.append('generate_journal', document.getElementById('generateJournal').checked ? 'true' : 'false');
-    if (document.getElementById('generateJournal').checked) {
-      fd.append('period_name', document.getElementById('periodName').value);
-      fd.append('interface_group_id', document.getElementById('interfaceGroupId').value);
+    // Add mode-specific parameters
+    if (currentMode === 'journal') {
+      // Journal mode specific parameters
+      fd.append('period_name', document.getElementById('journalPeriodName').value);
+      fd.append('interface_group_id', document.getElementById('journalInterfaceGroupId').value);
+    } else {
+      // Standard modes (ar_invoice, sales_payment)
+      fd.append('org_name',   document.getElementById('orgName').value);
+      fd.append('start_seq',  document.getElementById('startSeq').value);
+      fd.append('start_leg1', document.getElementById('legSeq1').value);
+      fd.append('start_leg2', document.getElementById('legSeq2').value);
+      fd.append('auto_increment', document.getElementById('autoIncrement').checked ? 'true' : 'false');
+
+      // Journal template parameters (for ar_invoice and sales_payment modes)
+      fd.append('generate_journal', document.getElementById('generateJournal').checked ? 'true' : 'false');
+      if (document.getElementById('generateJournal').checked) {
+        fd.append('period_name', document.getElementById('periodName').value);
+        fd.append('interface_group_id', document.getElementById('interfaceGroupId').value);
+      }
     }
 
     setProgress(5, 'Sending files to server…');
@@ -1624,7 +1709,7 @@
     currentMode = mode;
 
     // Update button styles
-    ['ar_invoice', 'sales_payment', 'merge', 'report', 'view-reports'].forEach(m => {
+    ['ar_invoice', 'sales_payment', 'journal', 'merge', 'report', 'view-reports'].forEach(m => {
       const btn = document.getElementById('mode-btn-' + m);
       if (btn) btn.classList.toggle('mode-btn-active', m === mode);
     });
@@ -1632,9 +1717,10 @@
     // Show/hide upload panels
     document.getElementById('uploads-ar_invoice').style.display     = mode === 'ar_invoice'    ? '' : 'none';
     document.getElementById('uploads-sales_payment').style.display  = mode === 'sales_payment' ? '' : 'none';
+    document.getElementById('uploads-journal').style.display        = mode === 'journal'       ? '' : 'none';
     document.getElementById('uploads-merge').style.display          = mode === 'merge'         ? '' : 'none';
     document.getElementById('uploads-report').style.display         = mode === 'report'        ? '' : 'none';
-    
+
     // Show/hide view reports section
     const viewReportsSection = document.getElementById('view-reports-section');
     if (viewReportsSection) {
@@ -1648,13 +1734,13 @@
     document.getElementById('pipeline-ar_invoice').style.display    = mode === 'ar_invoice'    ? '' : 'none';
     document.getElementById('pipeline-sales_payment').style.display = mode === 'sales_payment' ? '' : 'none';
 
-    // Hide config section for merge, report, and view-reports modes
+    // Hide config section for merge, report, journal, and view-reports modes
     const configCard = document.querySelector('.card:has(#configForm)');
-    if (configCard) configCard.style.display = (mode === 'merge' || mode === 'report' || mode === 'view-reports') ? 'none' : '';
+    if (configCard) configCard.style.display = (mode === 'merge' || mode === 'report' || mode === 'view-reports' || mode === 'journal') ? 'none' : '';
 
-    // Hide auto-loaded files section for merge, report, and view-reports modes
+    // Hide auto-loaded files section for merge, report, journal, and view-reports modes
     const autoLoadedFiles = document.getElementById('auto-loaded-files');
-    if (autoLoadedFiles) autoLoadedFiles.style.display = (mode === 'merge' || mode === 'report' || mode === 'view-reports') ? 'none' : '';
+    if (autoLoadedFiles) autoLoadedFiles.style.display = (mode === 'merge' || mode === 'report' || mode === 'view-reports' || mode === 'journal') ? 'none' : '';
 
     // Show/hide AR Invoice legend badge
     const arLegend = document.getElementById('legend-ar-invoice');
