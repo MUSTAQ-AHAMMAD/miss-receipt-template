@@ -1040,6 +1040,69 @@
         </label>
       </div>
       <div id="journalFields" style="display:none; margin-top:10px; padding-left:20px;">
+        <!-- Journal Template File Uploads -->
+        <div style="margin-bottom:20px;">
+          <div style="font-size:.82rem; font-weight:600; color:var(--accent-blue); margin-bottom:12px;">
+            <i class="fa-solid fa-file-arrow-up"></i> Upload Journal Template Configuration Files
+          </div>
+          <div class="upload-grid" style="grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));">
+
+            <!-- JOURNAL_CONFIG.csv Upload -->
+            <div class="file-zone" id="zone-journal_config" ondragover="onDragOver(event,'journal_config')" ondragleave="onDragLeave('journal_config')" ondrop="onDrop(event,'journal_config')">
+              <input type="file" id="file-journal_config" accept=".csv" onchange="onFileChange('journal_config',this)" />
+              <div class="fz-header">
+                <div class="fz-icon required"><i class="fa-solid fa-cog"></i></div>
+                <div>
+                  <div class="fz-title">Journal Configuration</div>
+                  <div class="fz-subtitle">JOURNAL_CONFIG.csv - Business unit, ledger ID, and journal source settings</div>
+                  <span class="fz-badge req">Required</span>
+                </div>
+              </div>
+              <div class="fz-drop-hint"><i class="fa-regular fa-file-csv"></i> &nbsp;CSV</div>
+              <div class="fz-filename" id="fn-journal_config"><i class="fa-solid fa-check"></i><span id="fntext-journal_config"></span></div>
+            </div>
+
+            <!-- JOURNAL_ACCOUNT_MAPPING.csv Upload -->
+            <div class="file-zone" id="zone-journal_account_mapping" ondragover="onDragOver(event,'journal_account_mapping')" ondragleave="onDragLeave('journal_account_mapping')" ondrop="onDrop(event,'journal_account_mapping')">
+              <input type="file" id="file-journal_account_mapping" accept=".csv" onchange="onFileChange('journal_account_mapping',this)" />
+              <div class="fz-header">
+                <div class="fz-icon required"><i class="fa-solid fa-table-list"></i></div>
+                <div>
+                  <div class="fz-title">Account Mapping</div>
+                  <div class="fz-subtitle">JOURNAL_ACCOUNT_MAPPING.csv - Payment method to account segment mapping</div>
+                  <span class="fz-badge req">Required</span>
+                </div>
+              </div>
+              <div class="fz-drop-hint"><i class="fa-regular fa-file-csv"></i> &nbsp;CSV</div>
+              <div class="fz-filename" id="fn-journal_account_mapping"><i class="fa-solid fa-check"></i><span id="fntext-journal_account_mapping"></span></div>
+            </div>
+
+          </div><!-- /upload-grid -->
+
+          <!-- Info box about expected columns -->
+          <div style="margin-top:16px; padding:14px 18px; background:rgba(59,130,246,.06); border:1px solid rgba(59,130,246,.20); border-radius:12px;">
+            <div style="font-size:.78rem; font-weight:600; color:var(--accent-blue); letter-spacing:.06em; text-transform:uppercase; margin-bottom:8px;">
+              <i class="fa-solid fa-circle-info" style="margin-right:6px;"></i>
+              Required CSV Format
+            </div>
+            <div style="font-size:.77rem; color:var(--text-muted); line-height:1.9;">
+              <strong>JOURNAL_CONFIG.csv columns:</strong>
+              <span style="background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Business Unit</span>
+              <span style="background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Ledger ID</span>
+              <span style="background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Journal Source</span>
+              <span style="background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Journal Category</span>
+              <span style="background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Currency Code</span>
+              <br/>
+              <strong>JOURNAL_ACCOUNT_MAPPING.csv columns:</strong>
+              <span style="background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Payment Method</span>
+              <span style="background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Business Unit</span>
+              <span style="background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Debit Account</span>
+              <span style="background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Credit Account</span>
+              <span style="background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Segment1-7</span>
+            </div>
+          </div>
+        </div>
+
         <div class="form-group">
           <label class="form-label" for="periodName">
             <i class="fa-solid fa-calendar" style="color:var(--accent-orange)"></i>
@@ -1189,6 +1252,7 @@
       <div class="ol-badge" id="legend-ar-invoice" style="display:none;"><span class="ol-dot" style="background:var(--accent-blue);"></span> AR Invoice (CSV)</div>
       <div class="ol-badge"><span class="ol-dot" style="background:var(--accent-cyan);"></span> Standard Receipts (CSV)</div>
       <div class="ol-badge"><span class="ol-dot" style="background:var(--accent-violet);"></span> Misc Receipts (CSV)</div>
+      <div class="ol-badge" id="legend-journal-template" style="display:none;"><span class="ol-dot" style="background:var(--accent-green);"></span> Journal Template (CSV)</div>
       <div class="ol-badge"><span class="ol-dot" style="background:var(--accent-amber);"></span> Verification Report (TXT)</div>
     </div>
   </div>
@@ -1242,7 +1306,14 @@
   function toggleJournalFields() {
     const checkbox = document.getElementById('generateJournal');
     const fields = document.getElementById('journalFields');
+    const journalLegend = document.getElementById('legend-journal-template');
+
     fields.style.display = checkbox.checked ? 'block' : 'none';
+
+    // Show/hide journal template legend badge
+    if (journalLegend) {
+      journalLegend.style.display = checkbox.checked ? '' : 'none';
+    }
   }
 
   // ─── File Upload Handlers ─────────────────────────────────────────
@@ -1299,6 +1370,18 @@
       }
       if (!fileMap['payment_lines']) {
         showBanner('error', 'Please upload your Payment Lines CSV/XLSX file.');
+        return;
+      }
+    }
+
+    // Validate journal template files if journal generation is enabled
+    if (document.getElementById('generateJournal').checked) {
+      if (!fileMap['journal_config']) {
+        showBanner('error', 'Please upload the JOURNAL_CONFIG.csv file when journal template generation is enabled.');
+        return;
+      }
+      if (!fileMap['journal_account_mapping']) {
+        showBanner('error', 'Please upload the JOURNAL_ACCOUNT_MAPPING.csv file when journal template generation is enabled.');
         return;
       }
     }
