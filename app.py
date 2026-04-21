@@ -362,6 +362,23 @@ def _run_integration(sid: str, cfg: dict):
                 integration.save_misc_receipts(misc_rcp)
                 stat("Misc Receipts", f"{len(misc_rcp):,} files")
 
+                # Generate Journal Template if requested
+                generate_journal = cfg.get("generate_journal", "false").lower() == "true"
+                if generate_journal:
+                    progress(85, "Generating Journal Import Template…")
+                    period_name = cfg.get("period_name", "Mar-26")
+                    interface_group_id = int(cfg.get("interface_group_id", "114"))
+
+                    journal_df = integration.generate_journal_template(
+                        period_name=period_name,
+                        interface_group_id=interface_group_id
+                    )
+                    if not journal_df.empty:
+                        integration.save_journal_template(journal_df)
+                        stat("Journal Entries", f"{len(journal_df)//2:,} transactions")
+                    else:
+                        stat("Journal Entries", "0 (No TAMARA/TABBY transactions)")
+
                 progress(90, "Writing verification report…")
                 integration._write_final_crosscheck(ar_df, std_rcp)
                 integration.vlog.close()
@@ -400,6 +417,23 @@ def _run_integration(sid: str, cfg: dict):
                 misc_rcp = integration.generate_misc_receipts()
                 integration.save_misc_receipts(misc_rcp)
                 stat("Misc Receipts", f"{len(misc_rcp):,} files")
+
+                # Generate Journal Template if requested
+                generate_journal = cfg.get("generate_journal", "false").lower() == "true"
+                if generate_journal:
+                    progress(85, "Generating Journal Import Template…")
+                    period_name = cfg.get("period_name", "Mar-26")
+                    interface_group_id = int(cfg.get("interface_group_id", "114"))
+
+                    journal_df = integration.generate_journal_template(
+                        period_name=period_name,
+                        interface_group_id=interface_group_id
+                    )
+                    if not journal_df.empty:
+                        integration.save_journal_template(journal_df)
+                        stat("Journal Entries", f"{len(journal_df)//2:,} transactions")
+                    else:
+                        stat("Journal Entries", "0 (No TAMARA/TABBY transactions)")
 
                 progress(90, "Writing verification report…")
                 integration._write_ar_invoice_crosscheck(std_rcp)
@@ -560,6 +594,12 @@ def run_integration():
     cfg["start_seq"]  = request.form.get("start_seq", "1")
     cfg["start_leg1"] = request.form.get("start_leg1", "1")
     cfg["start_leg2"] = request.form.get("start_leg2", "1")
+    cfg["auto_increment"] = request.form.get("auto_increment", "false")
+
+    # Journal generation parameters
+    cfg["generate_journal"] = request.form.get("generate_journal", "false")
+    cfg["period_name"] = request.form.get("period_name", "Mar-26")
+    cfg["interface_group_id"] = request.form.get("interface_group_id", "114")
 
     # Reset queue / status
     with SESSIONS_LOCK:

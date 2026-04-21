@@ -3317,6 +3317,236 @@ class OracleFusionIntegration:
         print("✅  ORACLE FUSION INTEGRATION COMPLETE")
         print("=" * 72)
 
+    # ──────────────────────────────────────────────────────────────────
+    # JOURNAL TEMPLATE GENERATION
+    # ──────────────────────────────────────────────────────────────────
+
+    def generate_journal_template(
+        self,
+        journal_config_path: str = "",
+        account_mapping_path: str = "",
+        period_name: str = "Mar-26",
+        interface_group_id: int = 114,
+    ) -> pd.DataFrame:
+        """
+        Generate Journal Import Template for Oracle Fusion from AR Invoice and Payment data.
+
+        This function creates journal entries for TAMARA and TABBY payment methods with debit/credit
+        entries based on the account mapping configuration.
+
+        Args:
+            journal_config_path: Path to JOURNAL_CONFIG.csv (business unit configuration)
+            account_mapping_path: Path to JOURNAL_ACCOUNT_MAPPING.csv (account segment mapping)
+            period_name: Period name (e.g., "Mar-26")
+            interface_group_id: Interface Group Identifier (unique per file)
+
+        Returns:
+            DataFrame with journal import template data
+        """
+        print("\n" + "=" * 72)
+        print("GENERATING JOURNAL IMPORT TEMPLATE")
+        print("=" * 72)
+
+        # Load configuration files
+        if not journal_config_path:
+            journal_config_path = Path(__file__).parent / "JOURNAL_CONFIG.csv"
+        if not account_mapping_path:
+            account_mapping_path = Path(__file__).parent / "JOURNAL_ACCOUNT_MAPPING.csv"
+
+        journal_config = pd.read_csv(journal_config_path)
+        account_mapping = pd.read_csv(account_mapping_path)
+
+        # Filter AR invoice data for TAMARA and TABBY transactions
+        # Get payment method from Receipt Method Name column
+        tamara_tabby_invoices = self.ar_df[
+            self.ar_df["Receipt Method Name"].str.upper().isin(["TAMARA", "TABBY"])
+        ].copy()
+
+        if tamara_tabby_invoices.empty:
+            print("⚠️  No TAMARA or TABBY transactions found in AR Invoice data")
+            return pd.DataFrame()
+
+        print(f"✓  Found {len(tamara_tabby_invoices)} TAMARA/TABBY transactions")
+
+        # Group by Order Ref (Transaction Number) and Payment Method
+        grouped = tamara_tabby_invoices.groupby([
+            "Transaction Number",
+            "Receipt Method Name",
+            "Transaction Date"
+        ]).agg({
+            "Transaction Line Amount": "sum"
+        }).reset_index()
+
+        # Initialize journal entries list
+        journal_entries = []
+
+        # Get business unit config (default to Alqurashi KSA)
+        bu_config = journal_config[journal_config["Business Unit"] == "Alqurashi KSA"].iloc[0]
+
+        batch_name_counter = 1
+        journal_entry_counter = 1
+
+        for _, row in grouped.iterrows():
+            payment_method = row["Receipt Method Name"].upper()
+            amount = abs(float(row["Transaction Line Amount"]))
+            transaction_date = pd.to_datetime(row["Transaction Date"]).strftime("%Y/%m/%d")
+
+            # Get account mapping for this payment method
+            mapping = account_mapping[
+                (account_mapping["Payment Method"] == payment_method) &
+                (account_mapping["Business Unit"] == "Alqurashi KSA")
+            ]
+
+            if mapping.empty:
+                print(f"⚠️  No account mapping found for {payment_method}, skipping")
+                continue
+
+            mapping_row = mapping.iloc[0]
+
+            # Batch and Journal Entry names
+            batch_name = f"M27 {payment_method.title()} sample - {batch_name_counter}"
+            journal_entry_name = f"Journal Import 1 sample - {journal_entry_counter}"
+
+            # Create DEBIT entry
+            debit_entry = {
+                "Status Code": "NEW",
+                "Ledger ID": bu_config["Ledger ID"],
+                "Effective Date of Transaction": transaction_date,
+                "Journal Source": bu_config["Journal Source"],
+                "Journal Category": bu_config["Journal Category"],
+                "Currency Code": bu_config["Currency Code"],
+                "Journal Entry Creation Date": transaction_date,
+                "Actual Flag": "A",
+                "Segment1": mapping_row["Segment1"],
+                "Segment2": mapping_row["Debit Account"],
+                "Segment3": mapping_row.get("Segment3", ""),
+                "Segment4": mapping_row.get("Segment4", ""),
+                "Segment5": mapping_row.get("Segment5", ""),
+                "Segment6": mapping_row.get("Segment6", ""),
+                "Segment7": mapping_row.get("Segment7", ""),
+                "Entered Debit Amount": amount,
+                "Entered Credit Amount": "",
+                "Converted Debit Amount": amount,
+                "Converted Credit Amount": "",
+                "REFERENCE1 (Batch Name)": batch_name,
+                "REFERENCE4 (Journal Entry Name)": journal_entry_name,
+                "Interface Group Identifier": interface_group_id,
+                "Period Name": period_name,
+            }
+
+            # Create CREDIT entry
+            credit_entry = {
+                "Status Code": "NEW",
+                "Ledger ID": bu_config["Ledger ID"],
+                "Effective Date of Transaction": transaction_date,
+                "Journal Source": bu_config["Journal Source"],
+                "Journal Category": bu_config["Journal Category"],
+                "Currency Code": bu_config["Currency Code"],
+                "Journal Entry Creation Date": transaction_date,
+                "Actual Flag": "A",
+                "Segment1": mapping_row["Segment1"],
+                "Segment2": mapping_row["Credit Account"],
+                "Segment3": mapping_row.get("Segment3", ""),
+                "Segment4": mapping_row.get("Segment4", ""),
+                "Segment5": mapping_row.get("Segment5", ""),
+                "Segment6": mapping_row.get("Segment6", ""),
+                "Segment7": mapping_row.get("Segment7", ""),
+                "Entered Debit Amount": "",
+                "Entered Credit Amount": amount,
+                "Converted Debit Amount": "",
+                "Converted Credit Amount": amount,
+                "REFERENCE1 (Batch Name)": batch_name,
+                "REFERENCE4 (Journal Entry Name)": journal_entry_name,
+                "Interface Group Identifier": interface_group_id,
+                "Period Name": period_name,
+            }
+
+            journal_entries.append(debit_entry)
+            journal_entries.append(credit_entry)
+
+            journal_entry_counter += 1
+            if journal_entry_counter % 10 == 0:
+                batch_name_counter += 1
+
+        # Create DataFrame from journal entries
+        journal_df = pd.DataFrame(journal_entries)
+
+        # Add all the empty columns from the JournalImportTemplate.csv
+        template_columns = [
+            "Status Code", "Ledger ID", "Effective Date of Transaction", "Journal Source",
+            "Journal Category", "Currency Code", "Journal Entry Creation Date", "Actual Flag",
+            "Segment1", "Segment2", "Segment3", "Segment4", "Segment5", "Segment6", "Segment7",
+            "Segment8", "Segment9", "Segment10", "Segment11", "Segment12", "Segment13", "Segment14",
+            "Segment15", "Segment16", "Segment17", "Segment18", "Segment19", "Segment20", "Segment21",
+            "Segment22", "Segment23", "Segment24", "Segment25", "Segment26", "Segment27", "Segment28",
+            "Segment29", "Segment30", "Entered Debit Amount", "Entered Credit Amount",
+            "Converted Debit Amount", "Converted Credit Amount", "REFERENCE1 (Batch Name)",
+            "REFERENCE2 (Batch Description)", "REFERENCE3", "REFERENCE4 (Journal Entry Name)",
+            "REFERENCE5 (Journal Entry Description)", "REFERENCE6 (Journal Entry Reference)",
+            "REFERENCE7 (Journal Entry Reversal flag)", "REFERENCE8 (Journal Entry Reversal Period)",
+            "REFERENCE9 (Journal Reversal Method)", "REFERENCE10 (Journal Entry Line Description)",
+            "Reference column 1", "Reference column 2", "Reference column 3", "Reference column 4",
+            "Reference column 5", "Reference column 6", "Reference column 7", "Reference column 8",
+            "Reference column 9", "Reference column 10", "Statistical Amount", "Currency Conversion Type",
+            "Currency Conversion Date", "Currency Conversion Rate", "Interface Group Identifier",
+            "Context field for Journal Entry Line DFF", "ATTRIBUTE1 Value for Journal Entry Line DFF",
+            "ATTRIBUTE2 Value for Journal Entry Line DFF", "Attribute3 Value for Journal Entry Line DFF",
+            "Attribute4 Value for Journal Entry Line DFF", "Attribute5 Value for Journal Entry Line DFF",
+            "Attribute6 Value for Journal Entry Line DFF", "Attribute7 Value for Journal Entry Line DFF",
+            "Attribute8 Value for Journal Entry Line DFF", "Attribute9 Value for Journal Entry Line DFF",
+            "Attribute10 Value for Journal Entry Line DFF", "Attribute11 Value for Captured Information DFF",
+            "Attribute12 Value for Captured Information DFF", "Attribute13 Value for Captured Information DFF",
+            "Attribute14 Value for Captured Information DFF", "Attribute15 Value for Captured Information DFF",
+            "Attribute16 Value for Captured Information DFF", "Attribute17 Value for Captured Information DFF",
+            "Attribute18 Value for Captured Information DFF", "Attribute19 Value for Captured Information DFF",
+            "Attribute20 Value for Captured Information DFF", "Context field for Captured Information DFF",
+            "Average Journal Flag", "Clearing Company", "Ledger Name", "Encumbrance Type ID",
+            "Reconciliation Reference", "Period Name", "REFERENCE 18", "REFERENCE 19", "REFERENCE 20",
+            "Attribute Date 1", "Attribute Date 2", "Attribute Date 3", "Attribute Date 4",
+            "Attribute Date 5", "Attribute Date 6", "Attribute Date 7", "Attribute Date 8",
+            "Attribute Date 9", "Attribute Date 10", "Attribute Number 1", "Attribute Number 2",
+            "Attribute Number 3", "Attribute Number 4", "Attribute Number 5", "Attribute Number 6",
+            "Attribute Number 7", "Attribute Number 8", "Attribute Number 9", "Attribute Number 10",
+            "Global Attribute Category", "Global Attribute 1 ", "Global Attribute 2", "Global Attribute 3",
+            "Global Attribute 4", "Global Attribute 5", "Global Attribute 6 ", "Global Attribute 7",
+            "Global Attribute 8", "Global Attribute 9", "Global Attribute 10", "Global Attribute 11",
+            "Global Attribute 12", "Global Attribute 13", "Global Attribute 14", "Global Attribute 15",
+            "Global Attribute 16", "Global Attribute 17", "Global Attribute 18", "Global Attribute 19 ",
+            "Global Attribute 20 ", "Global Attribute Date 1", "Global Attribute Date 2",
+            "Global Attribute Date 3", "Global Attribute Date 4", "Global Attribute Date 5",
+            "Global Attribute Number 1", "Global Attribute Number 2", "Global Attribute Number 3",
+            "Global Attribute Number 4", "Global Attribute Number 5", "END"
+        ]
+
+        # Add missing columns with empty values
+        for col in template_columns:
+            if col not in journal_df.columns:
+                journal_df[col] = ""
+
+        # Ensure END column has "END" value
+        journal_df["END"] = "END"
+
+        # Reorder columns to match template
+        journal_df = journal_df[template_columns]
+
+        print(f"✓  Generated {len(journal_df)} journal entries ({len(journal_df)//2} transactions)")
+        print("=" * 72)
+
+        return journal_df
+
+    def save_journal_template(self, journal_df: pd.DataFrame):
+        """Save journal import template to CSV file."""
+        if journal_df.empty:
+            print("⚠️  No journal entries to save")
+            return
+
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"Journal_Import_Template_{ts}.csv"
+        filepath = self.output_dir / filename
+
+        journal_df.to_csv(filepath, index=False, encoding="utf-8-sig")
+        print(f"✓  Saved journal template: {filepath}")
+
 
 # ============================================================================
 # MAIN
