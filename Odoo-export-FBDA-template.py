@@ -2572,6 +2572,95 @@ class OracleFusionIntegration:
                    f"{method_totals[m]:>14,.2f} SAR")
         vl.add(f"    {'Grand Total':<28}  {receipt_grand:>14,.2f} SAR")
 
+        # Add day-wise payment method validation
+        vl.section("8a. DAY-WISE PAYMENT METHOD VALIDATION")
+        vl.add("  This section shows payment totals broken down by date and payment method.")
+        vl.add("  These are the ACTUAL payment amounts collected (from payment file).")
+        vl.add()
+
+        # Build day-wise breakdown from invoice_payments
+        day_method_totals: Dict[Tuple[str, str], float] = defaultdict(float)
+        payment_total_for_receipts = 0.0
+
+        for inv, methods in self.invoice_payments.items():
+            ctype = self.invoice_ctype.get(inv, "NORMAL")
+            if ctype in ("TABBY", "TAMARA"):
+                continue  # Skip BNPL
+
+            sale_date = self.invoice_date.get(inv, datetime.now())
+            date_str = format_date(sale_date)
+
+            for method, amount in methods.items():
+                if method not in RECEIPT_PAYMENT_METHODS:
+                    continue  # Skip non-receipt methods
+                day_method_totals[(date_str, method)] += amount
+                payment_total_for_receipts += amount
+
+        # Get unique dates and methods
+        all_dates = sorted(set(date for date, _ in day_method_totals.keys()))
+        all_methods = sorted(set(method for _, method in day_method_totals.keys()))
+
+        if all_dates and all_methods:
+            vl.add("  Day-wise payment method totals (SAR):")
+            vl.add()
+
+            # Print header
+            header = f"  {'Date':<12}"
+            for method in all_methods:
+                header += f" {method:>12}"
+            header += f" {'TOTAL':>14}"
+            vl.add(header)
+            vl.add("  " + "-" * (12 + 14 * (len(all_methods) + 1)))
+
+            # Print rows
+            method_column_totals = defaultdict(float)
+            for date in all_dates:
+                row = f"  {date:<12}"
+                row_total = 0.0
+                for method in all_methods:
+                    amount = day_method_totals.get((date, method), 0.0)
+                    row_total += amount
+                    method_column_totals[method] += amount
+                    row += f" {amount:>12,.0f}"
+                row += f" {row_total:>14,.0f}"
+                vl.add(row)
+
+            # Print totals
+            vl.add("  " + "-" * (12 + 14 * (len(all_methods) + 1)))
+            total_row = f"  {'TOTAL':<12}"
+            grand_total = 0.0
+            for method in all_methods:
+                method_total = method_column_totals[method]
+                grand_total += method_total
+                total_row += f" {method_total:>12,.0f}"
+            total_row += f" {grand_total:>14,.0f}"
+            vl.add(total_row)
+            vl.add()
+
+            # Validation: Compare with receipt totals
+            vl.add("  VALIDATION:")
+            vl.add(f"    Payment file total (for standard receipts): {payment_total_for_receipts:>16,.2f} SAR")
+            vl.add(f"    Receipt files total:                        {receipt_grand:>16,.2f} SAR")
+            diff = abs(payment_total_for_receipts - receipt_grand)
+            if diff < 0.01:
+                vl.add(f"    Difference:                                 {diff:>16,.2f} SAR  ✓ MATCH")
+            else:
+                vl.add(f"    Difference:                                 {diff:>16,.2f} SAR  ⚠ CHECK")
+            vl.add()
+
+            # Per-method validation
+            vl.add("  Per-method validation:")
+            for method in sorted(all_methods):
+                payment_method_total = method_column_totals[method]
+                receipt_method_total = method_totals.get(method, 0.0)
+                method_diff = abs(payment_method_total - receipt_method_total)
+                status = "✓" if method_diff < 0.01 else "⚠"
+                vl.add(f"    {method:<14}  Payment: {payment_method_total:>12,.2f}  Receipt: {receipt_method_total:>12,.2f}  Diff: {method_diff:>8,.2f}  {status}")
+        else:
+            vl.add("  No day-wise data available for validation.")
+
+        vl.add()
+
         return receipt_files
 
     # ──────────────────────────────────────────────────────────────────
