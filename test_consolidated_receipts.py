@@ -11,7 +11,7 @@ This test verifies that:
 import sys
 import importlib.util
 from pathlib import Path
-from collections import defaultdict
+
 
 def test_consolidated_receipts():
     """Test that receipts are consolidated by payment method"""
@@ -123,6 +123,7 @@ def test_consolidated_receipts():
     print("\n" + "=" * 80)
 
     return True
+
 
 if __name__ == "__main__":
     try:
