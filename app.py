@@ -370,6 +370,8 @@ def _run_integration(sid: str, cfg: dict):
                     interface_group_id = int(cfg.get("interface_group_id", "114"))
 
                     journal_df = integration.generate_journal_template(
+                        journal_config_path=cfg.get("journal_config", ""),
+                        account_mapping_path=cfg.get("journal_account_mapping", ""),
                         period_name=period_name,
                         interface_group_id=interface_group_id
                     )
@@ -426,6 +428,8 @@ def _run_integration(sid: str, cfg: dict):
                     interface_group_id = int(cfg.get("interface_group_id", "114"))
 
                     journal_df = integration.generate_journal_template(
+                        journal_config_path=cfg.get("journal_config", ""),
+                        account_mapping_path=cfg.get("journal_account_mapping", ""),
                         period_name=period_name,
                         interface_group_id=interface_group_id
                     )
@@ -555,6 +559,26 @@ def run_integration():
         p = repo_dir / filename
         if p.exists():
             cfg[key] = str(p)
+
+    # Handle uploaded journal configuration files (if provided)
+    # These override the default auto-loaded files from repo root
+    journal_config_path = _save_upload(sid, "journal_config")
+    if journal_config_path:
+        cfg["journal_config"] = journal_config_path
+    else:
+        # Fall back to auto-loaded file from repo root if not uploaded
+        p = repo_dir / "JOURNAL_CONFIG.csv"
+        if p.exists():
+            cfg["journal_config"] = str(p)
+
+    journal_account_mapping_path = _save_upload(sid, "journal_account_mapping")
+    if journal_account_mapping_path:
+        cfg["journal_account_mapping"] = journal_account_mapping_path
+    else:
+        # Fall back to auto-loaded file from repo root if not uploaded
+        p = repo_dir / "JOURNAL_ACCOUNT_MAPPING.csv"
+        if p.exists():
+            cfg["journal_account_mapping"] = str(p)
 
     if mode == "sales_payment":
         # New mode: Sales Lines + Payment Lines → generate AR Invoice
