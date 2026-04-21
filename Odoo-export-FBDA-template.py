@@ -2406,8 +2406,9 @@ class OracleFusionIntegration:
                 agg_amount[key]    += amount
                 agg_inv_count[key] += 1
 
-        receipt_files:       Dict[str, pd.DataFrame] = {}
-        receipt_detail_rows: List[Dict]              = []
+        # Group rows by payment method (not by date/store)
+        method_rows: Dict[str, List[Dict]] = defaultdict(list)
+        receipt_detail_rows: List[Dict] = []
         skipped_no_ar_txn = 0
 
         for (store, date_str, method), total in sorted(agg_amount.items()):
@@ -2428,12 +2429,6 @@ class OracleFusionIntegration:
 
             receipt_number = f"{method}-{ar_txn}"
 
-            safe_store_part  = safe_filename(store)
-            safe_method_part = safe_filename(method)
-            date_compact     = date_str.replace("-", "")
-            filename         = (f"Receipt_{safe_method_part}_"
-                                f"{safe_store_part}_{date_compact}.csv")
-
             row = {
                 "ReceiptNumber":               receipt_number,
                 "ReceiptMethod":               method,
@@ -2447,10 +2442,11 @@ class OracleFusionIntegration:
                 "AccountingDate":              date_str,
             }
 
-            receipt_files[filename] = pd.DataFrame([row],
-                                                    columns=STANDARD_RECEIPT_COLUMNS)
+            # Add row to the method's list
+            method_rows[method].append(row)
+
             receipt_detail_rows.append({
-                "filename":       filename,
+                "filename":       f"Receipt_{safe_filename(method)}.csv",
                 "store":          store,
                 "date":           date_str,
                 "method":         method,
@@ -2460,6 +2456,13 @@ class OracleFusionIntegration:
                 "bank_name":      bank_name,
                 "bank_account":   bank_acct_number,
             })
+
+        # Create one file per payment method with all rows consolidated
+        receipt_files: Dict[str, pd.DataFrame] = {}
+        for method, rows in sorted(method_rows.items()):
+            safe_method_part = safe_filename(method)
+            filename = f"Receipt_{safe_method_part}.csv"
+            receipt_files[filename] = pd.DataFrame(rows, columns=STANDARD_RECEIPT_COLUMNS)
 
         vl.section("8. STANDARD RECEIPT RECORDS — DETAIL")
         vl.kv("BNPL invoices skipped",       f"{bnpl_skipped:,}")
@@ -2562,8 +2565,9 @@ class OracleFusionIntegration:
                 card_methods_accepted[method] += amount
                 agg_amount[(store, date_str, method)] += amount
 
-        misc_files:       Dict[str, pd.DataFrame] = {}
-        misc_detail_rows: List[Dict]              = []
+        # Group rows by payment method (not by date/store)
+        method_rows: Dict[str, List[Dict]] = defaultdict(list)
+        misc_detail_rows: List[Dict] = []
         seq = 1
         skipped_no_ar_txn_misc = 0
 
@@ -2590,12 +2594,6 @@ class OracleFusionIntegration:
 
             receipt_number = f"MISC-{method}-{ar_txn}"
 
-            safe_store_part  = safe_filename(store)
-            safe_method_part = safe_filename(method)
-            date_compact     = date_str.replace("-", "")
-            filename         = (f"MiscReceipt_{safe_method_part}_"
-                                f"{safe_store_part}_{date_compact}.csv")
-
             row = {
                 "Amount":                 round(misc_amount, 4),
                 "CurrencyCode":           "SAR",
@@ -2610,9 +2608,11 @@ class OracleFusionIntegration:
                 "BankAccountNumber":      bank_num,
             }
 
-            misc_files[filename] = pd.DataFrame([row], columns=MISC_RECEIPT_COLUMNS)
+            # Add row to the method's list
+            method_rows[method].append(row)
+
             misc_detail_rows.append({
-                "filename":      filename,
+                "filename":      f"MiscReceipt_{safe_filename(method)}.csv",
                 "store":         store,
                 "date":          date_str,
                 "method":        method,
@@ -2622,6 +2622,13 @@ class OracleFusionIntegration:
                 "bank_account":  bank_num,
             })
             seq += 1
+
+        # Create one file per payment method with all rows consolidated
+        misc_files: Dict[str, pd.DataFrame] = {}
+        for method, rows in sorted(method_rows.items()):
+            safe_method_part = safe_filename(method)
+            filename = f"MiscReceipt_{safe_method_part}.csv"
+            misc_files[filename] = pd.DataFrame(rows, columns=MISC_RECEIPT_COLUMNS)
 
         vl.section("8b. MISCELLANEOUS RECEIPT RECORDS — DETAIL")
         vl.kv("Skipped (no AR txn number)",  f"{skipped_no_ar_txn_misc:,}")
@@ -2721,9 +2728,10 @@ class OracleFusionIntegration:
             fpath  = folder / fname
             df.to_csv(fpath, index=False, encoding="utf-8-sig", quoting=1)
             amt = df["Amount"].sum()
+            row_count = len(df)
             method_totals[method] += amt
             method_counts[method] += 1
-            print(f"  ✓ {fname:<65}  {amt:,.2f} SAR")
+            print(f"  ✓ {fname:<50}  {row_count:>4} rows  {amt:>15,.2f} SAR")
 
         total_all = sum(method_totals.values())
         vl.kv("Grand Total", f"{total_all:,.2f} SAR")
@@ -2741,8 +2749,9 @@ class OracleFusionIntegration:
             fpath = folder / fname
             df.to_csv(fpath, index=False, encoding="utf-8-sig", quoting=1)
             amt = df["Amount"].sum()
+            row_count = len(df)
             total_misc += amt
-            print(f"  ✓ {fname:<65}  {amt:,.4f} SAR")
+            print(f"  ✓ {fname:<50}  {row_count:>4} rows  {amt:>15,.4f} SAR")
         print(f"\n  Misc receipt grand total : {total_misc:,.4f} SAR")
 
     # ──────────────────────────────────────────────────────────────────
