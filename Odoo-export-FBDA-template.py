@@ -2574,7 +2574,7 @@ class OracleFusionIntegration:
 
             cfg            = self.bank_charges.get(method, store)
             ar_txn         = agg_ar_txn.get((store, date_str), "")
-            org_id         = cfg.get("org_id", "300000001421038") if cfg else "300000001421038"
+            org_id         = cfg.get("org_id", "300000052613062") if cfg else "300000052613062"
             activity       = cfg.get("activity", "Misc Activity")  if cfg else "Misc Activity"
             method_id      = cfg.get("method_id", "")              if cfg else ""
             charge_rate    = cfg.get("rate", 0.0)                  if cfg else 0.0
