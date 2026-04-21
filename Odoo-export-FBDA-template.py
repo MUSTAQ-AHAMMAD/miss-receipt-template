@@ -2464,6 +2464,56 @@ class OracleFusionIntegration:
             filename = f"Receipt_{safe_method_part}.csv"
             receipt_files[filename] = pd.DataFrame(rows, columns=STANDARD_RECEIPT_COLUMNS)
 
+        # Create consolidated file with ALL payment methods merged into one file
+        all_consolidated_rows = []
+        for method, rows in sorted(method_rows.items()):
+            all_consolidated_rows.extend(rows)
+
+        if all_consolidated_rows:
+            consolidated_df = pd.DataFrame(all_consolidated_rows, columns=STANDARD_RECEIPT_COLUMNS)
+            receipt_files["Receipt_ALL_CONSOLIDATED.csv"] = consolidated_df
+
+            # Validate consolidated file against per-method files
+            consolidated_total = consolidated_df['Amount'].sum()
+            per_method_total = sum(df['Amount'].sum() for fname, df in receipt_files.items()
+                                  if fname != "Receipt_ALL_CONSOLIDATED.csv")
+
+            vl.add(f"\n  ✓ CONSOLIDATED FILE CREATED: Receipt_ALL_CONSOLIDATED.csv")
+            vl.add(f"    Total rows: {len(consolidated_df):,}")
+            vl.add(f"    Total amount: {consolidated_total:,.2f} SAR")
+            vl.add(f"    Payment methods included: {sorted(method_rows.keys())}")
+
+            # Detailed validation
+            vl.add(f"\n  ═══ CONSOLIDATED FILE VALIDATION ═══")
+            vl.add(f"    Consolidated total:      {consolidated_total:>18,.2f} SAR")
+            vl.add(f"    Per-method total:        {per_method_total:>18,.2f} SAR")
+            vl.add(f"    Difference:              {abs(consolidated_total - per_method_total):>18,.2f} SAR")
+
+            if abs(consolidated_total - per_method_total) < 0.01:
+                vl.add(f"    Status: ✓ MATCH - Totals are accurate")
+            else:
+                vl.add(f"    Status: ⚠ MISMATCH - Please review")
+
+            # Per-method breakdown in consolidated file
+            vl.add(f"\n  Payment Method Breakdown in Consolidated File:")
+            method_breakdown = consolidated_df.groupby('ReceiptMethod')['Amount'].agg(['sum', 'count'])
+            for method in sorted(method_breakdown.index):
+                method_total = method_breakdown.loc[method, 'sum']
+                method_count = method_breakdown.loc[method, 'count']
+                # Check for negative amounts
+                method_df = consolidated_df[consolidated_df['ReceiptMethod'] == method]
+                negative_count = len(method_df[method_df['Amount'] < 0])
+
+                status_str = ""
+                if negative_count > 0:
+                    status_str = f"  ⚠ {negative_count} NEGATIVE AMOUNTS!"
+                elif method_total < 0:
+                    status_str = "  ⚠ NEGATIVE TOTAL!"
+                else:
+                    status_str = "  ✓"
+
+                vl.add(f"    {method:<15} {method_count:>5} rows  {method_total:>18,.2f} SAR{status_str}")
+
         vl.section("8. STANDARD RECEIPT RECORDS — DETAIL")
         vl.kv("BNPL invoices skipped",       f"{bnpl_skipped:,}")
         vl.kv("Unknown method rows skipped", f"{unknown_method_skipped:,}")
@@ -2721,6 +2771,20 @@ class OracleFusionIntegration:
         method_counts: Dict[str, int]   = defaultdict(int)
 
         for fname, df in sorted(receipt_files.items()):
+            # Handle consolidated file separately
+            if fname == "Receipt_ALL_CONSOLIDATED.csv":
+                # Save consolidated file in the Receipts root directory
+                folder = base
+                folder.mkdir(parents=True, exist_ok=True)
+                fpath  = folder / fname
+                df.to_csv(fpath, index=False, encoding="utf-8-sig", quoting=1)
+                amt = df["Amount"].sum()
+                row_count = len(df)
+                print(f"  ✓ {fname:<50}  {row_count:>4} rows  {amt:>15,.2f} SAR  ← CONSOLIDATED")
+                vl.kv("Consolidated file", f"{fname} ({row_count:,} rows, {amt:,.2f} SAR)")
+                continue
+
+            # Save per-method files in their respective folders
             parts  = fname.replace(".csv", "").split("_")
             method = parts[1] if len(parts) > 1 else "Other"
             folder = base / method
@@ -2734,8 +2798,8 @@ class OracleFusionIntegration:
             print(f"  ✓ {fname:<50}  {row_count:>4} rows  {amt:>15,.2f} SAR")
 
         total_all = sum(method_totals.values())
-        vl.kv("Grand Total", f"{total_all:,.2f} SAR")
-        print(f"\n  Standard receipt grand total : {total_all:,.2f} SAR")
+        vl.kv("Per-method grand total", f"{total_all:,.2f} SAR")
+        print(f"\n  Standard receipt per-method total : {total_all:,.2f} SAR")
 
     def save_misc_receipts(self, misc_files: Dict[str, pd.DataFrame]):
         if not misc_files:
