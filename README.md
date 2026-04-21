@@ -11,6 +11,7 @@ A professional web UI for automating Oracle Fusion Standard Receipt and Miscella
   - **Generate Mode**: Sales Lines + Payment Lines → generate AR Invoice + receipts
 - **Real-time processing log** — live streaming console output as the pipeline runs
 - **Standard Receipt generation** — per payment method, per store, per date
+- **Consolidated Payment File** — single CSV with ALL payment methods merged 🆕
 - **Miscellaneous Receipt generation** — bank charge receipts from card payments
 - **Journal Template generation** — Oracle Fusion journal import for TAMARA/TABBY transactions 🆕
 - **Verification Report** — cross-check summary with match quality metrics
@@ -26,7 +27,16 @@ A professional web UI for automating Oracle Fusion Standard Receipt and Miscella
 - Configurable period names and interface group identifiers
 - See [JOURNAL_TEMPLATE_GENERATION_GUIDE.md](JOURNAL_TEMPLATE_GENERATION_GUIDE.md) for detailed documentation
 
-#### 2. **Upload Log Management System** 🆕
+#### 2. **Consolidated Payment File** 🆕
+- **Single merged file** with ALL payment methods in one CSV
+- Automatically generated alongside per-method files
+- Saved as `Receipt_ALL_CONSOLIDATED.csv` in Receipts root directory
+- **Built-in validation**: Detects total mismatches and negative amounts
+- **Per-method breakdown**: Shows count, totals, and status for each method
+- **Easier import**: Upload one file to Oracle Fusion instead of multiple
+- See [CONSOLIDATED_PAYMENT_FILE_GUIDE.md](CONSOLIDATED_PAYMENT_FILE_GUIDE.md) for detailed documentation
+
+#### 3. **Upload Log Management System** 🆕
 - Complete tracking of receipt uploads to Oracle Fusion
 - Detailed API request and response logging
 - Upload status dashboard with filtering
@@ -36,13 +46,13 @@ A professional web UI for automating Oracle Fusion Standard Receipt and Miscella
 - Accessible via "Upload Logs" page in web UI
 - REST API for programmatic access
 
-#### 2. **Automatic Invoice Number Sequencing**
+#### 4. **Automatic Invoice Number Sequencing**
 - Automatically persists last used invoice numbers
 - Auto-continues from previous run without manual input
 - Stores transaction numbers, segment 1, and segment 2 sequences
 - Enable via "Auto-Increment Invoice Numbers" checkbox in UI
 
-#### 3. **CSV Merger Tool**
+#### 5. **CSV Merger Tool**
 - Merge multiple AR Invoice CSV files into one consolidated file
 - Automatic duplicate detection and removal
 - **Comprehensive Accuracy Report**: Detailed before/after comparison showing:
@@ -54,7 +64,7 @@ A professional web UI for automating Oracle Fusion Standard Receipt and Miscella
 - Accessible via "Merge AR Invoices" mode in web UI
 - Command-line: `python csv_merger.py output.csv file1.csv file2.csv ...`
 
-#### 4. **Comprehensive Report Generator**
+#### 6. **Comprehensive Report Generator**
 - **AR Invoice Analysis**: SKU breakdown, discount tracking, store summaries
 - **Sub-Inventory Report**: Invoice-wise and total breakdown by sub-inventory
 - Detailed validation and accuracy metrics
@@ -62,7 +72,7 @@ A professional web UI for automating Oracle Fusion Standard Receipt and Miscella
 - Accessible via "Generate Reports" mode in web UI
 - Command-line: `python report_generator.py ar <ar_invoice.csv>`
 
-#### 5. **Data Validation Tool**
+#### 7. **Data Validation Tool**
 - Validates AR Invoice accuracy and consistency
 - Checks SKU/discount item handling
 - Verifies amount/quantity sign consistency
@@ -130,13 +140,31 @@ oracle_fusion_output.zip
     ├── AR_Invoice_<ORG>_<DATE>.csv  (if Generate mode)
     ├── Journal_Import_Template_<TIMESTAMP>.csv  (if journal generation enabled) 🆕
     ├── Receipts/
+    │   ├── Receipt_ALL_CONSOLIDATED.csv  (all payment methods merged) 🆕
     │   ├── Cash/
+    │   │   └── Receipt_Cash.csv
     │   ├── Mada/
+    │   │   └── Receipt_Mada.csv
     │   ├── Visa/
+    │   │   └── Receipt_Visa.csv
     │   ├── MasterCard/
+    │   │   └── Receipt_MasterCard.csv
     │   └── Misc/
+    │       ├── MiscReceipt_Mada.csv
+    │       ├── MiscReceipt_Visa.csv
+    │       └── MiscReceipt_MasterCard.csv
     └── Verification_Report_<TIMESTAMP>.txt
 ```
+
+### New! Consolidated Payment File
+
+The system now generates `Receipt_ALL_CONSOLIDATED.csv` which contains **all payment methods in one file**:
+- ✅ Easier to import to Oracle Fusion (single upload instead of multiple)
+- ✅ Complete payment data with validation
+- ✅ Automatic detection of negative amounts and total mismatches
+- ✅ Located in `Receipts/` root directory
+
+See [CONSOLIDATED_PAYMENT_FILE_GUIDE.md](CONSOLIDATED_PAYMENT_FILE_GUIDE.md) for complete documentation.
 
 ## Command-Line Tools
 
