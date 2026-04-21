@@ -404,26 +404,16 @@ def _run_integration(sid: str, cfg: dict):
 
                 integration.load_from_ar_invoice(
                     ar_invoice_path      = cfg["ar_invoice"],
-                    metadata_path        = cfg["metadata"],
+                    metadata_path        = cfg.get("metadata", ""),
                     receipt_methods_path = cfg.get("receipt_methods", ""),
                     bank_charges_path    = cfg.get("bank_charges", ""),
                     payment_file_path    = cfg.get("payment_file", ""),
                 )
 
-                progress(50, "Generating Standard Receipts…")
-                std_rcp = integration.generate_standard_receipts()
-                integration.save_standard_receipts(std_rcp)
-                stat("Standard Receipts", f"{len(std_rcp):,} files")
-
-                progress(75, "Generating Miscellaneous Receipts…")
-                misc_rcp = integration.generate_misc_receipts()
-                integration.save_misc_receipts(misc_rcp)
-                stat("Misc Receipts", f"{len(misc_rcp):,} files")
-
-                # Generate Journal Template if requested
-                generate_journal = cfg.get("generate_journal", "false").lower() == "true"
-                if generate_journal:
-                    progress(85, "Generating Journal Import Template…")
+                # Check if this is journal-only mode
+                if mode == "journal":
+                    # ── JOURNAL TEMPLATE ONLY MODE ──
+                    progress(50, "Generating Journal Import Template…")
                     period_name = cfg.get("period_name", "Mar-26")
                     interface_group_id = int(cfg.get("interface_group_id", "114"))
 
@@ -436,25 +426,73 @@ def _run_integration(sid: str, cfg: dict):
                     if not journal_df.empty:
                         integration.save_journal_template(journal_df)
                         stat("Journal Entries", f"{len(journal_df)//2:,} transactions")
+                        stat("Total Journal Lines", f"{len(journal_df):,} lines (debit + credit)")
                     else:
                         stat("Journal Entries", "0 (No TAMARA/TABBY transactions)")
+                        log("⚠ No TAMARA or TABBY transactions found in the AR Invoice")
+                        log("Please verify that the AR Invoice contains transactions with Receipt Method Name = 'TAMARA' or 'TABBY'")
 
-                progress(90, "Writing verification report…")
-                integration._write_ar_invoice_crosscheck(std_rcp)
-                integration.vlog.close()
-                ts       = datetime.now().strftime("%Y%m%d_%H%M%S")
-                log_path = Path(sess["output_dir"]) / f"Verification_Report_{ts}.txt"
-                integration.vlog.write(log_path)
+                    progress(90, "Writing verification report…")
+                    # Create a minimal verification report for journal-only mode
+                    integration.vlog.section("Journal Template Generation Summary")
+                    integration.vlog.print_summary()
+                    integration.vlog.close()
+                    ts       = datetime.now().strftime("%Y%m%d_%H%M%S")
+                    log_path = Path(sess["output_dir"]) / f"Journal_Generation_Report_{ts}.txt"
+                    integration.vlog.write(log_path)
 
-                # Copy report to persistent reports directory
-                import shutil
-                reports_copy = REPORTS_DIR / f"Verification_Report_{ts}.txt"
-                shutil.copy2(str(log_path), str(reports_copy))
+                    # Copy report to persistent reports directory
+                    import shutil
+                    reports_copy = REPORTS_DIR / f"Journal_Generation_Report_{ts}.txt"
+                    shutil.copy2(str(log_path), str(reports_copy))
 
-                # Send transaction sequence info to UI
-                if hasattr(integration, 'last_transaction_number'):
-                    stat("Last Transaction Number", f"BLKU-{integration.last_transaction_number:07d}")
-                    stat("Next Transaction Number", f"BLKU-{integration.next_transaction_number:07d}")
+                else:
+                    # ── STANDARD AR INVOICE MODE (with receipts) ──
+                    progress(50, "Generating Standard Receipts…")
+                    std_rcp = integration.generate_standard_receipts()
+                    integration.save_standard_receipts(std_rcp)
+                    stat("Standard Receipts", f"{len(std_rcp):,} files")
+
+                    progress(75, "Generating Miscellaneous Receipts…")
+                    misc_rcp = integration.generate_misc_receipts()
+                    integration.save_misc_receipts(misc_rcp)
+                    stat("Misc Receipts", f"{len(misc_rcp):,} files")
+
+                    # Generate Journal Template if requested
+                    generate_journal = cfg.get("generate_journal", "false").lower() == "true"
+                    if generate_journal:
+                        progress(85, "Generating Journal Import Template…")
+                        period_name = cfg.get("period_name", "Mar-26")
+                        interface_group_id = int(cfg.get("interface_group_id", "114"))
+
+                        journal_df = integration.generate_journal_template(
+                            journal_config_path=cfg.get("journal_config", ""),
+                            account_mapping_path=cfg.get("journal_account_mapping", ""),
+                            period_name=period_name,
+                            interface_group_id=interface_group_id
+                        )
+                        if not journal_df.empty:
+                            integration.save_journal_template(journal_df)
+                            stat("Journal Entries", f"{len(journal_df)//2:,} transactions")
+                        else:
+                            stat("Journal Entries", "0 (No TAMARA/TABBY transactions)")
+
+                    progress(90, "Writing verification report…")
+                    integration._write_ar_invoice_crosscheck(std_rcp)
+                    integration.vlog.close()
+                    ts       = datetime.now().strftime("%Y%m%d_%H%M%S")
+                    log_path = Path(sess["output_dir"]) / f"Verification_Report_{ts}.txt"
+                    integration.vlog.write(log_path)
+
+                    # Copy report to persistent reports directory
+                    import shutil
+                    reports_copy = REPORTS_DIR / f"Verification_Report_{ts}.txt"
+                    shutil.copy2(str(log_path), str(reports_copy))
+
+                    # Send transaction sequence info to UI
+                    if hasattr(integration, 'last_transaction_number'):
+                        stat("Last Transaction Number", f"BLKU-{integration.last_transaction_number:07d}")
+                        stat("Next Transaction Number", f"BLKU-{integration.next_transaction_number:07d}")
 
             progress(95, "Creating download ZIP…")
             zip_path = str(Path(sess["work_dir"]) / "oracle_fusion_output.zip")
@@ -596,6 +634,29 @@ def run_integration():
             return jsonify({"error": "Required file 'Payment Lines CSV/XLSX' is missing."}), 400
         if "metadata" not in cfg:
             return jsonify({"error": "Reference file RCPT_Mapping_DATA.csv not found in server root."}), 400
+
+    elif mode == "journal":
+        # Journal Template Generation mode: AR Invoice → Journal Template only
+        ar_invoice_path = _save_upload(sid, "journal-ar")
+        if ar_invoice_path:
+            cfg["ar_invoice"] = ar_invoice_path
+
+        # Optional journal config files with specific field names for journal mode
+        journal_config_file = _save_upload(sid, "journal-config-file")
+        if journal_config_file:
+            cfg["journal_config"] = journal_config_file
+
+        journal_mapping_file = _save_upload(sid, "journal-mapping-file")
+        if journal_mapping_file:
+            cfg["journal_account_mapping"] = journal_mapping_file
+
+        if "ar_invoice" not in cfg:
+            return jsonify({"error": "Required file 'AR Invoice CSV' is missing."}), 400
+
+        # Journal mode always generates journal template
+        cfg["generate_journal"] = "true"
+        cfg["period_name"] = request.form.get("period_name", "Mar-26")
+        cfg["interface_group_id"] = request.form.get("interface_group_id", "114")
 
     else:
         # Existing AR Invoice mode
