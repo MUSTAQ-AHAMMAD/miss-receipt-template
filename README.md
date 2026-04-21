@@ -12,12 +12,21 @@ A professional web UI for automating Oracle Fusion Standard Receipt and Miscella
 - **Real-time processing log** — live streaming console output as the pipeline runs
 - **Standard Receipt generation** — per payment method, per store, per date
 - **Miscellaneous Receipt generation** — bank charge receipts from card payments
+- **Journal Template generation** — Oracle Fusion journal import for TAMARA/TABBY transactions 🆕
 - **Verification Report** — cross-check summary with match quality metrics
 - **One-click ZIP download** — all output files packaged for immediate use
 
 ### New Advanced Features ✨
 
-#### 1. **Upload Log Management System** 🆕
+#### 1. **Journal Template Generation** 🆕
+- Automatic journal import template creation for TAMARA and TABBY transactions
+- Configurable account mapping and business unit support
+- Debit/Credit entry generation with proper segment allocation
+- Supports multiple business units with different ledger configurations
+- Configurable period names and interface group identifiers
+- See [JOURNAL_TEMPLATE_GENERATION_GUIDE.md](JOURNAL_TEMPLATE_GENERATION_GUIDE.md) for detailed documentation
+
+#### 2. **Upload Log Management System** 🆕
 - Complete tracking of receipt uploads to Oracle Fusion
 - Detailed API request and response logging
 - Upload status dashboard with filtering
@@ -76,6 +85,8 @@ The following files must be present in the same directory as `app.py` **before**
 | `RCPT_Mapping_DATA.csv` | Customer metadata (Bill-to Account, Site, Business Unit, Store) |
 | `Receipt_Methods.csv` | Bank account / receipt method mapping |
 | `BANK_CHARGES.csv` | Card charge rates for misc receipt generation |
+| `JOURNAL_CONFIG.csv` | Journal business unit configuration (for journal generation) 🆕 |
+| `JOURNAL_ACCOUNT_MAPPING.csv` | Journal account segment mapping (for journal generation) 🆕 |
 
 ### 3. Run the web server
 
@@ -107,6 +118,9 @@ Navigate to `http://localhost:5000` in your browser.
 | Transaction Start Seq | BLK- sequence start number (auto-populated if auto-increment enabled) |
 | Legacy Segment 1 Start | Flexfield Segment 1 counter (prefix auto-randomised per run) |
 | Legacy Segment 2 Start | Flexfield Segment 2 counter (prefix auto-randomised per run) |
+| Generate Journal Template | Enable journal import template generation for TAMARA/TABBY 🆕 |
+| Period Name | Oracle GL period name for journal entries (e.g., "Mar-26") 🆕 |
+| Interface Group ID | Unique identifier for journal import file (default: 114) 🆕 |
 
 ## Output Files (inside ZIP)
 
@@ -114,6 +128,7 @@ Navigate to `http://localhost:5000` in your browser.
 oracle_fusion_output.zip
 └── ORACLE_FUSION_OUTPUT/
     ├── AR_Invoice_<ORG>_<DATE>.csv  (if Generate mode)
+    ├── Journal_Import_Template_<TIMESTAMP>.csv  (if journal generation enabled) 🆕
     ├── Receipts/
     │   ├── Cash/
     │   ├── Mada/
