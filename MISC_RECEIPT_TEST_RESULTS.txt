@@ -1,0 +1,42 @@
+================================================================================
+MISCELLANEOUS RECEIPT MAPPING TEST RESULTS
+Generated: 2026-04-21 11:30:02
+================================================================================
+
+Total Tests: 19
+Passed: 18
+Failed: 0
+Warnings: 1
+Success Rate: 94.7%
+
+DETAILED RESULTS:
+--------------------------------------------------------------------------------
+[PASS] CARD_PAYMENT_METHODS Configuration
+[PASS] BANK_CHARGES.csv exists
+[PASS] BANK_CHARGES.csv structure
+[PASS] Card methods in BANK_CHARGES
+[PASS] generate_misc_receipts method
+[PASS] Logic: Bank charges check
+[PASS] Logic: Card method filter
+[PASS] Logic: Amount validation
+[PASS] Logic: Bank charge calculation
+[PASS] Logic: AR transaction check
+[PASS] Logic: Misc receipt number
+[PASS] MISC_RECEIPT_COLUMNS complete
+[PASS] Misc receipt payment filters
+[PASS] Diagnostic: Section 8b header
+[PASS] Diagnostic: Card methods accepted tracking
+[PASS] Diagnostic: Card methods skipped tracking
+[PASS] Diagnostic: Skipped breakdown logging
+[PASS] Diagnostic: Accepted breakdown logging
+[WARN] Simulation: bank charges
+      Note: Not loaded - expected
+
+================================================================================
+KEY VERIFICATION POINTS:
+--------------------------------------------------------------------------------
+1. BANK_CHARGES.csv must exist with charge rates for card methods
+2. CARD_PAYMENT_METHODS must include: Mada, Visa, MasterCard (at minimum)
+3. Misc receipts are ONLY generated for methods in CARD_PAYMENT_METHODS
+4. Check Verification Report Section 8b for detailed logging
+5. Misc receipt files will be in: Receipts/Misc/
