@@ -256,8 +256,8 @@ class ReceiptFunctionalityTester:
             self.record_result("Standard Receipt Number Format", True)
 
             print_test("Analyzing misc receipt number format...")
-            print_info("  Expected format: MISC-{method}-{ar_txn}")
-            print_info("  Example: MISC-Visa-BLKU-0000001")
+            print_info("  Expected format: {method}-{ar_txn}-MISC")
+            print_info("  Example: Visa-BLKU-0000001-MISC")
             print_success("Misc receipt number format validated")
             self.record_result("Misc Receipt Number Format", True)
 

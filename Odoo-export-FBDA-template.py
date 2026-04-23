@@ -2731,7 +2731,7 @@ class OracleFusionIntegration:
                 skipped_no_ar_txn_misc += 1
                 continue
 
-            receipt_number = f"MISC-{method}-{ar_txn}"
+            receipt_number = f"{method}-{ar_txn}-MISC"
 
             row = {
                 "Amount":                 round(misc_amount, 4),
