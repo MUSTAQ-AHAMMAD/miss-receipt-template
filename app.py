@@ -408,6 +408,7 @@ def _run_integration(sid: str, cfg: dict):
                     receipt_methods_path = cfg.get("receipt_methods", ""),
                     bank_charges_path    = cfg.get("bank_charges", ""),
                     payment_file_path    = cfg.get("payment_file", ""),
+                    registers_path       = cfg.get("registers", ""),
                 )
 
                 # Check if this is journal-only mode
@@ -593,6 +594,7 @@ def run_integration():
         ("metadata",        "RCPT_Mapping_DATA.csv"),
         ("receipt_methods", "Receipt_Methods.csv"),
         ("bank_charges",    "BANK_CHARGES.csv"),
+        ("registers",       "VENDHQ_REGISTERS_202604121654.csv"),
     ]:
         p = repo_dir / filename
         if p.exists():
