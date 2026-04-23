@@ -806,9 +806,38 @@ class ReceiptMethodsCache:
         if not self._loaded:
             return PAYMENT_BANK_MAP_FALLBACK.get(method, DEFAULT_BANK)
         store_upper = normalise_store(store_name)
-        for (acct_upper, canon_method), (acct_name, acct_number) in self._exact.items():
-            if canon_method == method and store_upper in acct_upper:
-                return (acct_name, acct_number)
+        # Score each candidate so the most-specific match wins deterministically:
+        #   3 = whole-token match (store appears bounded by non-alphanumeric chars
+        #       or string boundary; e.g. "RASHIDMAD" matches "...RASHIDMAD ACC#..."
+        #       but NOT "...RASHIDMAD2")
+        #   2 = substring match where the *next* char in the account name is a digit
+        #       (treat as a different-store extension, lower priority)
+        #   1 = plain substring match (legacy behaviour, fallback)
+        # Tie-breaker: shorter account-name string wins (more specific), then the
+        # first-encountered entry. This eliminates substring collisions such as
+        # RASHIDMAD vs RASHIDMAD2 regardless of CSV row order.
+        best = None  # tuple: (score, -len(acct_upper), -insertion_index, value)
+        for idx, ((acct_upper, canon_method), value) in enumerate(self._exact.items()):
+            if canon_method != method:
+                continue
+            pos = acct_upper.find(store_upper)
+            if pos < 0:
+                continue
+            end = pos + len(store_upper)
+            before_ok = pos == 0 or not acct_upper[pos - 1].isalnum()
+            after_ch  = acct_upper[end] if end < len(acct_upper) else ""
+            after_ok  = after_ch == "" or not after_ch.isalnum()
+            if before_ok and after_ok:
+                score = 3
+            elif before_ok and after_ch.isdigit():
+                score = 2
+            else:
+                score = 1
+            cand = (score, -len(acct_upper), -idx, value)
+            if best is None or cand > best:
+                best = cand
+        if best is not None:
+            return best[3]
         if method in self._method:
             return self._method[method]
         return PAYMENT_BANK_MAP_FALLBACK.get(method, DEFAULT_BANK)
