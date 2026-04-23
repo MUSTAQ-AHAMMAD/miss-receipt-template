@@ -1737,8 +1737,8 @@ class OracleFusionIntegration:
             activity       = cfg.get("activity", "Misc Activity")  if cfg else "Misc Activity"
             method_id      = cfg.get("method_id", "")              if cfg else ""
             _, bank_num    = self.receipt_methods.get_bank_account(store, method)
-            receipt_number = (f"MISC-{method}-{ar_txn}" if ar_txn
-                              else f"MISC-{method}-{seq:08d}")
+            receipt_number = (f"{method}-{ar_txn}-MISC" if ar_txn
+                              else f"{method}-{seq:08d}-MISC")
 
             safe_store_part  = safe_filename(store)
             safe_method_part = safe_filename(method)
