@@ -45,9 +45,9 @@ warnings.filterwarnings("ignore")
 # CONSTANTS
 # ============================================================================
 
-RECEIPT_PAYMENT_METHODS    = {"Cash", "Mada", "Visa", "MasterCard"}
+RECEIPT_PAYMENT_METHODS    = {"Cash", "Mada", "Visa", "MasterCard", "Amex"}
 NO_RECEIPT_PAYMENT_METHODS = {"TABBY", "TAMARA"}
-CARD_PAYMENT_METHODS       = {"Mada", "Visa", "MasterCard"}
+CARD_PAYMENT_METHODS       = {"Mada", "Visa", "MasterCard", "Amex"}
 
 PAYMENT_METHOD_NORM: Dict[str, str] = {
     "CASH":        "Cash",
