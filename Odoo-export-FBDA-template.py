@@ -1477,10 +1477,15 @@ class VerificationLog:
 
 class ReceiptMethodsCache:
 
-    def __init__(self, path: str):
+    def __init__(self, path: str, register_cache: "Optional[RegisterCache]" = None):
         self._exact:  Dict[Tuple[str, str], Tuple[str, str]] = {}
         self._method: Dict[str, Tuple[str, str]]             = {}
         self._loaded  = False
+        # Optional vend-register override: when set and the register has the
+        # required CASH_ACCOUNT / BANK_ACCOUNT, it takes priority over this
+        # CSV-based lookup so that SUBINVENTORY (= Branch on payment lines =
+        # REGISTER_NAME) routes directly to the per-store accounts.
+        self._register_cache = register_cache
         if path and Path(path).exists():
             self._load(path)
 
@@ -1512,12 +1517,49 @@ class ReceiptMethodsCache:
         print(f"  ✓ Receipt_Methods.csv loaded: {len(self._exact):,} entries")
 
     def get_bank_account(self, store_name: str, method: str) -> Tuple[str, str]:
+        # Primary source: vend register file keyed by REGISTER_NAME (= SUBINVENTORY
+        # = `Branch` from the Odoo payment-lines sheet). Standard receipts use
+        # CASH_ACCOUNT, miscellaneous (card) receipts use BANK_ACCOUNT.
+        if self._register_cache is not None:
+            override = self._register_cache.get_account(store_name, method)
+            if override is not None:
+                return override
+
         if not self._loaded:
             return PAYMENT_BANK_MAP_FALLBACK.get(method, DEFAULT_BANK)
         store_upper = normalise_store(store_name)
-        for (acct_upper, canon_method), (acct_name, acct_number) in self._exact.items():
-            if canon_method == method and store_upper in acct_upper:
-                return (acct_name, acct_number)
+        # Score each candidate so the most-specific match wins deterministically:
+        #   3 = whole-token match (store appears bounded by non-alphanumeric chars
+        #       or string boundary; e.g. "RASHIDMAD" matches "...RASHIDMAD ACC#..."
+        #       but NOT "...RASHIDMAD2")
+        #   2 = substring match where the *next* char in the account name is a digit
+        #       (treat as a different-store extension, lower priority)
+        #   1 = plain substring match (legacy behaviour, fallback)
+        # Tie-breaker: shorter account-name string wins (more specific), then the
+        # first-encountered entry. This eliminates substring collisions such as
+        # RASHIDMAD vs RASHIDMAD2 regardless of CSV row order.
+        best = None  # tuple: (score, -len(acct_upper), insertion_index, value)
+        for idx, ((acct_upper, canon_method), value) in enumerate(self._exact.items()):
+            if canon_method != method:
+                continue
+            pos = acct_upper.find(store_upper)
+            if pos < 0:
+                continue
+            end = pos + len(store_upper)
+            before_ok = pos == 0 or not acct_upper[pos - 1].isalnum()
+            after_ch  = acct_upper[end] if end < len(acct_upper) else ""
+            after_ok  = after_ch == "" or not after_ch.isalnum()
+            if before_ok and after_ok:
+                score = 3
+            elif before_ok and after_ch.isdigit():
+                score = 2
+            else:
+                score = 1
+            cand = (score, -len(acct_upper), -idx, value)
+            if best is None or cand > best:
+                best = cand
+        if best is not None:
+            return best[3]
         if method in self._method:
             return self._method[method]
         return PAYMENT_BANK_MAP_FALLBACK.get(method, DEFAULT_BANK)
@@ -1711,10 +1753,40 @@ class MetadataCache:
 # REGISTER CACHE
 # ============================================================================
 
+_ACC_NUM_RE = re.compile(r"(?:ACC|Acc|A/C)\s*#?\s*([0-9A-Za-z][0-9A-Za-z\-]*)")
+
+
+def _extract_acc_number(raw: str) -> str:
+    """Pull the bank account number out of strings like
+    'AL Jazeerah Bank WADILABAN ACC # 015795017321049' or
+    'Oman Arab Bank Account- ACC # 3106-573999-500'.
+    Returns "" when no parseable account number is present."""
+    if not raw:
+        return ""
+    m = _ACC_NUM_RE.search(raw)
+    if not m:
+        return ""
+    cand = m.group(1)
+    # Skip placeholder masks like '******'
+    if not any(c.isdigit() or c.isalpha() for c in cand):
+        return ""
+    return cand
+
+
 class RegisterCache:
+    """Cache of vend `VENDHQ_REGISTERS_*.csv` rows keyed by REGISTER_NAME.
+
+    The vend register file is the authoritative source for per-store
+    Standard-receipt (CASH_ACCOUNT) and Miscellaneous-receipt (BANK_ACCOUNT)
+    routing.  The `Branch` field on the Odoo payment lines and the
+    `SUBINVENTORY` field on Fusion sales metadata both equal REGISTER_NAME,
+    so it can be used directly for receipt-method bank-account lookup.
+    """
 
     def __init__(self, registers_path: str = ""):
-        self.name_map: Dict[str, str] = {}
+        self.name_map:    Dict[str, str]              = {}
+        self._records:    Dict[str, Dict[str, str]]   = {}
+        self._loaded     = False
         if registers_path and Path(registers_path).exists():
             self._load(registers_path)
         elif registers_path:
@@ -1728,13 +1800,51 @@ class RegisterCache:
         reg_col = next((c for c in df.columns if "REGISTER_NAME" in c.upper()), None)
         if reg_col is None:
             return
+        cash_col = next((c for c in df.columns if c.upper() == "CASH_ACCOUNT"), None)
+        bank_col = next((c for c in df.columns if c.upper() == "BANK_ACCOUNT"), None)
+        del_col  = next((c for c in df.columns if c.upper() == "DELETED_AT"), None)
         for _, row in df.iterrows():
             reg = safe_str(row.get(reg_col))
-            if reg:
-                self.name_map[reg.upper()] = reg
+            if not reg:
+                continue
+            if del_col and safe_str(row.get(del_col)).strip():
+                # Skip deactivated registers entirely
+                continue
+            self.name_map[reg.upper()] = reg
+            self._records[reg.upper()] = {
+                "cash": safe_str(row.get(cash_col)).strip() if cash_col else "",
+                "bank": safe_str(row.get(bank_col)).strip() if bank_col else "",
+            }
+        self._loaded = bool(self._records)
+        if self._loaded:
+            print(f"  ✓ Vend registers loaded: {len(self._records):,} active records")
 
     def resolve(self, raw_name: str) -> str:
         return self.name_map.get(normalise_store(raw_name), raw_name)
+
+    def get_account(self, store_name: str, method: str) -> Optional[Tuple[str, str]]:
+        """Return (account_name, account_number) for the SUBINVENTORY/Branch.
+
+        * `Cash` → CASH_ACCOUNT (used for Standard receipts)
+        * any other method (Mada/Visa/MasterCard/Amex/Apple Pay/STC Pay/
+          GCCNET/Wire/etc.) → BANK_ACCOUNT (used for Miscellaneous receipts)
+
+        Returns None when this register isn't in the vend file or has no
+        populated value for the requested side, so the caller can fall back
+        to `Receipt_Methods.csv`.
+        """
+        if not self._loaded:
+            return None
+        rec = self._records.get(normalise_store(store_name))
+        if not rec:
+            return None
+        raw = rec["cash"] if method == "Cash" else rec["bank"]
+        if not raw:
+            return None
+        # Prefer the parsed Acc # when present; otherwise fall back to using
+        # the full account-name string as the number (legacy behaviour for
+        # entries like 'Cash WADILABAN' that have no separate identifier).
+        return (raw, _extract_acc_number(raw) or raw)
 
 
 # ============================================================================
@@ -1872,7 +1982,8 @@ class OracleFusionIntegration:
 
         self.metadata_cache  = MetadataCache(metadata_path)
         self.register_cache  = RegisterCache(registers_path)
-        self.receipt_methods = ReceiptMethodsCache(receipt_methods_path)
+        self.receipt_methods = ReceiptMethodsCache(receipt_methods_path,
+                                                   register_cache=self.register_cache)
         self.bank_charges    = BankChargesCache(bank_charges_path)
 
         vl.kv("Metadata file",              Path(metadata_path).name)
@@ -3196,6 +3307,7 @@ class OracleFusionIntegration:
         receipt_methods_path: str = "",
         bank_charges_path:    str = "",
         payment_file_path:    str = "",
+        registers_path:       str = "",
     ):
         """Populate invoice dictionaries from an already-generated AR Invoice CSV.
 
@@ -3222,7 +3334,9 @@ class OracleFusionIntegration:
         vl.add()
 
         self.metadata_cache  = MetadataCache(metadata_path)
-        self.receipt_methods = ReceiptMethodsCache(receipt_methods_path)
+        self.register_cache  = RegisterCache(registers_path)
+        self.receipt_methods = ReceiptMethodsCache(receipt_methods_path,
+                                                   register_cache=self.register_cache)
         self.bank_charges    = BankChargesCache(bank_charges_path)
 
         # Build reverse lookup: BILL_TO_ACCOUNT → store (SUBINVENTORY)

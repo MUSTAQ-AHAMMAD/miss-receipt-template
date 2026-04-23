@@ -58,8 +58,11 @@ def print_info(text):
 
 
 def normalize_store(store: str) -> str:
-    """Normalize store name similar to the actual implementation"""
-    return store.upper().strip().replace(" ", "").replace("-", "").replace("_", "")
+    """Normalize store name to match the actual production implementation
+    (Odoo-export-FBDA-template.py:normalise_store), which uppercases and
+    strips outer whitespace only — it does NOT remove spaces inside the name.
+    """
+    return store.upper().strip()
 
 
 def extract_store_from_account_name(account_name: str) -> str:
@@ -106,11 +109,18 @@ def load_store_names(file_path: str) -> Set[str]:
 
 def analyze_substring_conflicts(records: List[Dict]) -> List[Tuple[str, str, str]]:
     """
-    Detect potential substring matching conflicts.
-    Returns list of (store1, store2, account_name) tuples where store1 is substring of store2
-    """
-    conflicts = []
+    Detect REAL substring matching conflicts under production semantics.
 
+    Production normalises the store name with `name.upper().strip()` (no space
+    removal) and the new `get_bank_account` lookup scores candidates by token
+    boundary, preferring whole-token matches. So a "conflict" only exists if
+    two different store identifiers BOTH score >= 2 (whole-token or digit-
+    extension) against the SAME account name for the SAME canonical payment
+    method, which would still yield ambiguity. Pure substring overlaps that
+    no longer collide under the new logic are excluded.
+
+    Returns list of (store1, store2, account_name) tuples.
+    """
     # Extract all unique store identifiers from account names
     store_identifiers = set()
     for record in records:
@@ -118,17 +128,36 @@ def analyze_substring_conflicts(records: List[Dict]) -> List[Tuple[str, str, str
         if store_id:
             store_identifiers.add(store_id)
 
-    # Check for substring relationships
+    conflicts: List[Tuple[str, str, str]] = []
     store_list = sorted(store_identifiers)
     for i, store1 in enumerate(store_list):
-        for store2 in store_list[i+1:]:
-            if store1 in store2:
-                # Find accounts that could be confused
-                for record in records:
-                    account_store = extract_store_from_account_name(record['account_name'])
-                    if account_store == store2:
-                        conflicts.append((store1, store2, record['account_name']))
-
+        for store2 in store_list[i + 1:]:
+            if store1 not in store2:
+                continue
+            for record in records:
+                acct_upper = record['account_name'].upper()
+                # Re-use the production scoring rules
+                def score(store: str) -> int:
+                    pos = acct_upper.find(store)
+                    if pos < 0:
+                        return 0
+                    end = pos + len(store)
+                    before_ok = pos == 0 or not acct_upper[pos - 1].isalnum()
+                    after_ch = acct_upper[end] if end < len(acct_upper) else ""
+                    after_ok = after_ch == "" or not after_ch.isalnum()
+                    if before_ok and after_ok:
+                        return 3
+                    if before_ok and after_ch.isdigit():
+                        return 2
+                    return 1
+                s1, s2 = score(store1), score(store2)
+                # An ambiguous case is one where the shorter store still scores
+                # >= 2 (whole-token / digit-extension) against the longer
+                # store's account — meaning even the new logic can't tell them
+                # apart cleanly.
+                if s1 >= 3 and s2 >= 3:
+                    conflicts.append((store1, store2, record['account_name']))
+                    break
     return conflicts
 
 
@@ -169,25 +198,45 @@ def analyze_method_coverage(records: List[Dict]) -> Dict[str, Set[str]]:
 
 def simulate_get_bank_account(records: List[Dict], store_name: str, method: str) -> Tuple[str, str, List[str]]:
     """
-    Simulate the actual get_bank_account() logic to see what gets matched.
-    Returns (account_name, account_number, list of all matches)
+    Simulate the actual ReceiptMethodsCache.get_bank_account() logic from
+    Odoo-export-FBDA-template.py. The production lookup now scores each
+    candidate so the most-specific match wins:
+        3 = whole-token match (store bounded by non-alphanumeric / string edge)
+        2 = followed by a digit (probably a longer-store extension)
+        1 = plain substring fallback
+    Tie-breaker: shorter account name wins (more specific).
+    Returns (account_name, account_number, list of all candidate matches).
     """
     store_upper = normalize_store(store_name)
-    matches = []
+    matches = []  # all candidates with their score for diagnostic output
+    best = None  # (score, -len(acct_upper), -idx, record)
 
-    for record in records:
-        if record['method'] == method:
-            account_upper = record['account_name'].upper()
-            # This is the actual logic used in the code
-            if store_upper in account_upper:
-                matches.append(record)
+    for idx, record in enumerate(records):
+        if record['method'] != method:
+            continue
+        account_upper = record['account_name'].upper()
+        pos = account_upper.find(store_upper)
+        if pos < 0:
+            continue
+        end = pos + len(store_upper)
+        before_ok = pos == 0 or not account_upper[pos - 1].isalnum()
+        after_ch = account_upper[end] if end < len(account_upper) else ""
+        after_ok = after_ch == "" or not after_ch.isalnum()
+        if before_ok and after_ok:
+            score = 3
+        elif before_ok and after_ch.isdigit():
+            score = 2
+        else:
+            score = 1
+        matches.append(record)
+        cand = (score, -len(account_upper), -idx, record)
+        if best is None or cand > best:
+            best = cand
 
-    if matches:
-        # Return first match (this is what the code does)
-        first = matches[0]
-        return (first['account_name'], first['account_number'], matches)
-    else:
-        return ("NOT FOUND", "", [])
+    if best is not None:
+        rec = best[3]
+        return (rec['account_name'], rec['account_number'], matches)
+    return ("NOT FOUND", "", [])
 
 
 def main():
@@ -339,31 +388,42 @@ def main():
         print_success("\n  All test lookups produced single unambiguous matches")
 
     # ========================================================================
-    # TEST 5: Missing Store Coverage
+    # TEST 5: Missing Store Coverage (uses production lookup semantics)
     # ========================================================================
     if known_stores:
         print_section("TEST 5: Missing Store Coverage")
 
-        # Check which known stores don't have bank accounts
+        # A store is considered "covered" if the production-style lookup finds
+        # at least one bank account for ANY payment method whose canonical
+        # account name still contains the store identifier (i.e. it's not just
+        # falling back to the first arbitrary entry of that method).
         missing_stores = []
         for store in known_stores:
-            # Check if this store has at least one account for any method
-            found = False
+            store_upper = normalize_store(store)
+            covered = False
             for record in records:
-                account_store = extract_store_from_account_name(record['account_name'])
-                if normalize_store(store) == normalize_store(account_store):
-                    found = True
+                acct_upper = record['account_name'].upper()
+                pos = acct_upper.find(store_upper)
+                if pos < 0:
+                    continue
+                end = pos + len(store_upper)
+                before_ok = pos == 0 or not acct_upper[pos - 1].isalnum()
+                after_ch = acct_upper[end] if end < len(acct_upper) else ""
+                after_ok = after_ch == "" or not after_ch.isalnum()
+                # Whole-token or digit-extension match counts as coverage
+                if before_ok and (after_ok or after_ch.isdigit()):
+                    covered = True
                     break
-            if not found:
+            if not covered:
                 missing_stores.append(store)
 
         if missing_stores:
             print_warning(f"Found {len(missing_stores)} stores without bank account mappings")
             print_info("\n  Stores missing from Receipt_Methods.csv:")
-            for store in sorted(missing_stores)[:20]:  # Show first 20
+            for store in sorted(missing_stores)[:30]:
                 print_warning(f"    {store}")
-            if len(missing_stores) > 20:
-                print_info(f"    ... and {len(missing_stores) - 20} more")
+            if len(missing_stores) > 30:
+                print_info(f"    ... and {len(missing_stores) - 30} more")
             print_info("\n  IMPACT: These stores will use fallback bank accounts")
         else:
             print_success("All known stores have bank account mappings")

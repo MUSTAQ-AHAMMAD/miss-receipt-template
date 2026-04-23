@@ -1,0 +1,8 @@
+REGISTER_ID,REGISTER_NAME,VEND_CASH_ACCOUNT,VEND_BANK_ACCOUNT,MISSING_RM_METHODS
+643,KWTALDABOS,,,Cash; Mada; Visa; MasterCard; Amex
+614,MATHNABMAL,,,MasterCard
+644,KHMISMUJAN,,,Cash; Visa
+645,MEDZAMPLMN,,,Cash; Visa; Amex
+532,EXBUAE1,,,Cash; Mada; Visa; MasterCard; Amex
+650,BURIDHIMAM,,,Mada; Visa; MasterCard
+654,JEDPNORAMA,,,Cash; Mada; Visa; MasterCard; Amex
