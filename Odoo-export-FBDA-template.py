@@ -3601,12 +3601,14 @@ class OracleFusionIntegration:
         receipt_methods_path: str = "",
         bank_charges_path:    str = "",
         payment_file_path:    str = "",
+        registers_path:       str = "",
     ):
         """Full pipeline: AR Invoice CSV → Standard Receipts + Misc Receipts."""
         self.load_from_ar_invoice(
             ar_invoice_path, metadata_path,
             receipt_methods_path, bank_charges_path,
             payment_file_path=payment_file_path,
+            registers_path=registers_path,
         )
         std_rcp  = self.generate_standard_receipts()
         self.save_standard_receipts(std_rcp)
