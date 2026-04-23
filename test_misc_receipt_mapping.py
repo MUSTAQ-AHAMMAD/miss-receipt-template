@@ -104,7 +104,7 @@ class MiscReceiptMappingTester:
             print_info(f"  Card methods count: {len(card_methods)}")
 
             # These are the methods that should generate misc receipts
-            expected_methods = ["Mada", "Visa", "MasterCard"]
+            expected_methods = ["Mada", "Visa", "MasterCard", "Amex"]
             for method in expected_methods:
                 if method in card_methods:
                     print_success(f"  ✓ {method} is in CARD_PAYMENT_METHODS")
@@ -549,7 +549,7 @@ class MiscReceiptMappingTester:
             f.write("KEY VERIFICATION POINTS:\n")
             f.write("-"*80 + "\n")
             f.write("1. BANK_CHARGES.csv must exist with charge rates for card methods\n")
-            f.write("2. CARD_PAYMENT_METHODS must include: Mada, Visa, MasterCard (at minimum)\n")
+            f.write("2. CARD_PAYMENT_METHODS must include: Mada, Visa, MasterCard, Amex (at minimum)\n")
             f.write("3. Misc receipts are ONLY generated for methods in CARD_PAYMENT_METHODS\n")
             f.write("4. Check Verification Report Section 8b for detailed logging\n")
             f.write("5. Misc receipt files will be in: Receipts/Misc/\n")

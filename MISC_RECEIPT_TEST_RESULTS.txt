@@ -1,6 +1,6 @@
 ================================================================================
 MISCELLANEOUS RECEIPT MAPPING TEST RESULTS
-Generated: 2026-04-21 11:30:02
+Generated: 2026-04-23 21:19:24
 ================================================================================
 
 Total Tests: 19
@@ -36,7 +36,7 @@ DETAILED RESULTS:
 KEY VERIFICATION POINTS:
 --------------------------------------------------------------------------------
 1. BANK_CHARGES.csv must exist with charge rates for card methods
-2. CARD_PAYMENT_METHODS must include: Mada, Visa, MasterCard (at minimum)
+2. CARD_PAYMENT_METHODS must include: Mada, Visa, MasterCard, Amex (at minimum)
 3. Misc receipts are ONLY generated for methods in CARD_PAYMENT_METHODS
 4. Check Verification Report Section 8b for detailed logging
 5. Misc receipt files will be in: Receipts/Misc/
