@@ -8,9 +8,13 @@ Cross-checks every active register in VENDHQ_REGISTERS_*.csv against the bank
 account rows in Receipt_Methods.csv, using the EXACT lookup logic implemented
 in `Odoo-export-FBDA-template.py::ReceiptMethodsCache.get_bank_account()`:
 
+    * Primary source: vend register file (REGISTER_NAME = SUBINVENTORY =
+      `Branch` from the Odoo payment-lines sheet).
+        - Standard receipt (Cash)        → CASH_ACCOUNT
+        - Miscellaneous receipt (cards)  → BANK_ACCOUNT
+    * Fallback source: Receipt_Methods.csv with score-based scoring
+      (whole-token > digit-extension > substring; tie-break: shorter name).
     * normalise_store(name)  -> name.upper().strip()
-    * Score-based lookup     -> whole-token > digit-extension > substring
-    * Tie-breaker            -> shorter account name wins (more specific)
 
 For each register we check both code paths:
 
@@ -89,9 +93,40 @@ def load_receipt_methods(path: Path):
     return method_index
 
 
-def get_bank_account(method_index, store: str, canonical_method: str):
-    """Replicates the new score-based ReceiptMethodsCache.get_bank_account()."""
+_ACC_NUM_RE = re.compile(r"(?:ACC|Acc|A/C)\s*#?\s*([0-9A-Za-z][0-9A-Za-z\-]*)")
+
+
+def _extract_acc_number(raw: str) -> str:
+    if not raw:
+        return ""
+    m = _ACC_NUM_RE.search(raw)
+    if not m:
+        return ""
+    cand = m.group(1)
+    if not any(c.isdigit() or c.isalpha() for c in cand):
+        return ""
+    return cand
+
+
+def get_bank_account(method_index, register_index, store: str, canonical_method: str):
+    """Replicates the production lookup with the vend register override.
+
+    Order of resolution:
+        1. Vend register file (REGISTER_NAME = SUBINVENTORY = Branch)
+              - 'Cash' method → CASH_ACCOUNT
+              - any other method → BANK_ACCOUNT
+           If the vend file has a populated value, use it.
+        2. Score-based scan over Receipt_Methods.csv.
+    """
     su = normalise_store(store)
+    # 1. vend override
+    rec = (register_index or {}).get(su)
+    if rec:
+        raw = rec["cash"] if canonical_method == "Cash" else rec["bank"]
+        if raw:
+            return (raw, _extract_acc_number(raw) or raw), [("__vend__", raw, 99)]
+
+    # 2. CSV fallback (score-based)
     matches = []
     best = None  # (score, -len(acct_upper), -idx, (name, num))
     for idx, (acct_name, acct_num, acct_upper) in enumerate(method_index.get(canonical_method, [])):
@@ -115,6 +150,12 @@ def get_bank_account(method_index, store: str, canonical_method: str):
     if best is None:
         return None, matches  # no match → caller would fall back
     return best[3], matches
+
+
+def build_register_index(registers):
+    """REGISTER_NAME (uppercased) → {cash, bank} (only active rows)."""
+    return {normalise_store(r["name"]): {"cash": r["cash"], "bank": r["bank"]}
+            for r in registers}
 
 
 # ---------------------------------------------------------------------------
@@ -158,6 +199,7 @@ def main() -> int:
 
     method_index = load_receipt_methods(RM_FILE)
     registers = load_registers(VEND_FILE)
+    register_index = build_register_index(registers)
 
     print(f"Active vend registers : {len(registers)}")
     print(f"RM methods present    : {sorted(method_index)}")
@@ -175,7 +217,7 @@ def main() -> int:
         if squash(reg["cash"]) in cash_acct_names:
             cash_ok += 1
             continue
-        match, _ = get_bank_account(method_index, reg["name"], "Cash")
+        match, _ = get_bank_account(method_index, register_index, reg["name"], "Cash")
         if match is None:
             cash_mismatch.append((reg, "no Cash entry via store-lookup"))
         else:
@@ -188,7 +230,7 @@ def main() -> int:
     bank_ok = defaultdict(int)
     for reg in registers:
         for m in card_methods:
-            match, candidates = get_bank_account(method_index, reg["name"], m)
+            match, candidates = get_bank_account(method_index, register_index, reg["name"], m)
             if match is None:
                 bank_issues[m].append((reg, "NO MATCH (will fall back)"))
                 continue
@@ -239,7 +281,7 @@ def main() -> int:
 
     # --- 5. Registers without any Mada mapping ------------------------------
     no_mada = [r for r in registers
-               if get_bank_account(method_index, r["name"], "Mada")[0] is None]
+               if get_bank_account(method_index, register_index, r["name"], "Mada")[0] is None]
 
     # --------------------------- REPORT ------------------------------------
     hdr("STANDARD RECEIPT (Cash)")
