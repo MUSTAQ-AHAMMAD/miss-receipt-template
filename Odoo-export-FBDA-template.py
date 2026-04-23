@@ -3154,13 +3154,15 @@ class OracleFusionIntegration:
             method = normalise_payment(safe_str(row.get(method_col, "Cash")))
             amount = safe_float(row.get(amount_col, 0))
 
-            # CRITICAL FIX: Handle payments with no Order Ref
-            # Create synthetic invoice references for these so they don't get lost
-            if not inv and amount != 0:
-                inv = f"SYNTH-PAYMENT-{synthetic_inv_counter:05d}"
-                synthetic_inv_counter += 1
-
+            # Skip payments with no Order Ref or zero amount
             if not inv or amount == 0:
+                continue
+
+            # CRITICAL FIX: Only load payments that match AR Invoice entries
+            # Unmatched payments should be ignored to prevent generating receipts for non-existent invoices
+            if inv not in inv_ref_set:
+                unmatched += 1
+                unmatched_amount += amount
                 continue
 
             # Parse date if available
@@ -3174,19 +3176,14 @@ class OracleFusionIntegration:
                 except Exception:
                     dates[inv] = datetime.now()
 
-            # CRITICAL FIX: Load ALL payments, not just matched ones
-            # Standard receipts must reflect actual cash collected, regardless of AR Invoice matching
+            # Add payment data only for matched invoices
             result[inv][method] += amount
-
-            if inv not in inv_ref_set:
-                unmatched += 1
-                unmatched_amount += amount
 
         if unmatched:
             print(f"  ⚠ {unmatched:,} payment file row(s) did not match any "
                   f"AR Invoice Sales Order reference (amount: {unmatched_amount:,.2f} SAR)")
-            print(f"    ✓ These payments WILL still generate standard receipts with fallback AR transaction numbers")
-        print(f"  ✓ Payment file loaded: {len(result):,} total invoice references ({len(result) - unmatched:,} matched, {unmatched:,} unmatched)")
+            print(f"    → These unmatched payments are IGNORED and will NOT generate receipts")
+        print(f"  ✓ Payment file loaded: {len(result):,} matched invoice references (ignored {unmatched:,} unmatched entries)")
         return (result, dates)
 
     def load_from_ar_invoice(
@@ -3308,46 +3305,14 @@ class OracleFusionIntegration:
                 payment_data, payment_dates = payment_result
                 # Override payments only for invoices present in the payment file;
                 # all other invoices retain their existing Cash allocation.
-                newly_added_invoices = []
                 for inv_ref, methods in payment_data.items():
-                    # If invoice is already in the system (matched from AR Invoice),
-                    # clear its Cash default and replace with real payment methods
+                    # Since _load_payment_file now only returns matched invoices,
+                    # all entries here should already be in self.invoice_payments
                     if inv_ref in self.invoice_payments:
+                        # Clear Cash default and replace with real payment methods
                         self.invoice_payments[inv_ref].clear()
                         for method, amount in methods.items():
                             self.invoice_payments[inv_ref][method] += amount
-                    else:
-                        # CRITICAL FIX: Handle unmatched invoices from payment file
-                        # These are payments that don't have corresponding AR Invoice entries
-                        # We must register them to generate accurate standard receipts
-                        newly_added_invoices.append(inv_ref)
-
-                        # Extract store from invoice reference (e.g., "ALARIDAH/8371" → "ALARIDAH")
-                        if "/" in inv_ref:
-                            store = inv_ref.split("/")[0].upper().strip()
-                        else:
-                            store = "UNKNOWN"
-
-                        # Register this invoice with default values
-                        self.invoice_store[inv_ref] = store
-
-                        # Use date from payment file if available
-                        self.invoice_date[inv_ref] = payment_dates.get(inv_ref, datetime.now())
-
-                        # Create a fallback AR transaction number
-                        # Use the invoice reference as the transaction number
-                        self.invoice_to_ar_txn[inv_ref] = f"PAYMENT-{inv_ref}"
-
-                        # Add payment methods
-                        for method, amount in methods.items():
-                            self.invoice_payments[inv_ref][method] += amount
-
-                        # Set AR total to match payment total (since no AR Invoice entry exists)
-                        self.invoice_ar_total[inv_ref] = sum(methods.values())
-
-                if newly_added_invoices:
-                    print(f"  ✓ Added {len(newly_added_invoices):,} invoice(s) from payment file that were not in AR Invoice")
-                    print(f"    These will generate standard receipts with transaction numbers like 'PAYMENT-{newly_added_invoices[0]}'")
 
                 # Refresh invoice types from the real payment methods
                 for inv, methods in self.invoice_payments.items():
