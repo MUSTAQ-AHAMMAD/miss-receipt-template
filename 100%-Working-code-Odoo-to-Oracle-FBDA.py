@@ -1037,7 +1037,7 @@ class MetadataCache:
 # REGISTER CACHE
 # ============================================================================
 
-_ACC_NUM_RE = re.compile(r"(?:ACC|Acc|A/C)\s*#?\s*([0-9A-Za-z][0-9A-Za-z\-]*)")
+_ACC_NUM_RE = re.compile(r"\b(?:ACC|Acc|A/C)\b\s*#?\s*([0-9A-Za-z][0-9A-Za-z\-]*)")
 
 
 def _extract_acc_number(raw: str) -> str:
