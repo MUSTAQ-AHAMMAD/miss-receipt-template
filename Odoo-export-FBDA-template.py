@@ -1943,6 +1943,7 @@ class OracleFusionIntegration:
 
         self.line_items:        Optional[pd.DataFrame]        = None
         self.payments:          Optional[pd.DataFrame]        = None
+        self.ar_df:             Optional[pd.DataFrame]        = None
 
         self.invoice_store:     Dict[str, str]                = {}
         self.invoice_ctype:     Dict[str, str]                = {}
@@ -2464,6 +2465,10 @@ class OracleFusionIntegration:
             vl.add()
             for line in meta_issues:
                 vl.add(line)
+
+        # Persist the generated AR DataFrame on the instance so downstream
+        # steps (e.g. generate_journal_template) can access it.
+        self.ar_df = df
 
         return df
 
@@ -3347,6 +3352,10 @@ class OracleFusionIntegration:
         ar_df = self._read_file(ar_invoice_path)
         vl.kv("AR rows read", len(ar_df))
 
+        # Persist the AR DataFrame on the instance so downstream steps
+        # (e.g. generate_journal_template) can access the original rows.
+        self.ar_df = ar_df
+
         # Needed columns (resolve tolerantly)
         COL_TXN   = find_col(ar_df, ["Transaction Number"])
         COL_DATE  = find_col(ar_df, ["Transaction Date", "Accounting Date"])
@@ -3771,8 +3780,19 @@ class OracleFusionIntegration:
         else:
             valid_providers = {"TAMARA", "TABBY"}
 
+        # Guard: ensure the AR DataFrame has the Receipt Method Name column.
+        # When loading from an AR Invoice CSV that does not include this
+        # column, the journal template cannot be generated.
+        if self.ar_df is None or "Receipt Method Name" not in self.ar_df.columns:
+            print("⚠️  AR Invoice data is missing the 'Receipt Method Name' column; "
+                  "cannot generate journal template. "
+                  "Please supply an AR Invoice CSV that includes payment-method "
+                  f"values for: {sorted(valid_providers)}.")
+            return pd.DataFrame()
+
         invoices = self.ar_df[
-            self.ar_df["Receipt Method Name"].str.upper().isin(valid_providers)
+            self.ar_df["Receipt Method Name"].fillna("").astype(str)
+                .str.upper().isin(valid_providers)
         ].copy()
 
         if invoices.empty:
