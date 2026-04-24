@@ -2113,10 +2113,23 @@ class OracleFusionIntegration:
         # If the chosen sheet still looks header-less, try to locate the
         # header row inside the sheet's body.
         if named < max(2, len(best_df.columns) // 2):
+            # Scan up to this many leading rows looking for a real header.
+            HEADER_SCAN_ROWS = 12
+
+            def _looks_textual(v: str) -> bool:
+                """True when v is a non-empty string that isn't purely a number."""
+                if not v:
+                    return False
+                try:
+                    float(v)
+                    return False
+                except ValueError:
+                    return True
+
             try:
                 raw = pd.read_excel(
                     path, sheet_name=best_name, header=None, dtype=None,
-                    nrows=15,
+                    nrows=HEADER_SCAN_ROWS,
                 )
             except Exception:
                 raw = None
@@ -2124,16 +2137,13 @@ class OracleFusionIntegration:
             best_header_row = None
             best_header_score = named
             if raw is not None:
-                for i in range(min(len(raw), 12)):
+                for i in range(min(len(raw), HEADER_SCAN_ROWS)):
                     row_vals = [
                         str(v).strip()
                         for v in raw.iloc[i].tolist()
                         if v is not None and not (isinstance(v, float) and np.isnan(v))
                     ]
-                    score = sum(
-                        1 for v in row_vals
-                        if v and not v.replace(".", "", 1).replace("-", "", 1).isdigit()
-                    )
+                    score = sum(1 for v in row_vals if _looks_textual(v))
                     if score > best_header_score:
                         best_header_score = score
                         best_header_row = i
