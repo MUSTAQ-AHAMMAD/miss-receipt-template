@@ -373,7 +373,9 @@ def _run_integration(sid: str, cfg: dict):
                         journal_config_path=cfg.get("journal_config", ""),
                         account_mapping_path=cfg.get("journal_account_mapping", ""),
                         period_name=period_name,
-                        interface_group_id=interface_group_id
+                        interface_group_id=interface_group_id,
+                        service_provider_meta_path=cfg.get("service_provider_meta", ""),
+                        cost_center_meta_path=cfg.get("cost_center_meta", ""),
                     )
                     if not journal_df.empty:
                         integration.save_journal_template(journal_df)
@@ -422,7 +424,9 @@ def _run_integration(sid: str, cfg: dict):
                         journal_config_path=cfg.get("journal_config", ""),
                         account_mapping_path=cfg.get("journal_account_mapping", ""),
                         period_name=period_name,
-                        interface_group_id=interface_group_id
+                        interface_group_id=interface_group_id,
+                        service_provider_meta_path=cfg.get("service_provider_meta", ""),
+                        cost_center_meta_path=cfg.get("cost_center_meta", ""),
                     )
                     if not journal_df.empty:
                         integration.save_journal_template(journal_df)
@@ -470,7 +474,9 @@ def _run_integration(sid: str, cfg: dict):
                             journal_config_path=cfg.get("journal_config", ""),
                             account_mapping_path=cfg.get("journal_account_mapping", ""),
                             period_name=period_name,
-                            interface_group_id=interface_group_id
+                            interface_group_id=interface_group_id,
+                            service_provider_meta_path=cfg.get("service_provider_meta", ""),
+                            cost_center_meta_path=cfg.get("cost_center_meta", ""),
                         )
                         if not journal_df.empty:
                             integration.save_journal_template(journal_df)
@@ -619,6 +625,24 @@ def run_integration():
         p = repo_dir / "JOURNAL_ACCOUNT_MAPPING.csv"
         if p.exists():
             cfg["journal_account_mapping"] = str(p)
+
+    # Service-provider journal metadata (preferred segment / ledger source)
+    service_provider_meta_path = _save_upload(sid, "service_provider_meta")
+    if service_provider_meta_path:
+        cfg["service_provider_meta"] = service_provider_meta_path
+    else:
+        p = repo_dir / "SERVICE_PROVIDER_JOURNAL_META.csv"
+        if p.exists():
+            cfg["service_provider_meta"] = str(p)
+
+    # Cost center metadata (per-store Segment4 lookup)
+    cost_center_meta_path = _save_upload(sid, "cost_center_meta")
+    if cost_center_meta_path:
+        cfg["cost_center_meta"] = cost_center_meta_path
+    else:
+        p = repo_dir / "FUSION_SALES_METADATA_Cost_Center.csv"
+        if p.exists():
+            cfg["cost_center_meta"] = str(p)
 
     if mode == "sales_payment":
         # New mode: Sales Lines + Payment Lines → generate AR Invoice

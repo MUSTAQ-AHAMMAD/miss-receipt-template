@@ -3669,138 +3669,231 @@ class OracleFusionIntegration:
         account_mapping_path: str = "",
         period_name: str = "Mar-26",
         interface_group_id: int = 114,
+        service_provider_meta_path: str = "",
+        cost_center_meta_path: str = "",
+        is_cash: str = "0",
     ) -> pd.DataFrame:
         """
         Generate Journal Import Template for Oracle Fusion from AR Invoice and Payment data.
 
-        This function creates journal entries for TAMARA and TABBY payment methods with debit/credit
-        entries based on the account mapping configuration.
+        For each qualifying service-provider transaction, this function creates a balanced
+        DEBIT / CREDIT pair using account segments sourced from
+        ``SERVICE_PROVIDER_JOURNAL_META.csv`` (when available) and a per-store cost-center
+        value sourced from ``FUSION_SALES_METADATA_Cost_Center.csv``.
+
+        When the new metadata files are not provided, the function falls back to the legacy
+        ``JOURNAL_CONFIG.csv`` / ``JOURNAL_ACCOUNT_MAPPING.csv`` behaviour (TAMARA / TABBY only).
+
+        Segment layout used when service-provider metadata is loaded:
+            Segment1 = COMPANY            Segment2 = ACCOUNT
+            Segment3 = DEPARTMENT         Segment4 = COST_CENTER_CODE (per-store)
+            Segment5 = PRODUCT_CATEGORY   Segment6 = INTER_COMPANY
+            Segment7 = FUT_USED
 
         Args:
-            journal_config_path: Path to JOURNAL_CONFIG.csv (business unit configuration)
-            account_mapping_path: Path to JOURNAL_ACCOUNT_MAPPING.csv (account segment mapping)
-            period_name: Period name (e.g., "Mar-26")
-            interface_group_id: Interface Group Identifier (unique per file)
+            journal_config_path: Legacy JOURNAL_CONFIG.csv (business unit configuration).
+            account_mapping_path: Legacy JOURNAL_ACCOUNT_MAPPING.csv (account segment mapping).
+            period_name: Period name (e.g., "Mar-26").
+            interface_group_id: Interface Group Identifier (unique per file).
+            service_provider_meta_path: Path to SERVICE_PROVIDER_JOURNAL_META.csv. When
+                provided, this is the primary source for segment / ledger / source / category.
+            cost_center_meta_path: Path to FUSION_SALES_METADATA_Cost_Center.csv. Used to
+                resolve Segment4 (cost center) by Warehouse Code + service provider.
+            is_cash: Filter for the IS_CASH column of the service-provider metadata
+                ("0" non-cash, "1" cash). Defaults to "0".
+
+        Notes:
+            When ``cost_center_meta_path`` yields no match for a given store/provider,
+            Segment4 falls back to the service-provider metadata's ``EXTRA_SEGMENT_1``
+            value (or, in legacy mode, to the legacy mapping's ``Segment4`` column).
 
         Returns:
-            DataFrame with journal import template data
+            DataFrame with journal import template data.
         """
         print("\n" + "=" * 72)
         print("GENERATING JOURNAL IMPORT TEMPLATE")
         print("=" * 72)
 
-        # Load configuration files
+        # Resolve default paths
+        repo_root = Path(__file__).parent
         if not journal_config_path:
-            journal_config_path = Path(__file__).parent / "JOURNAL_CONFIG.csv"
+            journal_config_path = repo_root / "JOURNAL_CONFIG.csv"
         if not account_mapping_path:
-            account_mapping_path = Path(__file__).parent / "JOURNAL_ACCOUNT_MAPPING.csv"
+            account_mapping_path = repo_root / "JOURNAL_ACCOUNT_MAPPING.csv"
+        if not service_provider_meta_path:
+            candidate = repo_root / "SERVICE_PROVIDER_JOURNAL_META.csv"
+            if candidate.exists():
+                service_provider_meta_path = str(candidate)
+        if not cost_center_meta_path:
+            candidate = repo_root / "FUSION_SALES_METADATA_Cost_Center.csv"
+            if candidate.exists():
+                cost_center_meta_path = str(candidate)
 
-        journal_config = pd.read_csv(journal_config_path)
-        account_mapping = pd.read_csv(account_mapping_path)
+        # ── Load service-provider metadata (preferred source) ──────────────
+        sp_meta = None
+        if service_provider_meta_path and Path(service_provider_meta_path).exists():
+            sp_meta = pd.read_csv(service_provider_meta_path, dtype=str).fillna("")
+            sp_meta["SERVICE_PROVIDER"] = sp_meta["SERVICE_PROVIDER"].str.upper()
+            sp_meta["CREDIT_DEBIT"] = sp_meta["CREDIT_DEBIT"].str.upper()
+            is_cash_str = str(is_cash).strip()
+            sp_meta = sp_meta[sp_meta["IS_CASH"].astype(str).str.strip() == is_cash_str]
+            print(f"✓  Loaded SERVICE_PROVIDER_JOURNAL_META "
+                  f"({len(sp_meta)} rows, IS_CASH={is_cash_str})")
 
-        # Filter AR invoice data for TAMARA and TABBY transactions
-        # Get payment method from Receipt Method Name column
-        tamara_tabby_invoices = self.ar_df[
-            self.ar_df["Receipt Method Name"].str.upper().isin(["TAMARA", "TABBY"])
+        # ── Load cost-center metadata (per-store Segment4) ─────────────────
+        cost_center_lookup: dict = {}
+        if cost_center_meta_path and Path(cost_center_meta_path).exists():
+            cc_df = pd.read_csv(cost_center_meta_path, dtype=str).fillna("")
+            for _, cc_row in cc_df.iterrows():
+                key = (
+                    str(cc_row.get("SUBINVENTORY", "")).strip().upper(),
+                    str(cc_row.get("CUSTOMER_TYPE", "")).strip().upper(),
+                )
+                code = str(cc_row.get("COST_CENTER_CODE", "")).strip()
+                if key[0] and key[1] and code:
+                    cost_center_lookup.setdefault(key, code)
+            print(f"✓  Loaded FUSION_SALES_METADATA_Cost_Center "
+                  f"({len(cost_center_lookup)} unique store/provider keys)")
+
+        # ── Legacy config (fallback when service-provider meta is absent) ──
+        legacy_bu_config = None
+        legacy_account_mapping = None
+        if sp_meta is None or sp_meta.empty:
+            journal_config = pd.read_csv(journal_config_path)
+            legacy_account_mapping = pd.read_csv(account_mapping_path)
+            legacy_bu_config = journal_config[
+                journal_config["Business Unit"] == "Alqurashi KSA"
+            ].iloc[0]
+
+        # Determine which payment methods qualify
+        if sp_meta is not None and not sp_meta.empty:
+            valid_providers = set(sp_meta["SERVICE_PROVIDER"].unique())
+        else:
+            valid_providers = {"TAMARA", "TABBY"}
+
+        invoices = self.ar_df[
+            self.ar_df["Receipt Method Name"].str.upper().isin(valid_providers)
         ].copy()
 
-        if tamara_tabby_invoices.empty:
-            print("⚠️  No TAMARA or TABBY transactions found in AR Invoice data")
+        if invoices.empty:
+            print(f"⚠️  No qualifying transactions found "
+                  f"(providers: {sorted(valid_providers)})")
             return pd.DataFrame()
 
-        print(f"✓  Found {len(tamara_tabby_invoices)} TAMARA/TABBY transactions")
+        print(f"✓  Found {len(invoices)} qualifying transactions "
+              f"for providers {sorted(valid_providers)}")
 
-        # Group by Order Ref (Transaction Number) and Payment Method
-        grouped = tamara_tabby_invoices.groupby([
-            "Transaction Number",
-            "Receipt Method Name",
-            "Transaction Date"
-        ]).agg({
+        # Group by Transaction + Payment Method + Date, and (when available) Warehouse Code
+        group_cols = ["Transaction Number", "Receipt Method Name", "Transaction Date"]
+        if "Warehouse Code" in invoices.columns:
+            group_cols.append("Warehouse Code")
+        grouped = invoices.groupby(group_cols, dropna=False).agg({
             "Transaction Line Amount": "sum"
         }).reset_index()
 
-        # Initialize journal entries list
         journal_entries = []
-
-        # Get business unit config (default to Alqurashi KSA)
-        bu_config = journal_config[journal_config["Business Unit"] == "Alqurashi KSA"].iloc[0]
-
         batch_name_counter = 1
         journal_entry_counter = 1
 
+        def _seg_from_sp(sp_row: pd.Series, cost_center: str) -> dict:
+            """Build a Segment1..Segment7 dict from a service-provider meta row."""
+            return {
+                "Segment1": sp_row.get("COMPANY", ""),
+                "Segment2": sp_row.get("ACCOUNT", ""),
+                "Segment3": sp_row.get("DEPARTMENT", ""),
+                "Segment4": cost_center or sp_row.get("EXTRA_SEGMENT_1", ""),
+                "Segment5": sp_row.get("PRODUCT_CATEGORY", ""),
+                "Segment6": sp_row.get("INTER_COMPANY", ""),
+                "Segment7": sp_row.get("FUT_USED", ""),
+            }
+
         for _, row in grouped.iterrows():
-            payment_method = row["Receipt Method Name"].upper()
+            payment_method = str(row["Receipt Method Name"]).upper()
             amount = abs(float(row["Transaction Line Amount"]))
             transaction_date = pd.to_datetime(row["Transaction Date"]).strftime("%Y/%m/%d")
+            warehouse = str(row.get("Warehouse Code", "") or "").strip().upper()
 
-            # Get account mapping for this payment method
-            mapping = account_mapping[
-                (account_mapping["Payment Method"] == payment_method) &
-                (account_mapping["Business Unit"] == "Alqurashi KSA")
-            ]
+            # Resolve cost center for this store/provider (when metadata loaded)
+            cost_center = cost_center_lookup.get((warehouse, payment_method), "")
 
-            if mapping.empty:
-                print(f"⚠️  No account mapping found for {payment_method}, skipping")
-                continue
+            if sp_meta is not None and not sp_meta.empty:
+                sp_rows = sp_meta[sp_meta["SERVICE_PROVIDER"] == payment_method]
+                debit_rows = sp_rows[sp_rows["CREDIT_DEBIT"] == "DEBIT"]
+                credit_rows = sp_rows[sp_rows["CREDIT_DEBIT"] == "CREDIT"]
+                if debit_rows.empty or credit_rows.empty:
+                    print(f"⚠️  Service-provider metadata missing DEBIT/CREDIT row "
+                          f"for {payment_method} (IS_CASH={is_cash}); skipping")
+                    continue
+                debit_meta = debit_rows.iloc[0]
+                credit_meta = credit_rows.iloc[0]
 
-            mapping_row = mapping.iloc[0]
+                ledger_id = debit_meta.get("LEDGER_ID", "")
+                journal_source = debit_meta.get("JE_SOURCE", "Vend")
+                journal_category = debit_meta.get("JE_CATEGORY", "Vend")
+                currency_code = "SAR"
+
+                debit_segments = _seg_from_sp(debit_meta, cost_center)
+                credit_segments = _seg_from_sp(credit_meta, cost_center)
+            else:
+                # Legacy fallback
+                mapping = legacy_account_mapping[
+                    (legacy_account_mapping["Payment Method"] == payment_method) &
+                    (legacy_account_mapping["Business Unit"] == "Alqurashi KSA")
+                ]
+                if mapping.empty:
+                    print(f"⚠️  No account mapping found for {payment_method}, skipping")
+                    continue
+                mapping_row = mapping.iloc[0]
+                ledger_id = legacy_bu_config["Ledger ID"]
+                journal_source = legacy_bu_config["Journal Source"]
+                journal_category = legacy_bu_config["Journal Category"]
+                currency_code = legacy_bu_config["Currency Code"]
+
+                base_segments = {
+                    "Segment1": mapping_row["Segment1"],
+                    "Segment3": mapping_row.get("Segment3", ""),
+                    "Segment4": cost_center or mapping_row.get("Segment4", ""),
+                    "Segment5": mapping_row.get("Segment5", ""),
+                    "Segment6": mapping_row.get("Segment6", ""),
+                    "Segment7": mapping_row.get("Segment7", ""),
+                }
+                debit_segments = {**base_segments, "Segment2": mapping_row["Debit Account"]}
+                credit_segments = {**base_segments, "Segment2": mapping_row["Credit Account"]}
 
             # Batch and Journal Entry names
             batch_name = f"M27 {payment_method.title()} sample - {batch_name_counter}"
             journal_entry_name = f"Journal Import 1 sample - {journal_entry_counter}"
 
-            # Create DEBIT entry
-            debit_entry = {
+            common = {
                 "Status Code": "NEW",
-                "Ledger ID": bu_config["Ledger ID"],
+                "Ledger ID": ledger_id,
                 "Effective Date of Transaction": transaction_date,
-                "Journal Source": bu_config["Journal Source"],
-                "Journal Category": bu_config["Journal Category"],
-                "Currency Code": bu_config["Currency Code"],
+                "Journal Source": journal_source,
+                "Journal Category": journal_category,
+                "Currency Code": currency_code,
                 "Journal Entry Creation Date": transaction_date,
                 "Actual Flag": "A",
-                "Segment1": mapping_row["Segment1"],
-                "Segment2": mapping_row["Debit Account"],
-                "Segment3": mapping_row.get("Segment3", ""),
-                "Segment4": mapping_row.get("Segment4", ""),
-                "Segment5": mapping_row.get("Segment5", ""),
-                "Segment6": mapping_row.get("Segment6", ""),
-                "Segment7": mapping_row.get("Segment7", ""),
-                "Entered Debit Amount": amount,
-                "Entered Credit Amount": "",
-                "Converted Debit Amount": amount,
-                "Converted Credit Amount": "",
                 "REFERENCE1 (Batch Name)": batch_name,
                 "REFERENCE4 (Journal Entry Name)": journal_entry_name,
                 "Interface Group Identifier": interface_group_id,
                 "Period Name": period_name,
             }
 
-            # Create CREDIT entry
+            debit_entry = {
+                **common,
+                **debit_segments,
+                "Entered Debit Amount": amount,
+                "Entered Credit Amount": "",
+                "Converted Debit Amount": amount,
+                "Converted Credit Amount": "",
+            }
             credit_entry = {
-                "Status Code": "NEW",
-                "Ledger ID": bu_config["Ledger ID"],
-                "Effective Date of Transaction": transaction_date,
-                "Journal Source": bu_config["Journal Source"],
-                "Journal Category": bu_config["Journal Category"],
-                "Currency Code": bu_config["Currency Code"],
-                "Journal Entry Creation Date": transaction_date,
-                "Actual Flag": "A",
-                "Segment1": mapping_row["Segment1"],
-                "Segment2": mapping_row["Credit Account"],
-                "Segment3": mapping_row.get("Segment3", ""),
-                "Segment4": mapping_row.get("Segment4", ""),
-                "Segment5": mapping_row.get("Segment5", ""),
-                "Segment6": mapping_row.get("Segment6", ""),
-                "Segment7": mapping_row.get("Segment7", ""),
+                **common,
+                **credit_segments,
                 "Entered Debit Amount": "",
                 "Entered Credit Amount": amount,
                 "Converted Debit Amount": "",
                 "Converted Credit Amount": amount,
-                "REFERENCE1 (Batch Name)": batch_name,
-                "REFERENCE4 (Journal Entry Name)": journal_entry_name,
-                "Interface Group Identifier": interface_group_id,
-                "Period Name": period_name,
             }
 
             journal_entries.append(debit_entry)
