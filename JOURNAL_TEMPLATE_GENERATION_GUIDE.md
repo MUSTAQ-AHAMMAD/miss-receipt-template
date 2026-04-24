@@ -14,7 +14,59 @@ The Journal Template Generation feature automatically creates Oracle Fusion Jour
 
 ## Configuration Files
 
-### 1. JOURNAL_CONFIG.csv
+The journal generator now supports **two layered sources** of mapping data:
+
+1. **Preferred (new)** — service-provider metadata + per-store cost-center metadata:
+   - `SERVICE_PROVIDER_JOURNAL_META.csv`
+   - `FUSION_SALES_METADATA_Cost_Center.csv`
+2. **Legacy fallback** — used only when the new files are missing:
+   - `JOURNAL_CONFIG.csv`
+   - `JOURNAL_ACCOUNT_MAPPING.csv`
+
+When the new files are present, the generator covers **all** service providers found in
+`SERVICE_PROVIDER_JOURNAL_META.csv` (currently TABBY, TAMARA, HUNGERSTATION, MRSOOL),
+not just TAMARA / TABBY.
+
+### 1. SERVICE_PROVIDER_JOURNAL_META.csv (preferred)
+
+Per-service-provider journal segment / ledger configuration. There are separate
+`CREDIT` and `DEBIT` rows per provider, and an `IS_CASH` flag (`0` non-cash, `1` cash) so
+the same provider can have different mappings for cash vs. non-cash settlements.
+
+| Column | Mapped to | Example |
+|--------|-----------|---------|
+| LEDGER_ID | Journal Ledger ID | 300000001418025 |
+| SERVICE_PROVIDER | Matched against AR `Receipt Method Name` | TABBY / TAMARA / HUNGERSTATION / MRSOOL |
+| CREDIT_DEBIT | Selects which segment row applies to the debit vs. credit line | DEBIT / CREDIT |
+| COMPANY | Segment1 | 01 |
+| ACCOUNT | Segment2 | 3020044 (credit) / 5000104 (debit) |
+| DEPARTMENT | Segment3 | 46 / 52 / 53 |
+| PRODUCT_CATEGORY | Segment5 | 00 |
+| INTER_COMPANY | Segment6 | 01 |
+| FUT_USED | Segment7 | 00 |
+| JE_SOURCE | Journal Source | Vend |
+| JE_CATEGORY | Journal Category | Vend |
+| IS_CASH | Filter for cash vs. non-cash mappings | 0 or 1 |
+
+### 2. FUSION_SALES_METADATA_Cost_Center.csv (preferred)
+
+Per-store cost-center lookup. Used to resolve **Segment4** (cost center) on each
+journal line. Joined to the AR Invoice using:
+
+- `SUBINVENTORY` ← AR Invoice `Warehouse Code`
+- `CUSTOMER_TYPE` ← AR Invoice `Receipt Method Name` (service provider)
+
+| Column | Description | Example |
+|--------|-------------|---------|
+| SUBINVENTORY | Store / register code | JARIRRD, WADIDAWSER, ... |
+| CUSTOMER_TYPE | Service provider | TABBY, TAMARA, HUNGERSTATION, MRSOOL |
+| COST_CENTER_CODE | Value used as Segment4 | 0159, 0160, ... |
+
+If no cost center is found for a given store/provider combination, Segment4 falls
+back to the legacy mapping value (or `EXTRA_SEGMENT_1` from the service-provider
+metadata when present).
+
+### 3. JOURNAL_CONFIG.csv (legacy fallback)
 
 Contains business unit-specific journal configuration:
 
@@ -33,7 +85,7 @@ Business Unit,Ledger ID,Journal Source,Journal Category,Currency Code,Segment1
 Alqurashi KSA,300000001418025,Vend,Vend,SAR,1
 ```
 
-### 2. JOURNAL_ACCOUNT_MAPPING.csv
+### 4. JOURNAL_ACCOUNT_MAPPING.csv (legacy fallback)
 
 Contains payment method-specific account mappings:
 
