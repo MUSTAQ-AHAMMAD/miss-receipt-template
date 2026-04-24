@@ -3826,11 +3826,31 @@ class OracleFusionIntegration:
         legacy_bu_config = None
         legacy_account_mapping = None
         if sp_meta is None or sp_meta.empty:
-            journal_config = pd.read_csv(journal_config_path)
-            legacy_account_mapping = pd.read_csv(account_mapping_path)
-            legacy_bu_config = journal_config[
-                journal_config["Business Unit"] == "Alqurashi KSA"
-            ].iloc[0]
+            # Check if legacy config files exist
+            if not Path(journal_config_path).exists():
+                print(f"⚠️  JOURNAL_CONFIG.csv not found at {journal_config_path}")
+                print("   Please provide either:")
+                print("   1. SERVICE_PROVIDER_JOURNAL_META.csv (preferred)")
+                print("   2. JOURNAL_CONFIG.csv + JOURNAL_ACCOUNT_MAPPING.csv (legacy)")
+                return pd.DataFrame()
+
+            if not Path(account_mapping_path).exists():
+                print(f"⚠️  JOURNAL_ACCOUNT_MAPPING.csv not found at {account_mapping_path}")
+                print("   Please provide either:")
+                print("   1. SERVICE_PROVIDER_JOURNAL_META.csv (preferred)")
+                print("   2. JOURNAL_CONFIG.csv + JOURNAL_ACCOUNT_MAPPING.csv (legacy)")
+                return pd.DataFrame()
+
+            try:
+                journal_config = pd.read_csv(journal_config_path)
+                legacy_account_mapping = pd.read_csv(account_mapping_path)
+                legacy_bu_config = journal_config[
+                    journal_config["Business Unit"] == "Alqurashi KSA"
+                ].iloc[0]
+                print(f"✓  Loaded legacy configuration (TAMARA/TABBY only)")
+            except Exception as e:
+                print(f"⚠️  Error loading legacy configuration files: {e}")
+                return pd.DataFrame()
 
         # Determine which payment methods qualify
         if sp_meta is not None and not sp_meta.empty:
@@ -3846,7 +3866,15 @@ class OracleFusionIntegration:
                   "cannot generate journal template. "
                   "Please supply an AR Invoice CSV that includes payment-method "
                   f"values for: {sorted(valid_providers)}.")
+            print("\n💡 TIP: The AR Invoice CSV must be exported from Oracle Fusion with")
+            print("   the 'Receipt Method Name' column populated with payment methods.")
             return pd.DataFrame()
+
+        # Show all unique payment methods in AR Invoice for debugging
+        all_methods = self.ar_df["Receipt Method Name"].fillna("").astype(str).str.upper().unique()
+        all_methods_clean = [m for m in all_methods if m.strip()]
+        if all_methods_clean:
+            print(f"   Payment methods found in AR Invoice: {sorted(all_methods_clean)}")
 
         invoices = self.ar_df[
             self.ar_df["Receipt Method Name"]
@@ -3856,10 +3884,20 @@ class OracleFusionIntegration:
         if invoices.empty:
             print(f"⚠️  No qualifying transactions found "
                   f"(providers: {sorted(valid_providers)})")
+            print(f"\n💡 TIP: Payment methods in your AR Invoice: {sorted(all_methods_clean)}")
+            print(f"   Expected payment methods: {sorted(valid_providers)}")
+            print("   Ensure the AR Invoice contains transactions with matching payment methods.")
             return pd.DataFrame()
 
         print(f"✓  Found {len(invoices)} qualifying transactions "
               f"for providers {sorted(valid_providers)}")
+
+        # Show breakdown by payment method
+        method_counts = invoices["Receipt Method Name"].fillna("").astype(str).str.upper().value_counts()
+        for method, count in method_counts.items():
+            if method in valid_providers:
+                print(f"   - {method}: {count} transaction(s)")
+
 
         # Group by Transaction + Payment Method + Date, and (when available) Warehouse Code
         group_cols = ["Transaction Number", "Receipt Method Name", "Transaction Date"]
