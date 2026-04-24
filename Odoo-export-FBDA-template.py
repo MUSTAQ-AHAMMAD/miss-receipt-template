@@ -2562,7 +2562,7 @@ class OracleFusionIntegration:
                 "CustomerSite":                customer_site,
                 "Amount":                      round(total, 2),
                 "Currency":                    "SAR",
-                "RemittanceBankAccountNumber": bank_name,
+                "RemittanceBankAccountNumber": bank_acct_number,
                 "AccountingDate":              date_str,
             }
 
