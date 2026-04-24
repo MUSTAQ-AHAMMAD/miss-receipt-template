@@ -3791,8 +3791,8 @@ class OracleFusionIntegration:
             return pd.DataFrame()
 
         invoices = self.ar_df[
-            self.ar_df["Receipt Method Name"].fillna("").astype(str)
-                .str.upper().isin(valid_providers)
+            self.ar_df["Receipt Method Name"]
+                .fillna("").astype(str).str.upper().isin(valid_providers)
         ].copy()
 
         if invoices.empty:
