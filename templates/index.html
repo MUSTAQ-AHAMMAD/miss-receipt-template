@@ -890,11 +890,17 @@
     <!-- ── Journal Template Generation mode ── -->
     <div id="uploads-journal" style="display:none;">
       <div style="padding:20px; background:rgba(16,185,129,.08); border:1px solid rgba(16,185,129,.25); border-radius:12px; margin-bottom:20px;">
-        <h4 style="margin-bottom:10px; color:var(--accent-green);"><i class="fa-solid fa-book"></i> Generate Journal Template for TAMARA/TABBY</h4>
+        <h4 style="margin-bottom:10px; color:var(--accent-green);"><i class="fa-solid fa-book"></i> Generate Journal Template for Service Providers</h4>
         <p style="font-size:.85rem; color:var(--text-muted); margin-bottom:16px;">
-          Upload an AR Invoice CSV file to generate Oracle Fusion Journal Import templates for TAMARA and TABBY payment method transactions.
-          The system will automatically filter TAMARA/TABBY transactions and create balanced debit/credit journal entries.
+          Upload an AR Invoice CSV file to generate Oracle Fusion Journal Import templates for service provider transactions (TAMARA, TABBY, HUNGERSTATION, MRSOOL).
+          The system will automatically filter qualifying transactions and create balanced debit/credit journal entries using the configured account mappings.
         </p>
+        <div style="font-size:.80rem; color:var(--text-muted); margin-top:12px; padding:10px; background:rgba(16,185,129,.05); border-left:3px solid var(--accent-green); border-radius:6px;">
+          <strong>Configuration Modes:</strong><br/>
+          • <strong>Preferred:</strong> Upload SERVICE_PROVIDER_JOURNAL_META.csv for enhanced multi-provider support<br/>
+          • <strong>Legacy:</strong> Uses JOURNAL_CONFIG.csv + JOURNAL_ACCOUNT_MAPPING.csv (TAMARA/TABBY only)<br/>
+          • <strong>Auto-detect:</strong> Files are auto-loaded from server if not uploaded
+        </div>
       </div>
 
       <div class="upload-grid">
@@ -948,6 +954,40 @@
             <small>JOURNAL_ACCOUNT_MAPPING.csv - leave empty to use server default</small>
           </div>
         </div>
+
+        <!-- Service Provider Metadata (Optional - Preferred) -->
+        <div class="file-zone" id="zone-journal-service-provider" ondragover="onDragOver(event,'journal-service-provider')" ondragleave="onDragLeave('journal-service-provider')" ondrop="onDrop(event,'journal-service-provider')">
+          <input type="file" id="file-journal-service-provider" accept=".csv" onchange="onFileChange('journal-service-provider',this)" />
+          <div class="fz-header">
+            <div class="fz-icon"><i class="fa-solid fa-building"></i></div>
+            <div>
+              <div class="fz-title">Service Provider Metadata</div>
+              <div class="fz-subtitle">Per-provider segment configuration (supports all providers)</div>
+              <span class="fz-badge opt">Optional</span>
+            </div>
+          </div>
+          <div class="fz-msg">
+            <p>Click to browse or drag & drop</p>
+            <small>SERVICE_PROVIDER_JOURNAL_META.csv - leave empty to use server default</small>
+          </div>
+        </div>
+
+        <!-- Cost Center Metadata (Optional) -->
+        <div class="file-zone" id="zone-journal-cost-center" ondragover="onDragOver(event,'journal-cost-center')" ondragleave="onDragLeave('journal-cost-center')" ondrop="onDrop(event,'journal-cost-center')">
+          <input type="file" id="file-journal-cost-center" accept=".csv" onchange="onFileChange('journal-cost-center',this)" />
+          <div class="fz-header">
+            <div class="fz-icon"><i class="fa-solid fa-store"></i></div>
+            <div>
+              <div class="fz-title">Cost Center Metadata</div>
+              <div class="fz-subtitle">Per-store cost center mapping (Segment4)</div>
+              <span class="fz-badge opt">Optional</span>
+            </div>
+          </div>
+          <div class="fz-msg">
+            <p>Click to browse or drag & drop</p>
+            <small>FUSION_SALES_METADATA_Cost_Center.csv - leave empty to use server default</small>
+          </div>
+        </div>
       </div>
 
       <!-- Journal Template Parameters -->
@@ -977,7 +1017,7 @@
         </div>
         <div style="margin-top:12px; padding:12px; background:rgba(16,185,129,.08); border:1px solid rgba(16,185,129,.25); border-radius:8px; font-size:.82rem; color:var(--text-muted);">
           <i class="fa-solid fa-info-circle" style="color:var(--accent-green);"></i>
-          <strong>Note:</strong> The system will automatically detect TAMARA and TABBY transactions from the AR Invoice and generate balanced debit/credit journal entries based on the account mapping configuration.
+          <strong>Note:</strong> The system will automatically detect qualifying service provider transactions (TAMARA, TABBY, HUNGERSTATION, MRSOOL) from the AR Invoice and generate balanced debit/credit journal entries. Service provider metadata enables support for all providers; legacy configuration supports TAMARA/TABBY only.
         </div>
       </div>
     </div><!-- /uploads-journal -->
@@ -1178,15 +1218,46 @@
               <div class="fz-filename" id="fn-journal_account_mapping"><i class="fa-solid fa-check"></i><span id="fntext-journal_account_mapping"></span></div>
             </div>
 
+            <!-- SERVICE_PROVIDER_JOURNAL_META.csv Upload (Optional - Preferred) -->
+            <div class="file-zone" id="zone-service_provider_meta" ondragover="onDragOver(event,'service_provider_meta')" ondragleave="onDragLeave('service_provider_meta')" ondrop="onDrop(event,'service_provider_meta')">
+              <input type="file" id="file-service_provider_meta" accept=".csv" onchange="onFileChange('service_provider_meta',this)" />
+              <div class="fz-header">
+                <div class="fz-icon"><i class="fa-solid fa-building"></i></div>
+                <div>
+                  <div class="fz-title">Service Provider Metadata</div>
+                  <div class="fz-subtitle">SERVICE_PROVIDER_JOURNAL_META.csv - Per-provider segment configuration (preferred)</div>
+                  <span class="fz-badge opt">Optional</span>
+                </div>
+              </div>
+              <div class="fz-drop-hint"><i class="fa-regular fa-file-csv"></i> &nbsp;CSV</div>
+              <div class="fz-filename" id="fn-service_provider_meta"><i class="fa-solid fa-check"></i><span id="fntext-service_provider_meta"></span></div>
+            </div>
+
+            <!-- FUSION_SALES_METADATA_Cost_Center.csv Upload (Optional) -->
+            <div class="file-zone" id="zone-cost_center_meta" ondragover="onDragOver(event,'cost_center_meta')" ondragleave="onDragLeave('cost_center_meta')" ondrop="onDrop(event,'cost_center_meta')">
+              <input type="file" id="file-cost_center_meta" accept=".csv" onchange="onFileChange('cost_center_meta',this)" />
+              <div class="fz-header">
+                <div class="fz-icon"><i class="fa-solid fa-store"></i></div>
+                <div>
+                  <div class="fz-title">Cost Center Metadata</div>
+                  <div class="fz-subtitle">FUSION_SALES_METADATA_Cost_Center.csv - Per-store cost center mapping</div>
+                  <span class="fz-badge opt">Optional</span>
+                </div>
+              </div>
+              <div class="fz-drop-hint"><i class="fa-regular fa-file-csv"></i> &nbsp;CSV</div>
+              <div class="fz-filename" id="fn-cost_center_meta"><i class="fa-solid fa-check"></i><span id="fntext-cost_center_meta"></span></div>
+            </div>
+
           </div><!-- /upload-grid -->
 
           <!-- Info box about expected columns -->
           <div style="margin-top:16px; padding:14px 18px; background:rgba(59,130,246,.06); border:1px solid rgba(59,130,246,.20); border-radius:12px;">
             <div style="font-size:.78rem; font-weight:600; color:var(--accent-blue); letter-spacing:.06em; text-transform:uppercase; margin-bottom:8px;">
               <i class="fa-solid fa-circle-info" style="margin-right:6px;"></i>
-              Required CSV Format
+              Configuration File Information
             </div>
             <div style="font-size:.77rem; color:var(--text-muted); line-height:1.9;">
+              <strong>Legacy Mode (Required files):</strong><br/>
               <strong>JOURNAL_CONFIG.csv columns:</strong>
               <span style="background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Business Unit</span>
               <span style="background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Ledger ID</span>
@@ -1200,6 +1271,11 @@
               <span style="background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Debit Account</span>
               <span style="background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Credit Account</span>
               <span style="background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);border-radius:5px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">Segment1-7</span>
+              <br/><br/>
+              <strong>Preferred Mode (Optional files for enhanced functionality):</strong><br/>
+              Upload <strong>SERVICE_PROVIDER_JOURNAL_META.csv</strong> to support multiple service providers (TAMARA, TABBY, HUNGERSTATION, MRSOOL) with per-provider segment configuration.<br/>
+              Upload <strong>FUSION_SALES_METADATA_Cost_Center.csv</strong> to enable per-store cost center resolution (Segment4).<br/>
+              <em>Note: If not uploaded, files are auto-loaded from server if available. Legacy files are used as fallback.</em>
             </div>
           </div>
         </div>
@@ -1439,7 +1515,7 @@
         showBanner('error', 'Please upload your AR Invoice CSV file.');
         return;
       }
-    } else {
+    } else if (currentMode === 'sales_payment') {
       if (!fileMap['sales_lines']) {
         showBanner('error', 'Please upload your Sales Lines CSV/XLSX file.');
         return;
@@ -1448,19 +1524,15 @@
         showBanner('error', 'Please upload your Payment Lines CSV/XLSX file.');
         return;
       }
+    } else if (currentMode === 'journal') {
+      if (!fileMap['journal-ar']) {
+        showBanner('error', 'Please upload your AR Invoice CSV file for journal generation.');
+        return;
+      }
     }
 
-    // Validate journal template files if journal generation is enabled
-    if (document.getElementById('generateJournal').checked) {
-      if (!fileMap['journal_config']) {
-        showBanner('error', 'Please upload the JOURNAL_CONFIG.csv file when journal template generation is enabled.');
-        return;
-      }
-      if (!fileMap['journal_account_mapping']) {
-        showBanner('error', 'Please upload the JOURNAL_ACCOUNT_MAPPING.csv file when journal template generation is enabled.');
-        return;
-      }
-    }
+    // Note: Journal template configuration files are now optional
+    // They will be auto-loaded from server if not uploaded
 
     const runBtn = document.getElementById('runBtn');
     runBtn.disabled = true;

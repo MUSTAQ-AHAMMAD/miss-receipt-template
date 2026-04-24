@@ -3826,11 +3826,31 @@ class OracleFusionIntegration:
         legacy_bu_config = None
         legacy_account_mapping = None
         if sp_meta is None or sp_meta.empty:
-            journal_config = pd.read_csv(journal_config_path)
-            legacy_account_mapping = pd.read_csv(account_mapping_path)
-            legacy_bu_config = journal_config[
-                journal_config["Business Unit"] == "Alqurashi KSA"
-            ].iloc[0]
+            # Check if legacy config files exist
+            if not Path(journal_config_path).exists():
+                print(f"⚠️  JOURNAL_CONFIG.csv not found at {journal_config_path}")
+                print("   Please provide either:")
+                print("   1. SERVICE_PROVIDER_JOURNAL_META.csv (preferred)")
+                print("   2. JOURNAL_CONFIG.csv + JOURNAL_ACCOUNT_MAPPING.csv (legacy)")
+                return pd.DataFrame()
+
+            if not Path(account_mapping_path).exists():
+                print(f"⚠️  JOURNAL_ACCOUNT_MAPPING.csv not found at {account_mapping_path}")
+                print("   Please provide either:")
+                print("   1. SERVICE_PROVIDER_JOURNAL_META.csv (preferred)")
+                print("   2. JOURNAL_CONFIG.csv + JOURNAL_ACCOUNT_MAPPING.csv (legacy)")
+                return pd.DataFrame()
+
+            try:
+                journal_config = pd.read_csv(journal_config_path)
+                legacy_account_mapping = pd.read_csv(account_mapping_path)
+                legacy_bu_config = journal_config[
+                    journal_config["Business Unit"] == "Alqurashi KSA"
+                ].iloc[0]
+                print(f"✓  Loaded legacy configuration (TAMARA/TABBY only)")
+            except Exception as e:
+                print(f"⚠️  Error loading legacy configuration files: {e}")
+                return pd.DataFrame()
 
         # Determine which payment methods qualify
         if sp_meta is not None and not sp_meta.empty:

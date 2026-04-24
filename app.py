@@ -676,6 +676,25 @@ def run_integration():
         if journal_mapping_file:
             cfg["journal_account_mapping"] = journal_mapping_file
 
+        # Optional service provider and cost center metadata for journal mode
+        service_provider_file = _save_upload(sid, "journal-service-provider")
+        if service_provider_file:
+            cfg["service_provider_meta"] = service_provider_file
+        else:
+            # Auto-load from server if not uploaded
+            p = Path(__file__).parent / "SERVICE_PROVIDER_JOURNAL_META.csv"
+            if p.exists():
+                cfg["service_provider_meta"] = str(p)
+
+        cost_center_file = _save_upload(sid, "journal-cost-center")
+        if cost_center_file:
+            cfg["cost_center_meta"] = cost_center_file
+        else:
+            # Auto-load from server if not uploaded
+            p = Path(__file__).parent / "FUSION_SALES_METADATA_Cost_Center.csv"
+            if p.exists():
+                cfg["cost_center_meta"] = str(p)
+
         if "ar_invoice" not in cfg:
             return jsonify({"error": "Required file 'AR Invoice CSV' is missing."}), 400
 
