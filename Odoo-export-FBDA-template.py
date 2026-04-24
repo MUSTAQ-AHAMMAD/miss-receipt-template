@@ -612,11 +612,20 @@ def safe_filename(text: str) -> str:
 
 
 def find_col(df: pd.DataFrame, candidates: List[str]) -> Optional[str]:
+    # Pass 1: exact (whitespace-normalised) match — preserves prior behaviour.
     norm_map = {normalise_col_name(c): c for c in df.columns}
     for cand in candidates:
         norm_cand = normalise_col_name(cand)
         if norm_cand in norm_map:
             return norm_map[norm_cand]
+    # Pass 2: case-insensitive match. Many Odoo exports vary header casing
+    # (e.g. "payments/payment method" vs "Payments/Payment Method"), and a
+    # silent miss here causes the loader to fall back to Cash-only receipts.
+    ci_map = {normalise_col_name(c).lower(): c for c in df.columns}
+    for cand in candidates:
+        norm_cand = normalise_col_name(cand).lower()
+        if norm_cand in ci_map:
+            return ci_map[norm_cand]
     return None
 
 
@@ -3231,16 +3240,18 @@ class OracleFusionIntegration:
         # Tolerant column discovery
         so_col = find_col(pf, [
             "Sales Order Number", "Sales Order", "Order Number",
-            "Order Ref", "Payments/Order Ref", "SO Number",
-            "Invoice Number", "Invoice Ref", "Reference",
+            "Order Ref", "Payments/Order Ref", "Order Lines/Order Ref",
+            "SO Number", "Invoice Number", "Invoice Ref", "Reference",
+            "Order Reference", "Pos Reference", "POS Reference",
         ])
         method_col = find_col(pf, [
             "Payments/Payment Method", "Payment Method",
+            "Payments/Method", "Payments/Journal", "Payment Journal",
             "Payment Type", "Method", "Pay Method",
         ])
         amount_col = find_col(pf, [
             "Payments/Amount", "Amount", "Paid Amount",
-            "Payment Amount", "Total Amount",
+            "Payment Amount", "Total Amount", "Payments/Total",
         ])
         # Optional date column
         date_col = find_col(pf, [
@@ -3255,6 +3266,10 @@ class OracleFusionIntegration:
         ] if not c]
         if missing:
             print(f"  ⚠ Payment file missing required columns: {missing} — skipped")
+            # Print the columns we actually saw so the user can diagnose a
+            # header mismatch (otherwise standard receipts silently fall
+            # back to a Cash-only allocation).
+            print(f"    Actual columns in payment file: {list(pf.columns)}")
             return None
 
         result: Dict[str, Dict[str, float]] = defaultdict(lambda: defaultdict(float))
