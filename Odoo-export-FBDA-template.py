@@ -2063,10 +2063,89 @@ class OracleFusionIntegration:
     def _read_file(self, path: str) -> pd.DataFrame:
         p = path.lower()
         if p.endswith(".xlsx") or p.endswith(".xls"):
-            df = pd.read_excel(path, dtype=None)
+            df = self._read_excel_smart(path)
         else:
             df = pd.read_csv(path, encoding="utf-8-sig", dtype=None)
         return normalise_dataframe_columns(df)
+
+    @staticmethod
+    def _named_col_count(cols) -> int:
+        """Count columns that look like real headers (not blank / Unnamed: N)."""
+        n = 0
+        for c in cols:
+            if c is None:
+                continue
+            s = str(c).strip()
+            if not s or s.lower().startswith("unnamed:") or s.lower() in ("nan", "none"):
+                continue
+            n += 1
+        return n
+
+    def _read_excel_smart(self, path: str) -> pd.DataFrame:
+        """Read an Excel workbook robustly.
+
+        Real-world Odoo / pivot exports often have:
+          • multiple sheets where the data is NOT on the first sheet
+          • a few blank rows above the actual header row
+
+        Strategy:
+          1. Load every sheet (header=0).
+          2. Pick the sheet with the most ``named`` (non-``Unnamed``) columns.
+          3. If that sheet still has mostly ``Unnamed`` columns, scan the first
+             ~10 rows for a row that looks like a header (mostly non-empty,
+             non-numeric values) and re-read using that row as the header.
+        """
+        all_sheets = pd.read_excel(path, sheet_name=None, dtype=None)
+        if not all_sheets:
+            # Fall back to the default behaviour so callers see a clear error.
+            return pd.read_excel(path, dtype=None)
+
+        # 1) Pick the sheet that already has the most real column names.
+        best_name, best_df = max(
+            all_sheets.items(),
+            key=lambda kv: (
+                self._named_col_count(kv[1].columns),
+                kv[1].shape[0],
+            ),
+        )
+
+        named = self._named_col_count(best_df.columns)
+        # If the chosen sheet still looks header-less, try to locate the
+        # header row inside the sheet's body.
+        if named < max(2, len(best_df.columns) // 2):
+            try:
+                raw = pd.read_excel(
+                    path, sheet_name=best_name, header=None, dtype=None,
+                    nrows=15,
+                )
+            except Exception:
+                raw = None
+
+            best_header_row = None
+            best_header_score = named
+            if raw is not None:
+                for i in range(min(len(raw), 12)):
+                    row_vals = [
+                        str(v).strip()
+                        for v in raw.iloc[i].tolist()
+                        if v is not None and not (isinstance(v, float) and np.isnan(v))
+                    ]
+                    score = sum(
+                        1 for v in row_vals
+                        if v and not v.replace(".", "", 1).replace("-", "", 1).isdigit()
+                    )
+                    if score > best_header_score:
+                        best_header_score = score
+                        best_header_row = i
+
+            if best_header_row is not None:
+                best_df = pd.read_excel(
+                    path, sheet_name=best_name, header=best_header_row, dtype=None,
+                )
+                # Drop fully-empty trailing columns that often come from pivot tables.
+                best_df = best_df.dropna(axis=1, how="all")
+
+        return best_df
 
     def _resolve_columns(
         self,
