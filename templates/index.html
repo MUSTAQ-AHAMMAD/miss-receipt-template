@@ -988,6 +988,23 @@
             <small>FUSION_SALES_METADATA_Cost_Center.csv - leave empty to use server default</small>
           </div>
         </div>
+
+        <!-- Payment File (Optional) -->
+        <div class="file-zone" id="zone-journal-payment-file" ondragover="onDragOver(event,'journal-payment-file')" ondragleave="onDragLeave('journal-payment-file')" ondrop="onDrop(event,'journal-payment-file')">
+          <input type="file" id="file-journal-payment-file" accept=".xlsx,.csv" onchange="onFileChange('journal-payment-file',this)" />
+          <div class="fz-header">
+            <div class="fz-icon"><i class="fa-solid fa-credit-card"></i></div>
+            <div>
+              <div class="fz-title">Payment File</div>
+              <div class="fz-subtitle">Detailed payment method breakdown per transaction</div>
+              <span class="fz-badge opt">Optional</span>
+            </div>
+          </div>
+          <div class="fz-msg">
+            <p>Click to browse or drag & drop</p>
+            <small>XLSX/CSV with payment methods per transaction - overrides AR Invoice payment methods</small>
+          </div>
+        </div>
       </div>
 
       <!-- Journal Template Parameters -->

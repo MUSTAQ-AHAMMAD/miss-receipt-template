@@ -3739,6 +3739,7 @@ class OracleFusionIntegration:
         service_provider_meta_path: str = "",
         cost_center_meta_path: str = "",
         is_cash: str = "0",
+        payment_file_path: str = "",
     ) -> pd.DataFrame:
         """
         Generate Journal Import Template for Oracle Fusion from AR Invoice and Payment data.
@@ -3768,6 +3769,9 @@ class OracleFusionIntegration:
                 resolve Segment4 (cost center) by Warehouse Code + service provider.
             is_cash: Filter for the IS_CASH column of the service-provider metadata
                 ("0" non-cash, "1" cash). Defaults to "0".
+            payment_file_path: Optional path to payment file (XLSX/CSV) containing detailed
+                payment method breakdown per transaction. If provided, payment methods from
+                this file will be used instead of the AR Invoice's Receipt Method Name.
 
         Notes:
             When ``cost_center_meta_path`` yields no match for a given store/provider,
@@ -3822,6 +3826,37 @@ class OracleFusionIntegration:
             print(f"✓  Loaded FUSION_SALES_METADATA_Cost_Center "
                   f"({len(cost_center_lookup)} unique store/provider keys)")
 
+        # ── Load payment file (optional) ────────────────────────────────────
+        payment_data: Dict[str, Dict[str, float]] = {}
+        if payment_file_path and Path(payment_file_path).exists():
+            print(f"✓  Loading payment file: {Path(payment_file_path).name}")
+            try:
+                # Create a set of transaction numbers from AR Invoice
+                if self.ar_df is not None and "Transaction Number" in self.ar_df.columns:
+                    ar_txn_numbers = set(
+                        self.ar_df["Transaction Number"].fillna("").astype(str).str.strip().unique()
+                    )
+                else:
+                    ar_txn_numbers = set()
+
+                # Load payment file using existing infrastructure
+                payment_result = self._load_payment_file(payment_file_path, ar_txn_numbers)
+                if payment_result is not None:
+                    payment_data, _ = payment_result
+                    print(f"✓  Loaded payment data for {len(payment_data)} transactions")
+
+                    # Show breakdown of payment methods from payment file
+                    all_payment_methods = set()
+                    for methods_dict in payment_data.values():
+                        all_payment_methods.update(methods_dict.keys())
+                    if all_payment_methods:
+                        print(f"   Payment methods in payment file: {sorted(all_payment_methods)}")
+                else:
+                    print(f"⚠  Could not load payment file")
+            except Exception as e:
+                print(f"⚠  Error loading payment file: {e}")
+                payment_data = {}
+
         # ── Legacy config (fallback when service-provider meta is absent) ──
         legacy_bu_config = None
         legacy_account_mapping = None
@@ -3858,54 +3893,115 @@ class OracleFusionIntegration:
         else:
             valid_providers = {"TAMARA", "TABBY"}
 
-        # Guard: ensure the AR DataFrame has the Receipt Method Name column.
-        # When loading from an AR Invoice CSV that does not include this
-        # column, the journal template cannot be generated.
-        if self.ar_df is None or "Receipt Method Name" not in self.ar_df.columns:
-            print("⚠️  AR Invoice data is missing the 'Receipt Method Name' column; "
+        # Guard: ensure we have either payment file data or Receipt Method Name column
+        if not payment_data and (self.ar_df is None or "Receipt Method Name" not in self.ar_df.columns):
+            print("⚠️  AR Invoice data is missing the 'Receipt Method Name' column and no payment file provided; "
                   "cannot generate journal template. "
-                  "Please supply an AR Invoice CSV that includes payment-method "
-                  f"values for: {sorted(valid_providers)}.")
-            print("\n💡 TIP: The AR Invoice CSV must be exported from Oracle Fusion with")
-            print("   the 'Receipt Method Name' column populated with payment methods.")
+                  "Please either: "
+                  f"\n   1. Supply an AR Invoice CSV with 'Receipt Method Name' column for: {sorted(valid_providers)}"
+                  "\n   2. Upload a payment file with payment method details per transaction")
             return pd.DataFrame()
 
-        # Show all unique payment methods in AR Invoice for debugging
-        all_methods = self.ar_df["Receipt Method Name"].fillna("").astype(str).str.upper().unique()
-        all_methods_clean = [m for m in all_methods if m.strip()]
-        if all_methods_clean:
-            print(f"   Payment methods found in AR Invoice: {sorted(all_methods_clean)}")
+        # Determine qualifying transactions based on payment file or AR Invoice
+        if payment_data:
+            print("✓  Using payment file data for payment method detection")
 
-        invoices = self.ar_df[
-            self.ar_df["Receipt Method Name"]
-                .fillna("").astype(str).str.upper().isin(valid_providers)
-        ].copy()
+            # Filter AR Invoice to transactions that have payment data
+            txn_numbers_in_payment_file = set(payment_data.keys())
+            if "Transaction Number" not in self.ar_df.columns:
+                print("⚠️  AR Invoice is missing 'Transaction Number' column")
+                return pd.DataFrame()
 
-        if invoices.empty:
-            print(f"⚠️  No qualifying transactions found "
-                  f"(providers: {sorted(valid_providers)})")
-            print(f"\n💡 TIP: Payment methods in your AR Invoice: {sorted(all_methods_clean)}")
-            print(f"   Expected payment methods: {sorted(valid_providers)}")
-            print("   Ensure the AR Invoice contains transactions with matching payment methods.")
-            return pd.DataFrame()
+            # Get all transactions from payment file that match valid providers
+            qualifying_txns = set()
+            payment_method_counts = {}
+            for txn_num, methods_dict in payment_data.items():
+                for method, amt in methods_dict.items():
+                    method_upper = method.upper()
+                    if method_upper in valid_providers:
+                        qualifying_txns.add(txn_num)
+                        payment_method_counts[method_upper] = payment_method_counts.get(method_upper, 0) + 1
 
-        print(f"✓  Found {len(invoices)} qualifying transactions "
-              f"for providers {sorted(valid_providers)}")
+            # Filter AR Invoice to qualifying transactions
+            invoices = self.ar_df[
+                self.ar_df["Transaction Number"].fillna("").astype(str).str.strip().isin(qualifying_txns)
+            ].copy()
 
-        # Show breakdown by payment method
-        method_counts = invoices["Receipt Method Name"].fillna("").astype(str).str.upper().value_counts()
-        for method, count in method_counts.items():
-            if method in valid_providers:
-                print(f"   - {method}: {count} transaction(s)")
+            if invoices.empty:
+                print(f"⚠️  No qualifying transactions found in payment file "
+                      f"(providers: {sorted(valid_providers)})")
+                print(f"\n💡 TIP: Checked {len(payment_data)} transactions from payment file")
+                return pd.DataFrame()
+
+            print(f"✓  Found {len(invoices)} AR Invoice rows matching payment file with qualifying payment methods")
+            for method, count in sorted(payment_method_counts.items()):
+                print(f"   - {method}: {count} payment(s)")
+
+        else:
+            # Show all unique payment methods in AR Invoice for debugging
+            all_methods = self.ar_df["Receipt Method Name"].fillna("").astype(str).str.upper().unique()
+            all_methods_clean = [m for m in all_methods if m.strip()]
+            if all_methods_clean:
+                print(f"   Payment methods found in AR Invoice: {sorted(all_methods_clean)}")
+
+            invoices = self.ar_df[
+                self.ar_df["Receipt Method Name"]
+                    .fillna("").astype(str).str.upper().isin(valid_providers)
+            ].copy()
+
+            if invoices.empty:
+                print(f"⚠️  No qualifying transactions found "
+                      f"(providers: {sorted(valid_providers)})")
+                print(f"\n💡 TIP: Payment methods in your AR Invoice: {sorted(all_methods_clean)}")
+                print(f"   Expected payment methods: {sorted(valid_providers)}")
+                print("   Ensure the AR Invoice contains transactions with matching payment methods.")
+                return pd.DataFrame()
+
+            print(f"✓  Found {len(invoices)} qualifying transactions "
+                  f"for providers {sorted(valid_providers)}")
+
+            # Show breakdown by payment method
+            method_counts = invoices["Receipt Method Name"].fillna("").astype(str).str.upper().value_counts()
+            for method, count in method_counts.items():
+                if method in valid_providers:
+                    print(f"   - {method}: {count} transaction(s)")
 
 
-        # Group by Transaction + Payment Method + Date, and (when available) Warehouse Code
-        group_cols = ["Transaction Number", "Receipt Method Name", "Transaction Date"]
-        if "Warehouse Code" in invoices.columns:
-            group_cols.append("Warehouse Code")
-        grouped = invoices.groupby(group_cols, dropna=False).agg({
-            "Transaction Line Amount": "sum"
-        }).reset_index()
+
+        # Group by Transaction + Payment Method (from payment file or AR) + Date + Warehouse
+        # When using payment file, we need to expand transactions based on payment methods
+        if payment_data:
+            # Build expanded dataset with payment methods from payment file
+            expanded_rows = []
+            for _, ar_row in invoices.iterrows():
+                txn_num = str(ar_row.get("Transaction Number", "")).strip()
+                if txn_num in payment_data:
+                    methods_dict = payment_data[txn_num]
+                    for method, method_amt in methods_dict.items():
+                        method_upper = method.upper()
+                        if method_upper in valid_providers:
+                            expanded_rows.append({
+                                "Transaction Number": txn_num,
+                                "Receipt Method Name": method_upper,
+                                "Transaction Date": ar_row.get("Transaction Date"),
+                                "Transaction Line Amount": method_amt,
+                                "Warehouse Code": ar_row.get("Warehouse Code", ""),
+                            })
+
+            if not expanded_rows:
+                print("⚠️  No qualifying payment methods found in payment file data")
+                return pd.DataFrame()
+
+            grouped = pd.DataFrame(expanded_rows)
+            print(f"✓  Expanded {len(invoices)} AR transactions into {len(grouped)} payment entries")
+        else:
+            # Group by Transaction + Payment Method + Date, and (when available) Warehouse Code
+            group_cols = ["Transaction Number", "Receipt Method Name", "Transaction Date"]
+            if "Warehouse Code" in invoices.columns:
+                group_cols.append("Warehouse Code")
+            grouped = invoices.groupby(group_cols, dropna=False).agg({
+                "Transaction Line Amount": "sum"
+            }).reset_index()
 
         journal_entries = []
         batch_name_counter = 1

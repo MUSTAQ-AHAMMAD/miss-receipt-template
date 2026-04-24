@@ -376,6 +376,7 @@ def _run_integration(sid: str, cfg: dict):
                         interface_group_id=interface_group_id,
                         service_provider_meta_path=cfg.get("service_provider_meta", ""),
                         cost_center_meta_path=cfg.get("cost_center_meta", ""),
+                        payment_file_path="",
                     )
                     if not journal_df.empty:
                         integration.save_journal_template(journal_df)
@@ -427,6 +428,7 @@ def _run_integration(sid: str, cfg: dict):
                         interface_group_id=interface_group_id,
                         service_provider_meta_path=cfg.get("service_provider_meta", ""),
                         cost_center_meta_path=cfg.get("cost_center_meta", ""),
+                        payment_file_path=cfg.get("journal_payment_file", ""),
                     )
                     if not journal_df.empty:
                         integration.save_journal_template(journal_df)
@@ -477,6 +479,7 @@ def _run_integration(sid: str, cfg: dict):
                             interface_group_id=interface_group_id,
                             service_provider_meta_path=cfg.get("service_provider_meta", ""),
                             cost_center_meta_path=cfg.get("cost_center_meta", ""),
+                            payment_file_path="",
                         )
                         if not journal_df.empty:
                             integration.save_journal_template(journal_df)
@@ -694,6 +697,11 @@ def run_integration():
             p = Path(__file__).parent / "FUSION_SALES_METADATA_Cost_Center.csv"
             if p.exists():
                 cfg["cost_center_meta"] = str(p)
+
+        # Optional payment file for journal mode
+        journal_payment_file = _save_upload(sid, "journal-payment-file")
+        if journal_payment_file:
+            cfg["journal_payment_file"] = journal_payment_file
 
         if "ar_invoice" not in cfg:
             return jsonify({"error": "Required file 'AR Invoice CSV' is missing."}), 400
