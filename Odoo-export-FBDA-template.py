@@ -1485,9 +1485,13 @@ class VerificationLog:
 
 class ReceiptMethodsCache:
 
+    DEFAULT_ORG_ID = "300000052613062"
+
     def __init__(self, path: str, register_cache: "Optional[RegisterCache]" = None):
-        self._exact:  Dict[Tuple[str, str], Tuple[str, str]] = {}
-        self._method: Dict[str, Tuple[str, str]]             = {}
+        self._exact:      Dict[Tuple[str, str], Tuple[str, str]] = {}
+        self._method:     Dict[str, Tuple[str, str]]             = {}
+        self._exact_org:  Dict[Tuple[str, str], str]             = {}
+        self._method_org: Dict[str, str]                         = {}
         self._loaded  = False
         # Optional vend-register override: when set and the register has the
         # required CASH_ACCOUNT / BANK_ACCOUNT, it takes priority over this
@@ -1511,6 +1515,7 @@ class ReceiptMethodsCache:
             method      = safe_str(row.get("RECEIPT_METHOD_NAME")).strip()
             acct_name   = safe_str(row.get("BANK_ACCOUNT_NAME")).strip()
             acct_number = safe_str(row.get("BANK_ACCOUNT_NUMBER")).strip()
+            org_id      = safe_str(row.get("ORGANIZATION_ID", "")).strip()
             if not method or not acct_name:
                 continue
             canonical  = normalise_payment(method)
@@ -1520,6 +1525,11 @@ class ReceiptMethodsCache:
                 self._exact[key] = (acct_name, acct_number)
             if canonical not in self._method:
                 self._method[canonical] = (acct_name, acct_number)
+            if org_id:
+                if key not in self._exact_org:
+                    self._exact_org[key] = org_id
+                if canonical not in self._method_org:
+                    self._method_org[canonical] = org_id
 
         self._loaded = True
         print(f"  ✓ Receipt_Methods.csv loaded: {len(self._exact):,} entries")
@@ -1571,6 +1581,39 @@ class ReceiptMethodsCache:
         if method in self._method:
             return self._method[method]
         return PAYMENT_BANK_MAP_FALLBACK.get(method, DEFAULT_BANK)
+
+    def get_org_id(self, store_name: str, method: str) -> str:
+        """Look up ORGANIZATION_ID from Receipt_Methods.csv using the same
+        store/method matching logic as :meth:`get_bank_account`. Falls back
+        to :attr:`DEFAULT_ORG_ID` when no match is found."""
+        if not self._loaded:
+            return self.DEFAULT_ORG_ID
+        store_upper = normalise_store(store_name)
+        best = None  # tuple: (score, -len(acct_upper), -idx, org_id)
+        for idx, ((acct_upper, canon_method), org_id) in enumerate(self._exact_org.items()):
+            if canon_method != method:
+                continue
+            pos = acct_upper.find(store_upper)
+            if pos < 0:
+                continue
+            end = pos + len(store_upper)
+            before_ok = pos == 0 or not acct_upper[pos - 1].isalnum()
+            after_ch  = acct_upper[end] if end < len(acct_upper) else ""
+            after_ok  = after_ch == "" or not after_ch.isalnum()
+            if before_ok and after_ok:
+                score = 3
+            elif before_ok and after_ch.isdigit():
+                score = 2
+            else:
+                score = 1
+            cand = (score, -len(acct_upper), -idx, org_id)
+            if best is None or cand > best:
+                best = cand
+        if best is not None:
+            return best[3]
+        if method in self._method_org:
+            return self._method_org[method]
+        return self.DEFAULT_ORG_ID
 
 
 # ============================================================================
@@ -2841,7 +2884,7 @@ class OracleFusionIntegration:
 
             cfg            = self.bank_charges.get(method, store)
             ar_txn         = agg_ar_txn.get((store, date_str), "")
-            org_id         = "300000052613062"
+            org_id         = self.receipt_methods.get_org_id(store, method)
             activity       = cfg.get("activity", "Misc Activity")  if cfg else "Misc Activity"
             charge_rate    = cfg.get("rate", 0.0)                  if cfg else 0.0
 
