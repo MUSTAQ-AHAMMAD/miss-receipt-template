@@ -3928,6 +3928,8 @@ class OracleFusionIntegration:
         cost_center_lookup: dict = {}
         if cost_center_meta_path and Path(cost_center_meta_path).exists():
             cc_df = pd.read_csv(cost_center_meta_path, dtype=str).fillna("")
+            # Strip quotes from column names if present
+            cc_df.columns = cc_df.columns.str.strip('"')
             for _, cc_row in cc_df.iterrows():
                 key = (
                     str(cc_row.get("SUBINVENTORY", "")).strip().upper(),
