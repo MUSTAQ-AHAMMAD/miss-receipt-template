@@ -39,65 +39,6 @@ import pandas as pd
 _TOTAL_MATCH_THRESHOLD = 0.01
 
 
-# ---------------------------------------------------------------------------
-# Cache Management - Permanent Fix for 1000s of file generations
-# ---------------------------------------------------------------------------
-
-def _clear_python_cache():
-    """
-    Clear Python bytecode cache to prevent stale module imports.
-    This ensures that code changes are always reflected, even after
-    generating thousands of files.
-    """
-    cache_dir = Path(__file__).parent / "__pycache__"
-    if cache_dir.exists():
-        try:
-            shutil.rmtree(cache_dir)
-            print(f"✓ Cleared Python cache: {cache_dir}")
-        except Exception as e:
-            print(f"⚠ Could not clear Python cache: {e}")
-
-
-def _clean_old_output_directories(base_dir: Path, keep_sessions: int = 5):
-    """
-    Clean old session directories to prevent disk space issues.
-    Keeps only the most recent N sessions.
-
-    Args:
-        base_dir: Base upload directory
-        keep_sessions: Number of recent sessions to keep (default: 5)
-    """
-    if not base_dir.exists():
-        return
-
-    try:
-        # Get all session directories (UUID format)
-        session_dirs = []
-        for item in base_dir.iterdir():
-            if item.is_dir():
-                try:
-                    # Check if it looks like a UUID
-                    uuid.UUID(item.name)
-                    session_dirs.append(item)
-                except ValueError:
-                    # Not a UUID, skip it
-                    continue
-
-        # Sort by modification time (newest first)
-        session_dirs.sort(key=lambda x: x.stat().st_mtime, reverse=True)
-
-        # Remove old sessions
-        for old_dir in session_dirs[keep_sessions:]:
-            try:
-                shutil.rmtree(old_dir)
-                print(f"✓ Cleaned old session: {old_dir.name}")
-            except Exception as e:
-                print(f"⚠ Could not remove old session {old_dir.name}: {e}")
-
-    except Exception as e:
-        print(f"⚠ Error during cleanup: {e}")
-
-
 # Initialize Flask app
 app = Flask(__name__)
 
@@ -106,10 +47,6 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY") or os.urandom(24)
 app.config["MAX_CONTENT_LENGTH"] = 512 * 1024 * 1024  # 512 MB
 
-# Disable Flask's built-in caching for templates (always load fresh)
-app.config["TEMPLATES_AUTO_RELOAD"] = True
-app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0  # No cache for static files
-
 # Upload directory is configurable via the UPLOAD_DIR environment variable.
 UPLOAD_BASE = Path(os.environ.get("UPLOAD_DIR", "/tmp/oracle_fusion_ui"))
 UPLOAD_BASE.mkdir(parents=True, exist_ok=True)
@@ -117,14 +54,6 @@ UPLOAD_BASE.mkdir(parents=True, exist_ok=True)
 # In-memory session store: session_id → {queue, status, output_dir, zip_path}
 SESSIONS: Dict[str, dict] = {}
 SESSIONS_LOCK = threading.Lock()
-
-# Clear caches on startup to ensure clean state
-print("="*80)
-print("ORACLE FUSION INTEGRATION - Starting with cache cleanup...")
-print("="*80)
-_clear_python_cache()
-_clean_old_output_directories(UPLOAD_BASE, keep_sessions=5)
-print("="*80)
 
 
 # ---------------------------------------------------------------------------
@@ -199,17 +128,9 @@ def _run_integration(sid: str, cfg: dict):
         sys.stdout = _QueueWriter()
 
         try:
-            # Force fresh import of integration module (no cache)
-            # This ensures code changes are always reflected, even for 1000s of runs
+            # Import integration module
             import importlib.util
             import importlib
-
-            # Clear any cached version of the module
-            if "oracle_integration" in sys.modules:
-                del sys.modules["oracle_integration"]
-
-            # Clear Python bytecode cache before import
-            _clear_python_cache()
 
             spec = importlib.util.spec_from_file_location(
                 "oracle_integration",
@@ -543,25 +464,14 @@ def _zip_output(output_dir: str, zip_path: str):
 
 @app.route("/")
 def index():
-    """Serve main page with cache-busting headers"""
-    response = render_template("index.html")
-    # Add cache-busting headers to ensure fresh content
-    response = app.make_response(response)
-    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
-    response.headers["Pragma"] = "no-cache"
-    response.headers["Expires"] = "0"
-    return response
+    """Serve main page"""
+    return render_template("index.html")
 
 
 @app.route("/upload-logs")
 def upload_logs_page():
     """Serve upload logs dashboard page"""
-    response = render_template("upload_logs.html")
-    response = app.make_response(response)
-    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
-    response.headers["Pragma"] = "no-cache"
-    response.headers["Expires"] = "0"
-    return response
+    return render_template("upload_logs.html")
 
 
 @app.route("/test-report")
@@ -571,7 +481,6 @@ def test_report():
         content = p.read_text(encoding="utf-8")
         response = app.make_response(content)
         response.headers["Content-Type"] = "text/html; charset=utf-8"
-        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
         return response
     return "Test report not found", 404
 
@@ -774,7 +683,7 @@ def stream(sid: str):
                     break
 
     return Response(generate(), mimetype="text/event-stream",
-                    headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+                    headers={"X-Accel-Buffering": "no"})
 
 
 @app.route("/api/status/<sid>")
