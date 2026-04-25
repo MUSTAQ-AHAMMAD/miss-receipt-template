@@ -3915,6 +3915,8 @@ class OracleFusionIntegration:
         sp_meta = None
         if service_provider_meta_path and Path(service_provider_meta_path).exists():
             sp_meta = pd.read_csv(service_provider_meta_path, dtype=str).fillna("")
+            # Strip quotes from column names if present
+            sp_meta.columns = sp_meta.columns.str.strip('"')
             sp_meta["SERVICE_PROVIDER"] = sp_meta["SERVICE_PROVIDER"].str.upper()
             sp_meta["CREDIT_DEBIT"] = sp_meta["CREDIT_DEBIT"].str.upper()
             is_cash_str = str(is_cash).strip()
