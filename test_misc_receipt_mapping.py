@@ -104,7 +104,7 @@ class MiscReceiptMappingTester:
             print_info(f"  Card methods count: {len(card_methods)}")
 
             # These are the methods that should generate misc receipts
-            expected_methods = ["Mada", "Visa", "MasterCard", "Amex"]
+            expected_methods = ["Mada", "Visa", "Master", "Amex"]
             for method in expected_methods:
                 if method in card_methods:
                     print_success(f"  ✓ {method} is in CARD_PAYMENT_METHODS")
@@ -167,7 +167,7 @@ class MiscReceiptMappingTester:
             card_methods_in_file = set()
             for _, row in df.iterrows():
                 method = str(row.get('PAYMENT_METHOD', '')).strip()
-                if method in ['Mada', 'MADA', 'Visa', 'VISA', 'Master', 'MasterCard', 'AMEX', 'Amex']:
+                if method in ['Mada', 'MADA', 'Visa', 'VISA', 'Master', 'MASTER', 'AMEX', 'Amex']:
                     card_methods_in_file.add(method)
 
             if card_methods_in_file:
@@ -366,7 +366,7 @@ class MiscReceiptMappingTester:
             integration.invoice_payments = defaultdict(lambda: defaultdict(float))
             integration.invoice_payments["INV-001"]["Mada"] = 1000.00
             integration.invoice_payments["INV-001"]["Visa"] = 500.00
-            integration.invoice_payments["INV-002"]["MasterCard"] = 750.00
+            integration.invoice_payments["INV-002"]["Master"] = 750.00
             integration.invoice_payments["INV-003"]["Cash"] = 200.00  # Should not generate misc receipt
 
             # Set up invoice metadata
@@ -397,7 +397,7 @@ class MiscReceiptMappingTester:
             print_success("Test data setup complete")
             print_info("  Invoices with card payments:")
             print_info("    INV-001: Mada (1000 SAR), Visa (500 SAR)")
-            print_info("    INV-002: MasterCard (750 SAR)")
+            print_info("    INV-002: Master (750 SAR)")
             print_info("    INV-003: Cash (200 SAR) - should NOT generate misc receipt")
 
             # Try to generate misc receipts
@@ -549,7 +549,7 @@ class MiscReceiptMappingTester:
             f.write("KEY VERIFICATION POINTS:\n")
             f.write("-"*80 + "\n")
             f.write("1. BANK_CHARGES.csv must exist with charge rates for card methods\n")
-            f.write("2. CARD_PAYMENT_METHODS must include: Mada, Visa, MasterCard, Amex (at minimum)\n")
+            f.write("2. CARD_PAYMENT_METHODS must include: Mada, Visa, Master, Amex (at minimum)\n")
             f.write("3. Misc receipts are ONLY generated for methods in CARD_PAYMENT_METHODS\n")
             f.write("4. Check Verification Report Section 8b for detailed logging\n")
             f.write("5. Misc receipt files will be in: Receipts/Misc/\n")

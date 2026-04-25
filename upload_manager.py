@@ -251,7 +251,7 @@ class UploadManager:
     def _extract_payment_method(self, filename: str) -> Optional[str]:
         """Extract payment method from filename"""
         filename_upper = filename.upper()
-        for method in ["CASH", "MADA", "VISA", "MASTERCARD"]:
+        for method in ["CASH", "MADA", "VISA", "MASTER"]:
             if method in filename_upper:
                 return method.title()
         return None
