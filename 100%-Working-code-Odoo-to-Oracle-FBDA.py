@@ -1735,11 +1735,6 @@ class OracleFusionIntegration:
         receipt_detail_rows: List[Dict]              = []
 
         for (store, date_str, method), total in sorted(agg_amount.items()):
-            # Skip transactions with negative totals
-            if total < 0:
-                vl.add(f"  ⚠ WARNING: Skipping negative total ({total:.2f}) for {store} on {date_str}, method: {method}")
-                continue
-
             ar_txn           = agg_ar_txn.get((store, date_str), "")
             meta, _          = self.metadata_cache.get(store, "NORMAL")
             business_unit    = meta["BUSINESS_UNIT"]
