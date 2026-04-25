@@ -45,18 +45,18 @@ warnings.filterwarnings("ignore")
 # CONSTANTS
 # ============================================================================
 
-RECEIPT_PAYMENT_METHODS    = {"Cash", "Mada", "Visa", "MasterCard", "Amex"}
+RECEIPT_PAYMENT_METHODS    = {"Cash", "Mada", "Visa", "Master", "Amex"}
 NO_RECEIPT_PAYMENT_METHODS = {"TABBY", "TAMARA"}
-CARD_PAYMENT_METHODS       = {"Mada", "Visa", "MasterCard", "Amex"}
+CARD_PAYMENT_METHODS       = {"Mada", "Visa", "Master", "Amex"}
 
 PAYMENT_METHOD_NORM: Dict[str, str] = {
     "CASH":        "Cash",
     "MADA":        "Mada",
     "VISA":        "Visa",
-    "MASTERCARD":  "MasterCard",
-    "MASTER CARD": "MasterCard",
-    "MASTER":      "MasterCard",
-    "MC":          "MasterCard",
+    "MASTERCARD":  "Master",
+    "MASTER CARD": "Master",
+    "MASTER":      "Master",
+    "MC":          "Master",
     "TAMARA":      "TAMARA",
     "TABBY":       "TABBY",
     "AMEX":        "Amex",
@@ -71,7 +71,7 @@ PAYMENT_BANK_MAP_FALLBACK: Dict[str, Tuple[str, str, str]] = {
     "Cash":       ("Cash",       "Cash Bank",       "Cash Account"),
     "Mada":       ("Mada",       "Mada Bank",       "Mada Account"),
     "Visa":       ("Visa",       "Visa Bank",       "Visa Account"),
-    "MasterCard": ("MasterCard", "MasterCard Bank", "MasterCard Account"),
+    "Master": ("Master", "Master Bank", "Master Account"),
     "Amex":       ("Amex",       "Amex Bank",       "Amex Account"),
     "Apple Pay":  ("Apple Pay",  "Apple Pay Bank",  "Apple Pay Account"),
     "STC Pay":    ("STC Pay",    "STC Pay Bank",    "STC Pay Account"),
@@ -597,7 +597,7 @@ def normalise_payment(raw: str) -> str:
         return PAYMENT_METHOD_NORM[key]
     if "MADA"   in key: return "Mada"
     if "VISA"   in key: return "Visa"
-    if "MASTER" in key or key.startswith("MC"): return "MasterCard"
+    if "MASTER" in key or key.startswith("MC"): return "Master"
     if "CASH"   in key: return "Cash"
     if "TAMARA" in key: return "TAMARA"
     if "TABBY"  in key: return "TABBY"
@@ -1889,7 +1889,7 @@ class RegisterCache:
         """Return (account_name, account_number) for the SUBINVENTORY/Branch.
 
         * `Cash` → CASH_ACCOUNT (used for Standard receipts)
-        * any other method (Mada/Visa/MasterCard/Amex/Apple Pay/STC Pay/
+        * any other method (Mada/Visa/Master/Amex/Apple Pay/STC Pay/
           GCCNET/Wire/etc.) → BANK_ACCOUNT (used for Miscellaneous receipts)
 
         Returns None when this register isn't in the vend file or has no
@@ -3104,7 +3104,7 @@ class OracleFusionIntegration:
         ar_total       = ar_df["Transaction Line Amount"].sum()
         rcpt_total     = sum(df["Amount"].sum() for df in receipt_files.values())
 
-        # Calculate NORMAL payment total (Cash/Mada/Visa/MasterCard only, excluding BNPL)
+        # Calculate NORMAL payment total (Cash/Mada/Visa/Master only, excluding BNPL)
         pay_norm_total = sum(
             amt
             for inv, methods in self.invoice_payments.items()
@@ -3386,7 +3386,7 @@ class OracleFusionIntegration:
         An optional *payment_file_path* (CSV/XLSX) can be supplied to provide
         actual payment-method breakdowns per Sales Order.  Expected columns:
           • Sales Order Number (or Order Ref / Invoice Number / …)
-          • Payment Method  (e.g. Cash, Mada, Visa, MasterCard)
+          • Payment Method  (e.g. Cash, Mada, Visa, Master)
           • Amount
 
         When matched by Sales Order Number the payment methods replace the
