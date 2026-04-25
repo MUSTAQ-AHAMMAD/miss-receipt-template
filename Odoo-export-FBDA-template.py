@@ -3915,6 +3915,8 @@ class OracleFusionIntegration:
         sp_meta = None
         if service_provider_meta_path and Path(service_provider_meta_path).exists():
             sp_meta = pd.read_csv(service_provider_meta_path, dtype=str).fillna("")
+            # Strip quotes from column names if present
+            sp_meta.columns = sp_meta.columns.str.strip('"')
             sp_meta["SERVICE_PROVIDER"] = sp_meta["SERVICE_PROVIDER"].str.upper()
             sp_meta["CREDIT_DEBIT"] = sp_meta["CREDIT_DEBIT"].str.upper()
             is_cash_str = str(is_cash).strip()
@@ -3926,6 +3928,8 @@ class OracleFusionIntegration:
         cost_center_lookup: dict = {}
         if cost_center_meta_path and Path(cost_center_meta_path).exists():
             cc_df = pd.read_csv(cost_center_meta_path, dtype=str).fillna("")
+            # Strip quotes from column names if present
+            cc_df.columns = cc_df.columns.str.strip('"')
             for _, cc_row in cc_df.iterrows():
                 key = (
                     str(cc_row.get("SUBINVENTORY", "")).strip().upper(),
