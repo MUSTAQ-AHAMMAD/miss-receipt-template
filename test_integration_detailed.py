@@ -110,7 +110,7 @@ class DetailedIntegrationTester:
             print_info(f"Payment methods found: {len(unique_methods)}")
             print_info(f"Organizations found: {len(unique_orgs)}")
 
-            for method in ['Cash', 'Mada', 'Visa', 'MasterCard']:
+            for method in ['Cash', 'Mada', 'Visa', 'Master']:
                 count = len(df[df['RECEIPT_METHOD_NAME'] == method])
                 if count > 0:
                     print_success(f"{method}: {count} store mappings")
@@ -149,7 +149,7 @@ class DetailedIntegrationTester:
                 print_success("All required columns present")
 
             # Check card payment methods
-            card_methods = ['Mada', 'Visa', 'MasterCard']
+            card_methods = ['Mada', 'Visa', 'Master']
             for method in card_methods:
                 method_data = df[df['PAYMENT_METHOD'] == method]
                 if len(method_data) > 0:

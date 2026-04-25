@@ -334,7 +334,7 @@ def main():
         print_success(f"  {method:<20} {store_count:>4} stores")
 
     # Check for card methods (important for MISS receipts)
-    card_methods = ['Mada', 'Visa', 'MasterCard', 'AMEX', 'Amex']
+    card_methods = ['Mada', 'Visa', 'Master', 'AMEX', 'Amex']
     print_info("\n  Card payment methods (required for MISS receipts):")
     for method in card_methods:
         if method in coverage:
