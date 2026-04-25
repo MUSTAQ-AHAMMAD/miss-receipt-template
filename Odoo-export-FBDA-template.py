@@ -1520,7 +1520,9 @@ class ReceiptMethodsCache:
         for _, row in df.iterrows():
             method      = safe_str(row.get("RECEIPT_METHOD_NAME")).strip()
             acct_name   = safe_str(row.get("BANK_ACCOUNT_NAME")).strip()
-            acct_number = safe_str(row.get("BANK_ACCOUNT_NUMBER"))
+            # Preserve full bank account number text without trimming
+            acct_number_raw = row.get("BANK_ACCOUNT_NUMBER")
+            acct_number = str(acct_number_raw) if acct_number_raw is not None and not (isinstance(acct_number_raw, float) and np.isnan(acct_number_raw)) else ""
             org_id      = safe_str(row.get("ORGANIZATION_ID", "")).strip()
             if not method or not acct_name:
                 continue
