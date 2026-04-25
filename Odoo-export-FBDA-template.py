@@ -3591,7 +3591,7 @@ class OracleFusionIntegration:
                 payment_file_path, set(self.invoice_store.keys())
             )
             if payment_result is not None:
-                payment_data, payment_dates = payment_result
+                payment_data, payment_dates, payment_branches = payment_result
                 # Override payments only for invoices present in the payment file;
                 # all other invoices retain their existing Cash allocation.
                 newly_added_invoices = []
@@ -3608,8 +3608,11 @@ class OracleFusionIntegration:
                         # We must register them to generate accurate standard receipts
                         newly_added_invoices.append(inv_ref)
 
-                        # Extract store from invoice reference (e.g., "ALARIDAH/8371" → "ALARIDAH")
-                        if "/" in inv_ref:
+                        # Get store from Branch column in payment file if available
+                        # Otherwise, extract from invoice reference (e.g., "ALARIDAH/8371" → "ALARIDAH")
+                        if inv_ref in payment_branches:
+                            store = payment_branches[inv_ref]
+                        elif "/" in inv_ref:
                             store = inv_ref.split("/")[0].upper().strip()
                         else:
                             store = "UNKNOWN"
