@@ -1520,7 +1520,7 @@ class ReceiptMethodsCache:
         for _, row in df.iterrows():
             method      = safe_str(row.get("RECEIPT_METHOD_NAME")).strip()
             acct_name   = safe_str(row.get("BANK_ACCOUNT_NAME")).strip()
-            acct_number = safe_str(row.get("BANK_ACCOUNT_NUMBER")).strip()
+            acct_number = safe_str(row.get("BANK_ACCOUNT_NUMBER"))
             org_id      = safe_str(row.get("ORGANIZATION_ID", "")).strip()
             if not method or not acct_name:
                 continue
@@ -1875,8 +1875,8 @@ class RegisterCache:
                 continue
             self.name_map[reg.upper()] = reg
             self._records[reg.upper()] = {
-                "cash": safe_str(row.get(cash_col)).strip() if cash_col else "",
-                "bank": safe_str(row.get(bank_col)).strip() if bank_col else "",
+                "cash": safe_str(row.get(cash_col)) if cash_col else "",
+                "bank": safe_str(row.get(bank_col)) if bank_col else "",
             }
         self._loaded = bool(self._records)
         if self._loaded:
