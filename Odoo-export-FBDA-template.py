@@ -1548,17 +1548,16 @@ class ReceiptMethodsCache:
         Look up bank account information for a given store and payment method.
         Returns: (receipt_method_name, bank_account_name, bank_account_number)
         """
-        # Primary source: vend register file keyed by REGISTER_NAME (= SUBINVENTORY
-        # = `Branch` from the Odoo payment-lines sheet). Standard receipts use
-        # CASH_ACCOUNT, miscellaneous (card) receipts use BANK_ACCOUNT.
-        if self._register_cache is not None:
-            override = self._register_cache.get_account(store_name, method)
-            if override is not None:
-                # Register cache returns (bank_name, bank_number), prepend method
-                return (method, override[0], override[1])
-
+        # Primary source: Receipt_Methods.csv (contains complete bank account numbers)
+        # Fallback: vend register file for stores not in Receipt_Methods.csv
         if not self._loaded:
+            # If Receipt_Methods.csv not loaded, try vend registers as fallback
+            if self._register_cache is not None:
+                override = self._register_cache.get_account(store_name, method)
+                if override is not None:
+                    return (method, override[0], override[1])
             return PAYMENT_BANK_MAP_FALLBACK.get(method, DEFAULT_BANK)
+
         store_upper = normalise_store(store_name)
         # Score each candidate so the most-specific match wins deterministically:
         #   3 = whole-token match (store appears bounded by non-alphanumeric chars
@@ -1594,6 +1593,13 @@ class ReceiptMethodsCache:
             return best[3]
         if method in self._method:
             return self._method[method]
+
+        # Fallback to vend register file if not found in Receipt_Methods.csv
+        if self._register_cache is not None:
+            override = self._register_cache.get_account(store_name, method)
+            if override is not None:
+                return (method, override[0], override[1])
+
         return PAYMENT_BANK_MAP_FALLBACK.get(method, DEFAULT_BANK)
 
     def get_org_id(self, store_name: str, method: str) -> str:
