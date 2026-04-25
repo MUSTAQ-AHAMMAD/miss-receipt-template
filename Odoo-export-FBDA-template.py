@@ -2948,6 +2948,56 @@ class OracleFusionIntegration:
             filename = f"MiscReceipt_{safe_method_part}.csv"
             misc_files[filename] = pd.DataFrame(rows, columns=MISC_RECEIPT_COLUMNS)
 
+        # Create consolidated file with ALL payment methods merged into one file
+        all_misc_consolidated_rows = []
+        for method, rows in sorted(method_rows.items()):
+            all_misc_consolidated_rows.extend(rows)
+
+        if all_misc_consolidated_rows:
+            misc_consolidated_df = pd.DataFrame(all_misc_consolidated_rows, columns=MISC_RECEIPT_COLUMNS)
+            misc_files["MiscReceipt_ALL_CONSOLIDATED.csv"] = misc_consolidated_df
+
+            # Validate consolidated file against per-method files
+            misc_consolidated_total = misc_consolidated_df['Amount'].sum()
+            misc_per_method_total = sum(df['Amount'].sum() for fname, df in misc_files.items()
+                                       if fname != "MiscReceipt_ALL_CONSOLIDATED.csv")
+
+            vl.add(f"\n  ✓ MISC CONSOLIDATED FILE CREATED: MiscReceipt_ALL_CONSOLIDATED.csv")
+            vl.add(f"    Total rows: {len(misc_consolidated_df):,}")
+            vl.add(f"    Total amount: {misc_consolidated_total:,.4f} SAR")
+            vl.add(f"    Payment methods included: {sorted(method_rows.keys())}")
+
+            # Detailed validation
+            vl.add(f"\n  ═══ MISC CONSOLIDATED FILE VALIDATION ═══")
+            vl.add(f"    Consolidated total:      {misc_consolidated_total:>18,.4f} SAR")
+            vl.add(f"    Per-method total:        {misc_per_method_total:>18,.4f} SAR")
+            vl.add(f"    Difference:              {abs(misc_consolidated_total - misc_per_method_total):>18,.4f} SAR")
+
+            if abs(misc_consolidated_total - misc_per_method_total) < 0.0001:
+                vl.add(f"    Status: ✓ MATCH - Totals are accurate")
+            else:
+                vl.add(f"    Status: ⚠ MISMATCH - Please review")
+
+            # Per-method breakdown in consolidated file
+            vl.add(f"\n  Payment Method Breakdown in Misc Consolidated File:")
+            misc_method_breakdown = misc_consolidated_df.groupby('ReceiptMethodName')['Amount'].agg(['sum', 'count'])
+            for method in sorted(misc_method_breakdown.index):
+                method_total = misc_method_breakdown.loc[method, 'sum']
+                method_count = misc_method_breakdown.loc[method, 'count']
+                # Check for negative amounts
+                method_df = misc_consolidated_df[misc_consolidated_df['ReceiptMethodName'] == method]
+                negative_count = len(method_df[method_df['Amount'] < 0])
+
+                status_str = ""
+                if negative_count > 0:
+                    status_str = f"  ⚠ {negative_count} NEGATIVE AMOUNTS!"
+                elif method_total < 0:
+                    status_str = "  ⚠ NEGATIVE TOTAL!"
+                else:
+                    status_str = "  ✓"
+
+                vl.add(f"    {method:<15} {method_count:>5} rows  {method_total:>18,.4f} SAR{status_str}")
+
         vl.section("8b. MISCELLANEOUS RECEIPT RECORDS — DETAIL")
         vl.kv("Skipped (no AR txn number)",  f"{skipped_no_ar_txn_misc:,}")
         vl.kv("Misc receipt files to write", f"{len(misc_files):,}")
@@ -3073,18 +3123,42 @@ class OracleFusionIntegration:
         if not misc_files:
             return
         vl     = self.vlog
-        folder = self.output_dir / "Receipts" / "Misc"
-        folder.mkdir(parents=True, exist_ok=True)
+        base   = self.output_dir / "Receipts" / "Misc"
         vl.section("10b. OUTPUT FILES — MISCELLANEOUS RECEIPTS")
-        total_misc = 0.0
+
+        method_totals: Dict[str, float] = defaultdict(float)
+        method_counts: Dict[str, int]   = defaultdict(int)
+
         for fname, df in sorted(misc_files.items()):
-            fpath = folder / fname
+            # Handle consolidated file separately
+            if fname == "MiscReceipt_ALL_CONSOLIDATED.csv":
+                # Save consolidated file in the Misc Receipts root directory
+                folder = base
+                folder.mkdir(parents=True, exist_ok=True)
+                fpath  = folder / fname
+                df.to_csv(fpath, index=False, encoding="utf-8-sig", quoting=1)
+                amt = df["Amount"].sum()
+                row_count = len(df)
+                print(f"  ✓ {fname:<50}  {row_count:>4} rows  {amt:>15,.4f} SAR  ← CONSOLIDATED")
+                vl.kv("Misc Consolidated file", f"{fname} ({row_count:,} rows, {amt:,.4f} SAR)")
+                continue
+
+            # Save per-method files in their respective folders
+            parts  = fname.replace(".csv", "").split("_")
+            method = parts[1] if len(parts) > 1 else "Other"
+            folder = base / method
+            folder.mkdir(parents=True, exist_ok=True)
+            fpath  = folder / fname
             df.to_csv(fpath, index=False, encoding="utf-8-sig", quoting=1)
             amt = df["Amount"].sum()
             row_count = len(df)
-            total_misc += amt
+            method_totals[method] += amt
+            method_counts[method] += 1
             print(f"  ✓ {fname:<50}  {row_count:>4} rows  {amt:>15,.4f} SAR")
-        print(f"\n  Misc receipt grand total : {total_misc:,.4f} SAR")
+
+        total_misc = sum(method_totals.values())
+        vl.kv("Per-method grand total", f"{total_misc:,.4f} SAR")
+        print(f"\n  Misc receipt per-method total : {total_misc:,.4f} SAR")
 
     # ──────────────────────────────────────────────────────────────────
     # FINAL CROSS-CHECK
