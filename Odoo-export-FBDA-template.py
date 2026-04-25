@@ -3831,16 +3831,17 @@ class OracleFusionIntegration:
         if payment_file_path and Path(payment_file_path).exists():
             print(f"✓  Loading payment file: {Path(payment_file_path).name}")
             try:
-                # Create a set of transaction numbers from AR Invoice
-                if self.ar_df is not None and "Transaction Number" in self.ar_df.columns:
-                    ar_txn_numbers = set(
-                        self.ar_df["Transaction Number"].fillna("").astype(str).str.strip().unique()
+                # Create a set of Sales Order Numbers from AR Invoice
+                # Payment files contain "Order Ref" which matches "Sales Order Number", not "Transaction Number"
+                if self.ar_df is not None and "Sales Order Number" in self.ar_df.columns:
+                    ar_sales_order_numbers = set(
+                        self.ar_df["Sales Order Number"].fillna("").astype(str).str.strip().unique()
                     )
                 else:
-                    ar_txn_numbers = set()
+                    ar_sales_order_numbers = set()
 
                 # Load payment file using existing infrastructure
-                payment_result = self._load_payment_file(payment_file_path, ar_txn_numbers)
+                payment_result = self._load_payment_file(payment_file_path, ar_sales_order_numbers)
                 if payment_result is not None:
                     payment_data, _ = payment_result
                     print(f"✓  Loaded payment data for {len(payment_data)} transactions")
@@ -3907,24 +3908,24 @@ class OracleFusionIntegration:
             print("✓  Using payment file data for payment method detection")
 
             # Filter AR Invoice to transactions that have payment data
-            txn_numbers_in_payment_file = set(payment_data.keys())
-            if "Transaction Number" not in self.ar_df.columns:
-                print("⚠️  AR Invoice is missing 'Transaction Number' column")
+            sales_order_refs_in_payment_file = set(payment_data.keys())
+            if "Sales Order Number" not in self.ar_df.columns:
+                print("⚠️  AR Invoice is missing 'Sales Order Number' column")
                 return pd.DataFrame()
 
             # Get all transactions from payment file that match valid providers
-            qualifying_txns = set()
+            qualifying_sales_orders = set()
             payment_method_counts = {}
-            for txn_num, methods_dict in payment_data.items():
+            for sales_order_ref, methods_dict in payment_data.items():
                 for method, amt in methods_dict.items():
                     method_upper = method.upper()
                     if method_upper in valid_providers:
-                        qualifying_txns.add(txn_num)
+                        qualifying_sales_orders.add(sales_order_ref)
                         payment_method_counts[method_upper] = payment_method_counts.get(method_upper, 0) + 1
 
-            # Filter AR Invoice to qualifying transactions
+            # Filter AR Invoice to qualifying transactions by Sales Order Number
             invoices = self.ar_df[
-                self.ar_df["Transaction Number"].fillna("").astype(str).str.strip().isin(qualifying_txns)
+                self.ar_df["Sales Order Number"].fillna("").astype(str).str.strip().isin(qualifying_sales_orders)
             ].copy()
 
             if invoices.empty:
@@ -3974,14 +3975,15 @@ class OracleFusionIntegration:
             # Build expanded dataset with payment methods from payment file
             expanded_rows = []
             for _, ar_row in invoices.iterrows():
-                txn_num = str(ar_row.get("Transaction Number", "")).strip()
-                if txn_num in payment_data:
-                    methods_dict = payment_data[txn_num]
+                sales_order_ref = str(ar_row.get("Sales Order Number", "")).strip()
+                if sales_order_ref in payment_data:
+                    methods_dict = payment_data[sales_order_ref]
                     for method, method_amt in methods_dict.items():
                         method_upper = method.upper()
                         if method_upper in valid_providers:
                             expanded_rows.append({
-                                "Transaction Number": txn_num,
+                                "Transaction Number": ar_row.get("Transaction Number"),
+                                "Sales Order Number": sales_order_ref,
                                 "Receipt Method Name": method_upper,
                                 "Transaction Date": ar_row.get("Transaction Date"),
                                 "Transaction Line Amount": method_amt,
