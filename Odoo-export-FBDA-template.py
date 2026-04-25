@@ -4027,11 +4027,22 @@ class OracleFusionIntegration:
                 "Segment7": _to_text(sp_row.get("FUT_USED", "")),
             }
 
+        # Generate unique interface group identifier for this entire sheet
+        # Using timestamp to ensure uniqueness across multiple file generations
+        unique_interface_group_id = interface_group_id
+
         for _, row in grouped.iterrows():
             payment_method = str(row["Receipt Method Name"]).upper()
             amount = abs(float(row["Transaction Line Amount"]))
             transaction_date = pd.to_datetime(row["Transaction Date"]).strftime("%Y/%m/%d")
             warehouse = str(row.get("Warehouse Code", "") or "").strip().upper()
+
+            # Parse transaction date for formatting
+            trans_date_obj = pd.to_datetime(row["Transaction Date"])
+            # Format Period Name as "26-Mar" (day-month abbreviation)
+            formatted_period_name = trans_date_obj.strftime("%d-%b")
+            # Format timestamp for batch name as YYYYMMDD
+            timestamp_str = trans_date_obj.strftime("%Y%m%d")
 
             # Resolve cost center for this store/provider (when metadata loaded)
             cost_center = cost_center_lookup.get((warehouse, payment_method), "")
@@ -4081,8 +4092,14 @@ class OracleFusionIntegration:
                 credit_segments = {**base_segments, "Segment2": _to_text(mapping_row["Credit Account"])}
 
             # Batch and Journal Entry names
-            batch_name = f"M27 {payment_method.title()} sample - {batch_name_counter}"
-            journal_entry_name = f"Journal Import 1 sample - {journal_entry_counter}"
+            # Format: MAR-26: {{TABBY/TAMARA}} Vend -{{Store_name}}-{{timestamp_only_date_month_year}}
+            # Period name is in format "Mar-26" which gives us month and year
+            # Extract month from period_name (e.g., "Mar-26" -> "MAR")
+            month_name = formatted_period_name.split("-")[1].upper()  # Get month abbreviation and uppercase it
+            year_suffix = formatted_period_name.split("-")[0]  # Get day/year part
+            batch_name = f"{month_name}-{year_suffix}: {payment_method} Vend -{warehouse}-{timestamp_str}"
+            # REFERENCE4 (Journal Entry Name) should match REFERENCE1 (Batch Name)
+            journal_entry_name = batch_name
 
             common = {
                 "Status Code": "NEW",
@@ -4095,8 +4112,8 @@ class OracleFusionIntegration:
                 "Actual Flag": "A",
                 "REFERENCE1 (Batch Name)": batch_name,
                 "REFERENCE4 (Journal Entry Name)": journal_entry_name,
-                "Interface Group Identifier": interface_group_id,
-                "Period Name": period_name,
+                "Interface Group Identifier": unique_interface_group_id,
+                "Period Name": formatted_period_name,
             }
 
             debit_entry = {
@@ -4116,8 +4133,10 @@ class OracleFusionIntegration:
                 "Converted Credit Amount": amount,
             }
 
-            journal_entries.append(debit_entry)
+            # IMPORTANT: Credit entry must come first, then debit entry
+            # This matches the Oracle Fusion template format requirement
             journal_entries.append(credit_entry)
+            journal_entries.append(debit_entry)
 
             journal_entry_counter += 1
             if journal_entry_counter % 10 == 0:
