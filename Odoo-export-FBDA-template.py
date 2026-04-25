@@ -97,6 +97,9 @@ DEFAULT_TAX_CODE = "OUTPUT-GOODS-DOM-15%"
 # Miss Receipt (Miscellaneous Receipt) Organization ID
 MISS_RECEIPT_ORG_ID = "300000001421038"
 
+# Miss Receipt (Miscellaneous Receipt) Activity Name
+MISS_RECEIPT_ACTIVITY = "Bank Charge"
+
 STANDARD_RECEIPT_COLUMNS = [
     "ReceiptNumber",
     "ReceiptMethod",
@@ -2917,7 +2920,7 @@ class OracleFusionIntegration:
                 "OrgId":                  org_id,
                 "ReceiptNumber":          receipt_number,
                 "ReceiptMethodName":      receipt_method,
-                "ReceivableActivityName": bank_name,
+                "ReceivableActivityName": MISS_RECEIPT_ACTIVITY,
                 "BankAccountNumber":      bank_num,
             }
 
