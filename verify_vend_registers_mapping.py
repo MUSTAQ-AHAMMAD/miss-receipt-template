@@ -19,7 +19,7 @@ in `Odoo-export-FBDA-template.py::ReceiptMethodsCache.get_bank_account()`:
 For each register we check both code paths:
 
     Standard Receipt   →  Cash mapping
-    MISS Receipt       →  Mada / Visa / MasterCard / AMEX mappings
+    MISS Receipt       →  Mada / Visa / Master / AMEX mappings
 
 It reports:
     - Cash mismatches between vend `CASH_ACCOUNT` and Receipt_Methods.csv
@@ -53,7 +53,7 @@ def normalise_payment(raw: str) -> str:
     # Most-specific tokens first
     if "MADA"     in key: return "Mada"
     if "VISA"     in key: return "Visa"
-    if "MASTER"   in key or key.startswith("MC"): return "MasterCard"
+    if "MASTER"   in key or key.startswith("MC"): return "Master"
     if "CASH"     in key: return "Cash"
     # Production canonicalises "AMEX"/"AMERICAN EXPRESS" → "Amex"
     if "AMEX"     in key or "AMERICAN" in key: return "Amex"
@@ -225,7 +225,7 @@ def main() -> int:
                 f"vend cash='{reg['cash']}' but RM lookup -> '{match[0]}'"))
 
     # --- 2. Card methods (MISS receipt) ------------------------------------
-    card_methods = ["Mada", "Visa", "MasterCard", "Amex"]
+    card_methods = ["Mada", "Visa", "Master", "Amex"]
     bank_issues = defaultdict(list)
     bank_ok = defaultdict(int)
     for reg in registers:
