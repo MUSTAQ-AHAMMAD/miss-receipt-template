@@ -67,16 +67,16 @@ PAYMENT_METHOD_NORM: Dict[str, str] = {
     "GCCNET":      "GCCNET",
 }
 
-PAYMENT_BANK_MAP_FALLBACK: Dict[str, Tuple[str, str]] = {
-    "Cash":       ("Cash Bank",       "Cash Account"),
-    "Mada":       ("Mada Bank",       "Mada Account"),
-    "Visa":       ("Visa Bank",       "Visa Account"),
-    "MasterCard": ("MasterCard Bank", "MasterCard Account"),
-    "Amex":       ("Amex Bank",       "Amex Account"),
-    "Apple Pay":  ("Apple Pay Bank",  "Apple Pay Account"),
-    "STC Pay":    ("STC Pay Bank",    "STC Pay Account"),
+PAYMENT_BANK_MAP_FALLBACK: Dict[str, Tuple[str, str, str]] = {
+    "Cash":       ("Cash",       "Cash Bank",       "Cash Account"),
+    "Mada":       ("Mada",       "Mada Bank",       "Mada Account"),
+    "Visa":       ("Visa",       "Visa Bank",       "Visa Account"),
+    "MasterCard": ("MasterCard", "MasterCard Bank", "MasterCard Account"),
+    "Amex":       ("Amex",       "Amex Bank",       "Amex Account"),
+    "Apple Pay":  ("Apple Pay",  "Apple Pay Bank",  "Apple Pay Account"),
+    "STC Pay":    ("STC Pay",    "STC Pay Bank",    "STC Pay Account"),
 }
-DEFAULT_BANK: Tuple[str, str] = ("Cash Bank", "Cash Account")
+DEFAULT_BANK: Tuple[str, str, str] = ("Cash", "Cash Bank", "Cash Account")
 
 AR_STATIC: Dict[str, str] = {
     "Transaction Batch Source Name":       "Manual_Imported",
@@ -1524,10 +1524,11 @@ class ReceiptMethodsCache:
             canonical  = normalise_payment(method)
             acct_upper = acct_name.upper()
             key        = (acct_upper, canonical)
+            # Store (method_name_from_csv, bank_name, bank_number)
             if key not in self._exact:
-                self._exact[key] = (acct_name, acct_number)
+                self._exact[key] = (method, acct_name, acct_number)
             if canonical not in self._method:
-                self._method[canonical] = (acct_name, acct_number)
+                self._method[canonical] = (method, acct_name, acct_number)
             if org_id:
                 if key not in self._exact_org:
                     self._exact_org[key] = org_id
@@ -1537,14 +1538,19 @@ class ReceiptMethodsCache:
         self._loaded = True
         print(f"  ✓ Receipt_Methods.csv loaded: {len(self._exact):,} entries")
 
-    def get_bank_account(self, store_name: str, method: str) -> Tuple[str, str]:
+    def get_bank_account(self, store_name: str, method: str) -> Tuple[str, str, str]:
+        """
+        Look up bank account information for a given store and payment method.
+        Returns: (receipt_method_name, bank_account_name, bank_account_number)
+        """
         # Primary source: vend register file keyed by REGISTER_NAME (= SUBINVENTORY
         # = `Branch` from the Odoo payment-lines sheet). Standard receipts use
         # CASH_ACCOUNT, miscellaneous (card) receipts use BANK_ACCOUNT.
         if self._register_cache is not None:
             override = self._register_cache.get_account(store_name, method)
             if override is not None:
-                return override
+                # Register cache returns (bank_name, bank_number), prepend method
+                return (method, override[0], override[1])
 
         if not self._loaded:
             return PAYMENT_BANK_MAP_FALLBACK.get(method, DEFAULT_BANK)
@@ -2588,20 +2594,20 @@ class OracleFusionIntegration:
             customer_account = meta["BILL_TO_ACCOUNT"]
             customer_site    = meta["STD_RCPT_NO"]  # Use STD_RCPT_NO for receipt generation
 
-            bank_name, bank_acct_number = self.receipt_methods.get_bank_account(store, method)
+            receipt_method, bank_name, bank_acct_number = self.receipt_methods.get_bank_account(store, method)
 
             # AR invoice number is mandatory for receipt generation
             if not ar_txn:
                 vl.add(f"  ⚠ WARNING: Missing AR transaction number for {store} on {date_str}")
-                vl.add(f"            Skipping receipt generation for {method} payment")
+                vl.add(f"            Skipping receipt generation for {receipt_method} payment")
                 skipped_no_ar_txn += 1
                 continue
 
-            receipt_number = f"{method}-{ar_txn}"
+            receipt_number = f"{receipt_method}-{ar_txn}"
 
             row = {
                 "ReceiptNumber":               receipt_number,
-                "ReceiptMethod":               method,
+                "ReceiptMethod":               receipt_method,
                 "ReceiptDate":                 date_str,
                 "BusinessUnit":                business_unit,
                 "CustomerAccountNumber":       customer_account,
@@ -2613,10 +2619,10 @@ class OracleFusionIntegration:
             }
 
             # Add row to the method's list
-            method_rows[method].append(row)
+            method_rows[receipt_method].append(row)
 
             receipt_detail_rows.append({
-                "filename":       f"Receipt_{safe_filename(method)}.csv",
+                "filename":       f"Receipt_{safe_filename(receipt_method)}.csv",
                 "store":          store,
                 "date":           date_str,
                 "method":         method,
@@ -2891,16 +2897,16 @@ class OracleFusionIntegration:
             activity       = cfg.get("activity", "Misc Activity")  if cfg else "Misc Activity"
             charge_rate    = cfg.get("rate", 0.0)                  if cfg else 0.0
 
-            bank_name, bank_num = self.receipt_methods.get_bank_account(store, method)
+            receipt_method, bank_name, bank_num = self.receipt_methods.get_bank_account(store, method)
 
             # AR invoice number is mandatory for misc receipt generation
             if not ar_txn:
                 vl.add(f"  ⚠ WARNING: Missing AR transaction number for {store} on {date_str}")
-                vl.add(f"            Skipping misc receipt generation for {method} payment")
+                vl.add(f"            Skipping misc receipt generation for {receipt_method} payment")
                 skipped_no_ar_txn_misc += 1
                 continue
 
-            receipt_number = f"{method}-{ar_txn}-MISC"
+            receipt_number = f"{receipt_method}-{ar_txn}-MISC"
 
             row = {
                 "Amount":                 round(misc_amount, 4),
@@ -2910,16 +2916,16 @@ class OracleFusionIntegration:
                 "GlDate":                 date_str,
                 "OrgId":                  org_id,
                 "ReceiptNumber":          receipt_number,
-                "ReceiptMethodName":      method,
+                "ReceiptMethodName":      receipt_method,
                 "ReceivableActivityName": bank_name,
                 "BankAccountNumber":      bank_num,
             }
 
             # Add row to the method's list
-            method_rows[method].append(row)
+            method_rows[receipt_method].append(row)
 
             misc_detail_rows.append({
-                "filename":      f"MiscReceipt_{safe_filename(method)}.csv",
+                "filename":      f"MiscReceipt_{safe_filename(receipt_method)}.csv",
                 "store":         store,
                 "date":          date_str,
                 "method":        method,
