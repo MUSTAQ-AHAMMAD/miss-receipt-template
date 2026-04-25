@@ -94,6 +94,9 @@ AR_STATIC: Dict[str, str] = {
 
 DEFAULT_TAX_CODE = "OUTPUT-GOODS-DOM-15%"
 
+# Miss Receipt (Miscellaneous Receipt) Organization ID
+MISS_RECEIPT_ORG_ID = "300000001421038"
+
 STANDARD_RECEIPT_COLUMNS = [
     "ReceiptNumber",
     "ReceiptMethod",
@@ -2884,7 +2887,7 @@ class OracleFusionIntegration:
 
             cfg            = self.bank_charges.get(method, store)
             ar_txn         = agg_ar_txn.get((store, date_str), "")
-            org_id         = self.receipt_methods.get_org_id(store, method)
+            org_id         = MISS_RECEIPT_ORG_ID
             activity       = cfg.get("activity", "Misc Activity")  if cfg else "Misc Activity"
             charge_rate    = cfg.get("rate", 0.0)                  if cfg else 0.0
 
