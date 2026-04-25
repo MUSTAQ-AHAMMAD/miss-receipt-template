@@ -4009,16 +4009,22 @@ class OracleFusionIntegration:
         batch_name_counter = 1
         journal_entry_counter = 1
 
+        def _to_text(value) -> str:
+            """Convert any value to text, handling nulls/NaN/None properly."""
+            if pd.isna(value) or value is None:
+                return ""
+            return str(value).strip()
+
         def _seg_from_sp(sp_row: pd.Series, cost_center: str) -> dict:
             """Build a Segment1..Segment7 dict from a service-provider meta row."""
             return {
-                "Segment1": sp_row.get("COMPANY", ""),
-                "Segment2": sp_row.get("ACCOUNT", ""),
-                "Segment3": sp_row.get("DEPARTMENT", ""),
-                "Segment4": cost_center or sp_row.get("EXTRA_SEGMENT_1", ""),
-                "Segment5": sp_row.get("PRODUCT_CATEGORY", ""),
-                "Segment6": sp_row.get("INTER_COMPANY", ""),
-                "Segment7": sp_row.get("FUT_USED", ""),
+                "Segment1": _to_text(sp_row.get("COMPANY", "")),
+                "Segment2": _to_text(sp_row.get("ACCOUNT", "")),
+                "Segment3": _to_text(sp_row.get("DEPARTMENT", "")),
+                "Segment4": _to_text(cost_center or sp_row.get("EXTRA_SEGMENT_1", "")),
+                "Segment5": _to_text(sp_row.get("PRODUCT_CATEGORY", "")),
+                "Segment6": _to_text(sp_row.get("INTER_COMPANY", "")),
+                "Segment7": _to_text(sp_row.get("FUT_USED", "")),
             }
 
         for _, row in grouped.iterrows():
@@ -4064,15 +4070,15 @@ class OracleFusionIntegration:
                 currency_code = legacy_bu_config["Currency Code"]
 
                 base_segments = {
-                    "Segment1": mapping_row["Segment1"],
-                    "Segment3": mapping_row.get("Segment3", ""),
-                    "Segment4": cost_center or mapping_row.get("Segment4", ""),
-                    "Segment5": mapping_row.get("Segment5", ""),
-                    "Segment6": mapping_row.get("Segment6", ""),
-                    "Segment7": mapping_row.get("Segment7", ""),
+                    "Segment1": _to_text(mapping_row["Segment1"]),
+                    "Segment3": _to_text(mapping_row.get("Segment3", "")),
+                    "Segment4": _to_text(cost_center or mapping_row.get("Segment4", "")),
+                    "Segment5": _to_text(mapping_row.get("Segment5", "")),
+                    "Segment6": _to_text(mapping_row.get("Segment6", "")),
+                    "Segment7": _to_text(mapping_row.get("Segment7", "")),
                 }
-                debit_segments = {**base_segments, "Segment2": mapping_row["Debit Account"]}
-                credit_segments = {**base_segments, "Segment2": mapping_row["Credit Account"]}
+                debit_segments = {**base_segments, "Segment2": _to_text(mapping_row["Debit Account"])}
+                credit_segments = {**base_segments, "Segment2": _to_text(mapping_row["Credit Account"])}
 
             # Batch and Journal Entry names
             batch_name = f"M27 {payment_method.title()} sample - {batch_name_counter}"
@@ -4171,6 +4177,12 @@ class OracleFusionIntegration:
         for col in template_columns:
             if col not in journal_df.columns:
                 journal_df[col] = ""
+
+        # Ensure all segment columns are text and have no null values
+        segment_cols = [f"Segment{i}" for i in range(1, 31)]
+        for col in segment_cols:
+            if col in journal_df.columns:
+                journal_df[col] = journal_df[col].fillna("").astype(str)
 
         # Ensure END column has "END" value
         journal_df["END"] = "END"
