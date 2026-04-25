@@ -3360,11 +3360,11 @@ class OracleFusionIntegration:
         self,
         payment_file_path: str,
         inv_ref_set: set,
-    ) -> Optional[Tuple[Dict[str, Dict[str, float]], Dict[str, datetime]]]:
-        """Load an optional payment CSV and return ({inv_ref: {method: amount}}, {inv_ref: date}).
+    ) -> Optional[Tuple[Dict[str, Dict[str, float]], Dict[str, datetime], Dict[str, str]]]:
+        """Load an optional payment CSV and return ({inv_ref: {method: amount}}, {inv_ref: date}, {inv_ref: branch}).
 
         Recognises a wide range of column names for Sales Order / Order Ref,
-        Payment Method, Amount, and Date so that common export formats work without
+        Payment Method, Amount, Date, and Branch so that common export formats work without
         manual column renaming.  Returns None on failure (file not found or
         required columns missing).
         """
@@ -3395,6 +3395,11 @@ class OracleFusionIntegration:
             "Date", "Payment Date", "Transaction Date",
             "Payments/Date", "Order Date",
         ])
+        # Optional branch/store column
+        branch_col = find_col(pf, [
+            "Branch", "Store", "Store Name", "Warehouse",
+            "Location", "Shop", "Outlet",
+        ])
 
         missing = [n for n, c in [
             ("Sales Order / Order Ref", so_col),
@@ -3411,6 +3416,7 @@ class OracleFusionIntegration:
 
         result: Dict[str, Dict[str, float]] = defaultdict(lambda: defaultdict(float))
         dates: Dict[str, datetime] = {}
+        branches: Dict[str, str] = {}
         unmatched = 0
         unmatched_amount = 0.0
         synthetic_inv_counter = 1
@@ -3439,6 +3445,12 @@ class OracleFusionIntegration:
                 except Exception:
                     dates[inv] = datetime.now()
 
+            # Capture Branch/Store name if available
+            if branch_col and inv not in branches:
+                branch_value = safe_str(row.get(branch_col, "")).strip().upper()
+                if branch_value:
+                    branches[inv] = branch_value
+
             # CRITICAL FIX: Load ALL payments, not just matched ones
             # Standard receipts must reflect actual cash collected, regardless of AR Invoice matching
             result[inv][method] += amount
@@ -3452,7 +3464,9 @@ class OracleFusionIntegration:
                   f"AR Invoice Sales Order reference (amount: {unmatched_amount:,.2f} SAR)")
             print(f"    ✓ These payments WILL still generate standard receipts with fallback AR transaction numbers")
         print(f"  ✓ Payment file loaded: {len(result):,} total invoice references ({len(result) - unmatched:,} matched, {unmatched:,} unmatched)")
-        return (result, dates)
+        if branch_col:
+            print(f"  ✓ Captured Branch/Store names for {len(branches):,} transactions")
+        return (result, dates, branches)
 
     def load_from_ar_invoice(
         self,
@@ -3922,6 +3936,7 @@ class OracleFusionIntegration:
 
         # ── Load payment file (optional) ────────────────────────────────────
         payment_data: Dict[str, Dict[str, float]] = {}
+        payment_branches: Dict[str, str] = {}
         if payment_file_path and Path(payment_file_path).exists():
             print(f"✓  Loading payment file: {Path(payment_file_path).name}")
             try:
@@ -3937,7 +3952,7 @@ class OracleFusionIntegration:
                 # Load payment file using existing infrastructure
                 payment_result = self._load_payment_file(payment_file_path, ar_sales_order_numbers)
                 if payment_result is not None:
-                    payment_data, _ = payment_result
+                    payment_data, _, payment_branches = payment_result
                     print(f"✓  Loaded payment data for {len(payment_data)} transactions")
 
                     # Show breakdown of payment methods from payment file
@@ -3951,6 +3966,7 @@ class OracleFusionIntegration:
             except Exception as e:
                 print(f"⚠  Error loading payment file: {e}")
                 payment_data = {}
+                payment_branches = {}
 
         # ── Legacy config (fallback when service-provider meta is absent) ──
         legacy_bu_config = None
@@ -4063,7 +4079,7 @@ class OracleFusionIntegration:
 
 
 
-        # Group by Transaction + Payment Method (from payment file or AR) + Date + Warehouse
+        # Group by Transaction + Payment Method (from payment file or AR) + Date + Warehouse/Branch
         # When using payment file, we need to expand transactions based on payment methods
         if payment_data:
             # Build expanded dataset with payment methods from payment file
@@ -4072,6 +4088,10 @@ class OracleFusionIntegration:
                 sales_order_ref = str(ar_row.get("Sales Order Number", "")).strip()
                 if sales_order_ref in payment_data:
                     methods_dict = payment_data[sales_order_ref]
+                    # Get Branch from payment file if available, otherwise fall back to Warehouse Code from AR
+                    branch_from_payment = payment_branches.get(sales_order_ref, "")
+                    warehouse_code = branch_from_payment if branch_from_payment else str(ar_row.get("Warehouse Code", "")).strip()
+
                     for method, method_amt in methods_dict.items():
                         method_upper = method.upper()
                         if method_upper in valid_providers:
@@ -4081,7 +4101,7 @@ class OracleFusionIntegration:
                                 "Receipt Method Name": method_upper,
                                 "Transaction Date": ar_row.get("Transaction Date"),
                                 "Transaction Line Amount": method_amt,
-                                "Warehouse Code": ar_row.get("Warehouse Code", ""),
+                                "Warehouse Code": warehouse_code,
                             })
 
             if not expanded_rows:
