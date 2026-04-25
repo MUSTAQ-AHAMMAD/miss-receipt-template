@@ -7,11 +7,28 @@ retry logic, and comprehensive error reporting.
 ================================================================================
 """
 
+import os
 import time
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 import pandas as pd
+
+try:
+    import requests
+    from requests.auth import HTTPBasicAuth
+    REQUESTS_AVAILABLE = True
+except ImportError:
+    REQUESTS_AVAILABLE = False
+    print("WARNING: requests library not installed. Install with: pip install requests")
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv()  # Load environment variables from .env file
+    DOTENV_AVAILABLE = True
+except ImportError:
+    DOTENV_AVAILABLE = False
+    print("WARNING: python-dotenv not installed. Install with: pip install python-dotenv")
 
 from upload_logger import UploadLogger
 
@@ -25,7 +42,8 @@ class UploadManager:
     def __init__(
         self,
         api_endpoint: str = None,
-        api_key: str = None,
+        api_username: str = None,
+        api_password: str = None,
         logger: UploadLogger = None
     ):
         """
@@ -33,16 +51,61 @@ class UploadManager:
 
         Args:
             api_endpoint: Oracle Fusion API endpoint URL
-            api_key: Authentication key for the API
+            api_username: Oracle Fusion username
+            api_password: Oracle Fusion password
             logger: UploadLogger instance (creates new one if None)
         """
-        self.api_endpoint = api_endpoint or "https://your-oracle-instance.oracle.com/fscmRestApi/resources/..."
-        self.api_key = api_key
+        # Load from environment variables if not provided
+        self.api_endpoint = api_endpoint or os.getenv(
+            'ORACLE_API_ENDPOINT',
+            "https://your-oracle-instance.fa.oracle.com/fscmRestApi/resources/11.13.18.05"
+        )
+        self.api_username = api_username or os.getenv('ORACLE_API_USERNAME')
+        self.api_password = api_password or os.getenv('ORACLE_API_PASSWORD')
         self.logger = logger or UploadLogger()
 
-        # NOTE: Actual HTTP client would be imported here (requests, httpx, etc.)
-        # For now, this is a placeholder that logs what would be sent
-        self.mock_mode = True  # Set to False when real API is configured
+        # Configuration from environment
+        self.timeout = int(os.getenv('API_TIMEOUT', '30'))
+        self.debug_logging = os.getenv('API_DEBUG_LOGGING', 'false').lower() == 'true'
+
+        # Determine if we should use mock mode
+        # Mock mode is enabled if:
+        # 1. API_MOCK_MODE environment variable is explicitly set to true, OR
+        # 2. requests library is not available, OR
+        # 3. No credentials are configured
+        env_mock_mode = os.getenv('API_MOCK_MODE', 'true').lower() == 'true'
+        self.mock_mode = (
+            env_mock_mode or
+            not REQUESTS_AVAILABLE or
+            not self.api_username or
+            not self.api_password or
+            "your-oracle-instance" in self.api_endpoint
+        )
+
+        if self.mock_mode:
+            print("=" * 80)
+            print("⚠️  UPLOAD MANAGER RUNNING IN MOCK MODE")
+            print("=" * 80)
+            if not REQUESTS_AVAILABLE:
+                print("Reason: requests library not installed")
+                print("Fix: pip install requests")
+            elif not self.api_username or not self.api_password:
+                print("Reason: Oracle Fusion credentials not configured")
+                print("Fix: Set ORACLE_API_USERNAME and ORACLE_API_PASSWORD in .env file")
+            elif "your-oracle-instance" in self.api_endpoint:
+                print("Reason: Oracle Fusion API endpoint not configured")
+                print("Fix: Set ORACLE_API_ENDPOINT in .env file")
+            else:
+                print("Reason: API_MOCK_MODE=true in .env file")
+                print("Fix: Set API_MOCK_MODE=false in .env file")
+            print("=" * 80)
+        else:
+            print("=" * 80)
+            print("✅ UPLOAD MANAGER CONFIGURED FOR REAL API CALLS")
+            print(f"Endpoint: {self.api_endpoint}")
+            print(f"Username: {self.api_username}")
+            print(f"Timeout: {self.timeout}s")
+            print("=" * 80)
 
     def upload_receipt_file(
         self,
@@ -148,10 +211,10 @@ class UploadManager:
             (success, error_message, error_row)
         """
         # Prepare API request
-        endpoint = f"{self.api_endpoint}/receipts/{receipt_type.lower()}"
+        endpoint = f"{self.api_endpoint}/receivables/cashReceipts"
         headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {self.api_key}" if self.api_key else "Bearer <API_KEY_HERE>"
+            "Accept": "application/json"
         }
 
         # Convert CSV to API payload format
@@ -173,13 +236,45 @@ class UploadManager:
             # Mock response for testing/development
             response_status, response_body = self._mock_api_call(payload)
         else:
-            # Real API call would go here
-            # import requests
-            # response = requests.post(endpoint, json=payload, headers=headers)
-            # response_status = response.status_code
-            # response_body = response.json()
-            response_status = 501
-            response_body = {"error": "API not implemented - configure api_endpoint and api_key"}
+            # Real API call to Oracle Fusion
+            try:
+                if self.debug_logging:
+                    print(f"Making API call to: {endpoint}")
+                    print(f"Payload size: {len(str(payload))} bytes")
+
+                response = requests.post(
+                    endpoint,
+                    json=payload,
+                    headers=headers,
+                    auth=HTTPBasicAuth(self.api_username, self.api_password),
+                    timeout=self.timeout,
+                    verify=True  # Verify SSL certificates
+                )
+
+                response_status = response.status_code
+
+                try:
+                    response_body = response.json()
+                except Exception:
+                    # If response is not JSON, use text
+                    response_body = {"text": response.text}
+
+                if self.debug_logging:
+                    print(f"Response status: {response_status}")
+                    print(f"Response: {response_body}")
+
+            except requests.exceptions.Timeout:
+                response_status = 408
+                response_body = {"error": "Request timeout", "message": f"Request timed out after {self.timeout}s"}
+            except requests.exceptions.ConnectionError as e:
+                response_status = 503
+                response_body = {"error": "Connection error", "message": f"Could not connect to Oracle Fusion: {str(e)}"}
+            except requests.exceptions.RequestException as e:
+                response_status = 500
+                response_body = {"error": "Request error", "message": f"API request failed: {str(e)}"}
+            except Exception as e:
+                response_status = 500
+                response_body = {"error": "Unexpected error", "message": str(e)}
 
         duration_ms = int((time.time() - start_time) * 1000)
 
