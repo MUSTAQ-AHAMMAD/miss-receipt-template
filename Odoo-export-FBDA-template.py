@@ -2531,10 +2531,6 @@ class OracleFusionIntegration:
     def generate_standard_receipts(self) -> Dict[str, pd.DataFrame]:
         vl = self.vlog
 
-        agg_amount:    Dict[Tuple[str, str, str], float] = defaultdict(float)
-        agg_inv_count: Dict[Tuple[str, str, str], int]   = defaultdict(int)
-        agg_ar_txn:    Dict[Tuple[str, str], str]        = {}
-
         bnpl_skipped           = 0
         unknown_method_skipped = 0
 
@@ -2543,6 +2539,12 @@ class OracleFusionIntegration:
         accepted_methods_detail: Dict[str, float] = defaultdict(float)
         bnpl_methods_detail: Dict[str, float] = defaultdict(float)
 
+        # Group rows by payment method (not by date/store)
+        method_rows: Dict[str, List[Dict]] = defaultdict(list)
+        receipt_detail_rows: List[Dict] = []
+        skipped_no_ar_txn = 0
+
+        # Generate one receipt per invoice (not aggregated by store/date)
         for inv, methods in self.invoice_payments.items():
             ctype = self.invoice_ctype.get(inv, "NORMAL")
             if ctype in ("TABBY", "TAMARA"):
@@ -2556,9 +2558,17 @@ class OracleFusionIntegration:
             date_str  = format_date(sale_date)
             ar_txn    = self.invoice_to_ar_txn.get(inv, "")
 
-            sd_key = (store, date_str)
-            if sd_key not in agg_ar_txn and ar_txn:
-                agg_ar_txn[sd_key] = ar_txn
+            # AR invoice number is mandatory for receipt generation
+            if not ar_txn:
+                vl.add(f"  ⚠ WARNING: Missing AR transaction number for invoice {inv}")
+                vl.add(f"            Skipping receipt generation for this invoice")
+                skipped_no_ar_txn += 1
+                continue
+
+            meta, _          = self.metadata_cache.get(store, "NORMAL")
+            business_unit    = meta["BUSINESS_UNIT"]
+            customer_account = meta["BILL_TO_ACCOUNT"]
+            customer_site    = meta["STD_RCPT_NO"]  # Use STD_RCPT_NO for receipt generation
 
             for method, amount in methods.items():
                 if method.upper() in NO_RECEIPT_PAYMENT_METHODS:
@@ -2568,61 +2578,40 @@ class OracleFusionIntegration:
                     unknown_method_skipped += 1
                     skipped_methods_detail[method] += amount
                     continue
+
                 accepted_methods_detail[method] += amount
-                key = (store, date_str, method)
-                agg_amount[key]    += amount
-                agg_inv_count[key] += 1
 
-        # Group rows by payment method (not by date/store)
-        method_rows: Dict[str, List[Dict]] = defaultdict(list)
-        receipt_detail_rows: List[Dict] = []
-        skipped_no_ar_txn = 0
+                bank_name, bank_acct_number = self.receipt_methods.get_bank_account(store, method)
 
-        for (store, date_str, method), total in sorted(agg_amount.items()):
-            ar_txn           = agg_ar_txn.get((store, date_str), "")
-            meta, _          = self.metadata_cache.get(store, "NORMAL")
-            business_unit    = meta["BUSINESS_UNIT"]
-            customer_account = meta["BILL_TO_ACCOUNT"]
-            customer_site    = meta["STD_RCPT_NO"]  # Use STD_RCPT_NO for receipt generation
+                receipt_number = f"{method}-{ar_txn}"
 
-            bank_name, bank_acct_number = self.receipt_methods.get_bank_account(store, method)
+                row = {
+                    "ReceiptNumber":               receipt_number,
+                    "ReceiptMethod":               method,
+                    "ReceiptDate":                 date_str,
+                    "BusinessUnit":                business_unit,
+                    "CustomerAccountNumber":       customer_account,
+                    "CustomerSite":                customer_site,
+                    "Amount":                      round(amount, 2),
+                    "Currency":                    "SAR",
+                    "RemittanceBankAccountNumber": bank_acct_number,
+                    "AccountingDate":              date_str,
+                }
 
-            # AR invoice number is mandatory for receipt generation
-            if not ar_txn:
-                vl.add(f"  ⚠ WARNING: Missing AR transaction number for {store} on {date_str}")
-                vl.add(f"            Skipping receipt generation for {method} payment")
-                skipped_no_ar_txn += 1
-                continue
+                # Add row to the method's list
+                method_rows[method].append(row)
 
-            receipt_number = f"{method}-{ar_txn}"
-
-            row = {
-                "ReceiptNumber":               receipt_number,
-                "ReceiptMethod":               method,
-                "ReceiptDate":                 date_str,
-                "BusinessUnit":                business_unit,
-                "CustomerAccountNumber":       customer_account,
-                "CustomerSite":                customer_site,
-                "Amount":                      round(total, 2),
-                "Currency":                    "SAR",
-                "RemittanceBankAccountNumber": bank_acct_number,
-                "AccountingDate":              date_str,
-            }
-
-            # Add row to the method's list
-            method_rows[method].append(row)
-
-            receipt_detail_rows.append({
-                "filename":       f"Receipt_{safe_filename(method)}.csv",
-                "store":          store,
-                "date":           date_str,
-                "method":         method,
-                "inv_count":      agg_inv_count.get((store, date_str, method), 0),
-                "amount":         total,
-                "receipt_number": receipt_number,
-                "bank_name":      bank_name,
-                "bank_account":   bank_acct_number,
-            })
+                receipt_detail_rows.append({
+                    "filename":       f"Receipt_{safe_filename(method)}.csv",
+                    "store":          store,
+                    "date":           date_str,
+                    "method":         method,
+                    "inv_count":      1,
+                    "amount":         amount,
+                    "receipt_number": receipt_number,
+                    "bank_name":      bank_name,
+                    "bank_account":   bank_acct_number,
+                })
 
         # Create one file per payment method with all rows consolidated
         receipt_files: Dict[str, pd.DataFrame] = {}
