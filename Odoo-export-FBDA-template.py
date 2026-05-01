@@ -3943,23 +3943,25 @@ class OracleFusionIntegration:
 
         # ── Load payment file (optional) ────────────────────────────────────
         payment_data: Dict[str, Dict[str, float]] = {}
+        payment_dates: Dict[str, datetime] = {}
         payment_branches: Dict[str, str] = {}
         if payment_file_path and Path(payment_file_path).exists():
             print(f"✓  Loading payment file: {Path(payment_file_path).name}")
             try:
-                # Create a set of Sales Order Numbers from AR Invoice
+                # Create a set of Sales Order Numbers from AR Invoice (if available)
                 # Payment files contain "Order Ref" which matches "Sales Order Number", not "Transaction Number"
                 if self.ar_df is not None and "Sales Order Number" in self.ar_df.columns:
                     ar_sales_order_numbers = set(
                         self.ar_df["Sales Order Number"].fillna("").astype(str).str.strip().unique()
                     )
                 else:
+                    # When no AR Invoice, accept all transactions from payment file
                     ar_sales_order_numbers = set()
 
                 # Load payment file using existing infrastructure
                 payment_result = self._load_payment_file(payment_file_path, ar_sales_order_numbers)
                 if payment_result is not None:
-                    payment_data, _, payment_branches = payment_result
+                    payment_data, payment_dates, payment_branches = payment_result
                     print(f"✓  Loaded payment data for {len(payment_data)} transactions")
 
                     # Show breakdown of payment methods from payment file
@@ -3973,6 +3975,7 @@ class OracleFusionIntegration:
             except Exception as e:
                 print(f"⚠  Error loading payment file: {e}")
                 payment_data = {}
+                payment_dates = {}
                 payment_branches = {}
 
         # ── Legacy config (fallback when service-provider meta is absent) ──
@@ -4024,36 +4027,63 @@ class OracleFusionIntegration:
         if payment_data:
             print("✓  Using payment file data for payment method detection")
 
-            # Filter AR Invoice to transactions that have payment data
-            sales_order_refs_in_payment_file = set(payment_data.keys())
-            if "Sales Order Number" not in self.ar_df.columns:
-                print("⚠️  AR Invoice is missing 'Sales Order Number' column")
-                return pd.DataFrame()
+            # When AR Invoice is not provided, work directly from payment file
+            if self.ar_df is None or self.ar_df.empty:
+                print("✓  Working with payment file only (no AR Invoice provided)")
 
-            # Get all transactions from payment file that match valid providers
-            qualifying_sales_orders = set()
-            payment_method_counts = {}
-            for sales_order_ref, methods_dict in payment_data.items():
-                for method, amt in methods_dict.items():
-                    method_upper = method.upper()
-                    if method_upper in valid_providers:
-                        qualifying_sales_orders.add(sales_order_ref)
-                        payment_method_counts[method_upper] = payment_method_counts.get(method_upper, 0) + 1
+                # Get all transactions from payment file that match valid providers
+                qualifying_sales_orders = set()
+                payment_method_counts = {}
+                for sales_order_ref, methods_dict in payment_data.items():
+                    for method, amt in methods_dict.items():
+                        method_upper = method.upper()
+                        if method_upper in valid_providers:
+                            qualifying_sales_orders.add(sales_order_ref)
+                            payment_method_counts[method_upper] = payment_method_counts.get(method_upper, 0) + 1
 
-            # Filter AR Invoice to qualifying transactions by Sales Order Number
-            invoices = self.ar_df[
-                self.ar_df["Sales Order Number"].fillna("").astype(str).str.strip().isin(qualifying_sales_orders)
-            ].copy()
+                if not qualifying_sales_orders:
+                    print(f"⚠️  No qualifying transactions found in payment file "
+                          f"(providers: {sorted(valid_providers)})")
+                    print(f"\n💡 TIP: Checked {len(payment_data)} transactions from payment file")
+                    return pd.DataFrame()
 
-            if invoices.empty:
-                print(f"⚠️  No qualifying transactions found in payment file "
-                      f"(providers: {sorted(valid_providers)})")
-                print(f"\n💡 TIP: Checked {len(payment_data)} transactions from payment file")
-                return pd.DataFrame()
+                print(f"✓  Found {len(qualifying_sales_orders)} qualifying transactions in payment file")
+                for method, count in sorted(payment_method_counts.items()):
+                    print(f"   - {method}: {count} payment(s)")
 
-            print(f"✓  Found {len(invoices)} AR Invoice rows matching payment file with qualifying payment methods")
-            for method, count in sorted(payment_method_counts.items()):
-                print(f"   - {method}: {count} payment(s)")
+                # Create a placeholder invoices dataframe (will not be used)
+                invoices = pd.DataFrame()
+            else:
+                # Filter AR Invoice to transactions that have payment data
+                sales_order_refs_in_payment_file = set(payment_data.keys())
+                if "Sales Order Number" not in self.ar_df.columns:
+                    print("⚠️  AR Invoice is missing 'Sales Order Number' column")
+                    return pd.DataFrame()
+
+                # Get all transactions from payment file that match valid providers
+                qualifying_sales_orders = set()
+                payment_method_counts = {}
+                for sales_order_ref, methods_dict in payment_data.items():
+                    for method, amt in methods_dict.items():
+                        method_upper = method.upper()
+                        if method_upper in valid_providers:
+                            qualifying_sales_orders.add(sales_order_ref)
+                            payment_method_counts[method_upper] = payment_method_counts.get(method_upper, 0) + 1
+
+                # Filter AR Invoice to qualifying transactions by Sales Order Number
+                invoices = self.ar_df[
+                    self.ar_df["Sales Order Number"].fillna("").astype(str).str.strip().isin(qualifying_sales_orders)
+                ].copy()
+
+                if invoices.empty:
+                    print(f"⚠️  No qualifying transactions found in payment file "
+                          f"(providers: {sorted(valid_providers)})")
+                    print(f"\n💡 TIP: Checked {len(payment_data)} transactions from payment file")
+                    return pd.DataFrame()
+
+                print(f"✓  Found {len(invoices)} AR Invoice rows matching payment file with qualifying payment methods")
+                for method, count in sorted(payment_method_counts.items()):
+                    print(f"   - {method}: {count} payment(s)")
 
         else:
             # Show all unique payment methods in AR Invoice for debugging
@@ -4091,32 +4121,74 @@ class OracleFusionIntegration:
         if payment_data:
             # Build expanded dataset with payment methods from payment file
             expanded_rows = []
-            for _, ar_row in invoices.iterrows():
-                sales_order_ref = str(ar_row.get("Sales Order Number", "")).strip()
-                if sales_order_ref in payment_data:
-                    methods_dict = payment_data[sales_order_ref]
-                    # Get Branch from payment file if available, otherwise fall back to Warehouse Code from AR
-                    branch_from_payment = payment_branches.get(sales_order_ref, "")
-                    warehouse_code = branch_from_payment if branch_from_payment else str(ar_row.get("Warehouse Code", "")).strip()
+
+            if self.ar_df is None or self.ar_df.empty or invoices.empty:
+                # Working with payment file only (no AR Invoice)
+                print("✓  Building journal entries directly from payment file")
+                for sales_order_ref, methods_dict in payment_data.items():
+                    # Filter to only qualifying payment methods
+                    has_qualifying_method = any(
+                        method.upper() in valid_providers
+                        for method in methods_dict.keys()
+                    )
+                    if not has_qualifying_method:
+                        continue
+
+                    # Get date from payment file if available, otherwise use current date
+                    transaction_date = payment_dates.get(sales_order_ref)
+                    if transaction_date is None:
+                        # Use current date as fallback
+                        transaction_date = datetime.now()
+
+                    # Get branch from payment file
+                    warehouse_code = payment_branches.get(sales_order_ref, "")
 
                     for method, method_amt in methods_dict.items():
                         method_upper = method.upper()
                         if method_upper in valid_providers:
                             expanded_rows.append({
-                                "Transaction Number": ar_row.get("Transaction Number"),
+                                "Transaction Number": sales_order_ref,  # Use Sales Order as Transaction Number
                                 "Sales Order Number": sales_order_ref,
                                 "Receipt Method Name": method_upper,
-                                "Transaction Date": ar_row.get("Transaction Date"),
+                                "Transaction Date": transaction_date,
                                 "Transaction Line Amount": method_amt,
                                 "Warehouse Code": warehouse_code,
                             })
 
-            if not expanded_rows:
-                print("⚠️  No qualifying payment methods found in payment file data")
-                return pd.DataFrame()
+                if not expanded_rows:
+                    print("⚠️  No qualifying payment methods found in payment file data")
+                    return pd.DataFrame()
 
-            grouped = pd.DataFrame(expanded_rows)
-            print(f"✓  Expanded {len(invoices)} AR transactions into {len(grouped)} payment entries")
+                grouped = pd.DataFrame(expanded_rows)
+                print(f"✓  Created {len(grouped)} journal entries from payment file")
+            else:
+                # AR Invoice is available - use it to enrich payment data
+                for _, ar_row in invoices.iterrows():
+                    sales_order_ref = str(ar_row.get("Sales Order Number", "")).strip()
+                    if sales_order_ref in payment_data:
+                        methods_dict = payment_data[sales_order_ref]
+                        # Get Branch from payment file if available, otherwise fall back to Warehouse Code from AR
+                        branch_from_payment = payment_branches.get(sales_order_ref, "")
+                        warehouse_code = branch_from_payment if branch_from_payment else str(ar_row.get("Warehouse Code", "")).strip()
+
+                        for method, method_amt in methods_dict.items():
+                            method_upper = method.upper()
+                            if method_upper in valid_providers:
+                                expanded_rows.append({
+                                    "Transaction Number": ar_row.get("Transaction Number"),
+                                    "Sales Order Number": sales_order_ref,
+                                    "Receipt Method Name": method_upper,
+                                    "Transaction Date": ar_row.get("Transaction Date"),
+                                    "Transaction Line Amount": method_amt,
+                                    "Warehouse Code": warehouse_code,
+                                })
+
+                if not expanded_rows:
+                    print("⚠️  No qualifying payment methods found in payment file data")
+                    return pd.DataFrame()
+
+                grouped = pd.DataFrame(expanded_rows)
+                print(f"✓  Expanded {len(invoices)} AR transactions into {len(grouped)} payment entries")
         else:
             # Group by Transaction + Payment Method + Date, and (when available) Warehouse Code
             group_cols = ["Transaction Number", "Receipt Method Name", "Transaction Date"]

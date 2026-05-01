@@ -326,18 +326,20 @@ def _run_integration(sid: str, cfg: dict):
                 # ── AR INVOICE MODE (default) ──
                 progress(20, "Loading reference data files…")
 
-                integration.load_from_ar_invoice(
-                    ar_invoice_path      = cfg["ar_invoice"],
-                    metadata_path        = cfg.get("metadata", ""),
-                    receipt_methods_path = cfg.get("receipt_methods", ""),
-                    bank_charges_path    = cfg.get("bank_charges", ""),
-                    payment_file_path    = cfg.get("payment_file", ""),
-                    registers_path       = cfg.get("registers", ""),
-                )
-
                 # Check if this is journal-only mode
                 if mode == "journal":
                     # ── JOURNAL TEMPLATE ONLY MODE ──
+                    # Only load AR Invoice if provided (optional when payment file is provided)
+                    if cfg.get("ar_invoice"):
+                        integration.load_from_ar_invoice(
+                            ar_invoice_path      = cfg["ar_invoice"],
+                            metadata_path        = cfg.get("metadata", ""),
+                            receipt_methods_path = cfg.get("receipt_methods", ""),
+                            bank_charges_path    = cfg.get("bank_charges", ""),
+                            payment_file_path    = cfg.get("payment_file", ""),
+                            registers_path       = cfg.get("registers", ""),
+                        )
+
                     progress(50, "Generating Journal Import Template…")
                     period_name = cfg.get("period_name", "Mar-26")
                     interface_group_id = int(cfg.get("interface_group_id", "114"))
@@ -356,9 +358,13 @@ def _run_integration(sid: str, cfg: dict):
                         stat("Journal Entries", f"{len(journal_df)//2:,} transactions")
                         stat("Total Journal Lines", f"{len(journal_df):,} lines (debit + credit)")
                     else:
-                        stat("Journal Entries", "0 (No TAMARA/TABBY transactions)")
-                        log("⚠ No TAMARA or TABBY transactions found in the AR Invoice")
-                        log("Please verify that the AR Invoice contains transactions with Receipt Method Name = 'TAMARA' or 'TABBY'")
+                        stat("Journal Entries", "0 (No qualifying service provider transactions)")
+                        if cfg.get("ar_invoice"):
+                            log("⚠ No qualifying service provider transactions found in the AR Invoice")
+                            log("Please verify that the AR Invoice or Payment File contains transactions with qualifying payment methods")
+                        else:
+                            log("⚠ No qualifying service provider transactions found in the Payment File")
+                            log("Please verify that the Payment File contains transactions with qualifying payment methods")
 
                     progress(90, "Writing verification report…")
                     # Create a minimal verification report for journal-only mode
@@ -376,6 +382,16 @@ def _run_integration(sid: str, cfg: dict):
 
                 else:
                     # ── STANDARD AR INVOICE MODE (with receipts) ──
+                    # AR Invoice is required for standard mode
+                    integration.load_from_ar_invoice(
+                        ar_invoice_path      = cfg["ar_invoice"],
+                        metadata_path        = cfg.get("metadata", ""),
+                        receipt_methods_path = cfg.get("receipt_methods", ""),
+                        bank_charges_path    = cfg.get("bank_charges", ""),
+                        payment_file_path    = cfg.get("payment_file", ""),
+                        registers_path       = cfg.get("registers", ""),
+                    )
+
                     progress(50, "Generating Standard Receipts…")
                     std_rcp = integration.generate_standard_receipts()
                     integration.save_standard_receipts(std_rcp)
@@ -612,8 +628,9 @@ def run_integration():
         if journal_payment_file:
             cfg["journal_payment_file"] = journal_payment_file
 
-        if "ar_invoice" not in cfg:
-            return jsonify({"error": "Required file 'AR Invoice CSV' is missing."}), 400
+        # AR Invoice is now optional if payment file is provided
+        if "ar_invoice" not in cfg and not journal_payment_file:
+            return jsonify({"error": "Required file 'AR Invoice CSV' or 'Payment Lines File' is missing. Please provide at least one."}), 400
 
         # Journal mode always generates journal template
         cfg["generate_journal"] = "true"

@@ -748,7 +748,7 @@
               onclick="setMode('journal')">
         <i class="fa-solid fa-book"></i>
         Generate Journal Template
-        <span style="font-size:.7rem;opacity:.7;display:block;margin-top:2px;">AR Invoice → Oracle Fusion Journal Import for TAMARA/TABBY</span>
+        <span style="font-size:.7rem;opacity:.7;display:block;margin-top:2px;">Payment Lines → Oracle Fusion Journal Import for TAMARA/TABBY/HUNGERSTATION/MRSOOL</span>
       </button>
       <button id="mode-btn-merge" class="mode-btn"
               onclick="setMode('merge')">
@@ -892,8 +892,9 @@
       <div style="padding:20px; background:rgba(16,185,129,.08); border:1px solid rgba(16,185,129,.25); border-radius:12px; margin-bottom:20px;">
         <h4 style="margin-bottom:10px; color:var(--accent-green);"><i class="fa-solid fa-book"></i> Generate Journal Template for Service Providers</h4>
         <p style="font-size:.85rem; color:var(--text-muted); margin-bottom:16px;">
-          Upload an AR Invoice CSV file to generate Oracle Fusion Journal Import templates for service provider transactions (TAMARA, TABBY, HUNGERSTATION, MRSOOL).
+          Upload a Payment Lines file (required) to generate Oracle Fusion Journal Import templates for service provider transactions (TAMARA, TABBY, HUNGERSTATION, MRSOOL).
           The system will automatically filter qualifying transactions and create balanced debit/credit journal entries using the configured account mappings.
+          You can optionally upload an AR Invoice CSV file for additional transaction details.
         </p>
         <div style="font-size:.80rem; color:var(--text-muted); margin-top:12px; padding:10px; background:rgba(16,185,129,.05); border-left:3px solid var(--accent-green); border-radius:6px;">
           <strong>Configuration Modes:</strong><br/>
@@ -904,20 +905,37 @@
       </div>
 
       <div class="upload-grid">
-        <!-- AR Invoice -->
-        <div class="file-zone" id="zone-journal-ar" ondragover="onDragOver(event,'journal-ar')" ondragleave="onDragLeave('journal-ar')" ondrop="onDrop(event,'journal-ar')">
-          <input type="file" id="file-journal-ar" accept=".csv" onchange="onFileChange('journal-ar',this)" />
+        <!-- Payment Lines (Required) -->
+        <div class="file-zone" id="zone-journal-payment-file" ondragover="onDragOver(event,'journal-payment-file')" ondragleave="onDragLeave('journal-payment-file')" ondrop="onDrop(event,'journal-payment-file')">
+          <input type="file" id="file-journal-payment-file" accept=".csv,.xlsx" onchange="onFileChange('journal-payment-file',this)" />
           <div class="fz-header">
-            <div class="fz-icon required"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+            <div class="fz-icon required"><i class="fa-solid fa-credit-card"></i></div>
             <div>
-              <div class="fz-title">AR Invoice CSV</div>
-              <div class="fz-subtitle">Oracle Fusion AR Invoice with TAMARA/TABBY transactions</div>
+              <div class="fz-title">Payment Lines CSV/XLSX</div>
+              <div class="fz-subtitle">Payment transactions with payment method details</div>
               <span class="fz-badge req">Required</span>
             </div>
           </div>
           <div class="fz-msg">
             <p>Click to browse or drag & drop</p>
-            <small>CSV file containing AR Invoice data with payment methods</small>
+            <small>CSV/XLSX file containing payment lines with Order Ref, Payment Method, Amount</small>
+          </div>
+        </div>
+
+        <!-- AR Invoice (Optional) -->
+        <div class="file-zone" id="zone-journal-ar" ondragover="onDragOver(event,'journal-ar')" ondragleave="onDragLeave('journal-ar')" ondrop="onDrop(event,'journal-ar')">
+          <input type="file" id="file-journal-ar" accept=".csv" onchange="onFileChange('journal-ar',this)" />
+          <div class="fz-header">
+            <div class="fz-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+            <div>
+              <div class="fz-title">AR Invoice CSV</div>
+              <div class="fz-subtitle">Oracle Fusion AR Invoice (optional, for additional transaction details)</div>
+              <span class="fz-badge opt">Optional</span>
+            </div>
+          </div>
+          <div class="fz-msg">
+            <p>Click to browse or drag & drop</p>
+            <small>CSV file containing AR Invoice data with payment methods (optional)</small>
           </div>
         </div>
 
@@ -1034,7 +1052,7 @@
         </div>
         <div style="margin-top:12px; padding:12px; background:rgba(16,185,129,.08); border:1px solid rgba(16,185,129,.25); border-radius:8px; font-size:.82rem; color:var(--text-muted);">
           <i class="fa-solid fa-info-circle" style="color:var(--accent-green);"></i>
-          <strong>Note:</strong> The system will automatically detect qualifying service provider transactions (TAMARA, TABBY, HUNGERSTATION, MRSOOL) from the AR Invoice and generate balanced debit/credit journal entries. Service provider metadata enables support for all providers; legacy configuration supports TAMARA/TABBY only.
+          <strong>Note:</strong> The system will automatically detect qualifying service provider transactions (TAMARA, TABBY, HUNGERSTATION, MRSOOL) from the Payment Lines file and generate balanced debit/credit journal entries. Payment Lines file is required; AR Invoice is optional for additional transaction details. Service provider metadata enables support for all providers; legacy configuration supports TAMARA/TABBY only.
         </div>
       </div>
     </div><!-- /uploads-journal -->
@@ -1542,8 +1560,8 @@
         return;
       }
     } else if (currentMode === 'journal') {
-      if (!fileMap['journal-ar']) {
-        showBanner('error', 'Please upload your AR Invoice CSV file for journal generation.');
+      if (!fileMap['journal-payment-file']) {
+        showBanner('error', 'Please upload your Payment Lines CSV/XLSX file for journal generation.');
         return;
       }
     }
