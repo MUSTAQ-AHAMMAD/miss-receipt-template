@@ -4032,10 +4032,9 @@ class OracleFusionIntegration:
                 return pd.DataFrame()
 
         # Determine which payment methods qualify
-        if sp_meta is not None and not sp_meta.empty:
-            valid_providers = set(sp_meta["SERVICE_PROVIDER"].unique())
-        else:
-            valid_providers = {"TAMARA", "TABBY"}
+        # Journal templates are ONLY for TABBY and TAMARA (Buy Now Pay Later providers)
+        # Other payment methods (Cash, Mada, Visa, etc.) use receipts, not journal entries
+        valid_providers = {"TAMARA", "TABBY"}
 
         # Guard: ensure we have either payment file data or Receipt Method Name column
         if not payment_data and (self.ar_df is None or "Receipt Method Name" not in self.ar_df.columns):
