@@ -3437,15 +3437,22 @@ class OracleFusionIntegration:
                 continue
 
             # Parse date if available
-            if date_col and inv not in dates:
+            # IMPORTANT: Check date for every row, not just first occurrence
+            # This ensures we capture valid dates even when previous rows had invalid/empty dates
+            if date_col:
                 try:
                     date_parsed = pd.to_datetime(row.get(date_col), errors="coerce")
                     if pd.notna(date_parsed):
-                        dates[inv] = date_parsed
-                    else:
-                        dates[inv] = datetime.now()  # Fallback for NaT
+                        # Always update with valid date (overwrites previous invalid dates or keeps first valid date)
+                        if inv not in dates or dates[inv] is None or pd.isna(dates.get(inv)):
+                            dates[inv] = date_parsed
+                    elif inv not in dates:
+                        # Only set None if we haven't seen this invoice before
+                        # This allows subsequent rows with valid dates to update it
+                        dates[inv] = None
                 except Exception:
-                    dates[inv] = datetime.now()
+                    if inv not in dates:
+                        dates[inv] = None
 
             # Capture Branch/Store name if available
             if branch_col and inv not in branches:
@@ -3467,7 +3474,10 @@ class OracleFusionIntegration:
             print(f"    ✓ These payments WILL still generate standard receipts with fallback AR transaction numbers")
         print(f"  ✓ Payment file loaded: {len(result):,} total invoice references ({len(result) - unmatched:,} matched, {unmatched:,} unmatched)")
         if date_col:
-            print(f"  ✓ Captured transaction dates for {len(dates):,} transactions from column '{date_col}'")
+            valid_dates = sum(1 for d in dates.values() if d is not None and not pd.isna(d))
+            print(f"  ✓ Captured transaction dates for {valid_dates}/{len(dates)} transactions from column '{date_col}'")
+            if valid_dates < len(dates):
+                print(f"    ⚠ {len(dates) - valid_dates} transaction(s) have missing/invalid dates and will use current date as fallback")
         else:
             print(f"  ⚠ No date column found in payment file - will use current date as fallback")
         if branch_col:
@@ -4142,8 +4152,8 @@ class OracleFusionIntegration:
 
                     # Get date from payment file if available, otherwise use current date
                     transaction_date = payment_dates.get(sales_order_ref)
-                    if transaction_date is None:
-                        # Use current date as fallback
+                    if transaction_date is None or pd.isna(transaction_date):
+                        # Use current date as fallback only when date is truly missing
                         transaction_date = datetime.now()
 
                     # Get branch from payment file
