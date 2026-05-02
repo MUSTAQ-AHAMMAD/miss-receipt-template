@@ -3887,9 +3887,10 @@ class OracleFusionIntegration:
 
         Negative Amount Handling:
             When a negative payment amount is detected (refunds/returns), the system automatically
-            reverses the debit/credit entry order. For positive amounts, credit entry comes first
-            followed by debit. For negative amounts, debit comes first followed by credit. The
-            absolute value is used for the amounts in both cases.
+            swaps the debit and credit account assignments. For positive amounts, the standard
+            account mapping is used. For negative amounts, the accounts are swapped so the amount
+            appears in the debit column instead of credit. The absolute value is used for all
+            amounts (no negative signs appear in the output).
 
         Args:
             journal_config_path: Legacy JOURNAL_CONFIG.csv (business unit configuration).
@@ -4341,32 +4342,48 @@ class OracleFusionIntegration:
                 "Period Name": formatted_period_name,
             }
 
-            debit_entry = {
-                **common,
-                **debit_segments,
-                "Entered Debit Amount": abs_amount,
-                "Entered Credit Amount": "",
-                "Converted Debit Amount": abs_amount,
-                "Converted Credit Amount": "",
-            }
-            credit_entry = {
-                **common,
-                **credit_segments,
-                "Entered Debit Amount": "",
-                "Entered Credit Amount": abs_amount,
-                "Converted Debit Amount": "",
-                "Converted Credit Amount": abs_amount,
-            }
-
-            # IMPORTANT: For positive amounts, credit entry comes first, then debit entry
-            # For negative amounts (refunds/returns), reverse the order: debit first, then credit
-            # This matches the Oracle Fusion template format requirement
+            # IMPORTANT: For negative amounts (refunds/returns), swap the debit/credit accounts
+            # This means the amount that would normally be in credit goes to debit instead
             if is_negative_amount:
-                journal_entries.append(debit_entry)
-                journal_entries.append(credit_entry)
+                # Swap: use credit segments for debit entry and debit segments for credit entry
+                debit_entry = {
+                    **common,
+                    **credit_segments,  # Swapped: credit segments used for debit entry
+                    "Entered Debit Amount": abs_amount,
+                    "Entered Credit Amount": "",
+                    "Converted Debit Amount": abs_amount,
+                    "Converted Credit Amount": "",
+                }
+                credit_entry = {
+                    **common,
+                    **debit_segments,  # Swapped: debit segments used for credit entry
+                    "Entered Debit Amount": "",
+                    "Entered Credit Amount": abs_amount,
+                    "Converted Debit Amount": "",
+                    "Converted Credit Amount": abs_amount,
+                }
             else:
-                journal_entries.append(credit_entry)
-                journal_entries.append(debit_entry)
+                # Normal flow for positive amounts
+                debit_entry = {
+                    **common,
+                    **debit_segments,
+                    "Entered Debit Amount": abs_amount,
+                    "Entered Credit Amount": "",
+                    "Converted Debit Amount": abs_amount,
+                    "Converted Credit Amount": "",
+                }
+                credit_entry = {
+                    **common,
+                    **credit_segments,
+                    "Entered Debit Amount": "",
+                    "Entered Credit Amount": abs_amount,
+                    "Converted Debit Amount": "",
+                    "Converted Credit Amount": abs_amount,
+                }
+
+            # For both positive and negative amounts, credit entry comes first, then debit entry
+            journal_entries.append(credit_entry)
+            journal_entries.append(debit_entry)
 
             journal_entry_counter += 1
             if journal_entry_counter % 10 == 0:
@@ -4441,7 +4458,7 @@ class OracleFusionIntegration:
 
         print(f"✓  Generated {len(journal_df)} journal entries ({len(journal_df)//2} transactions)")
         if negative_amount_count > 0:
-            print(f"ℹ️  Note: {negative_amount_count} transaction(s) with negative amounts had reversed debit/credit order")
+            print(f"ℹ️  Note: {negative_amount_count} transaction(s) with negative amounts had swapped debit/credit accounts")
         print("=" * 72)
 
         return journal_df
