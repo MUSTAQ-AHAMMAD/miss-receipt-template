@@ -3885,6 +3885,12 @@ class OracleFusionIntegration:
             Segment5 = PRODUCT_CATEGORY   Segment6 = INTER_COMPANY
             Segment7 = FUT_USED
 
+        Negative Amount Handling:
+            When a negative payment amount is detected (refunds/returns), the system automatically
+            reverses the debit/credit entry order. For positive amounts, credit entry comes first
+            followed by debit. For negative amounts, debit comes first followed by credit. The
+            absolute value is used for the amounts in both cases.
+
         Args:
             journal_config_path: Legacy JOURNAL_CONFIG.csv (business unit configuration).
             account_mapping_path: Legacy JOURNAL_ACCOUNT_MAPPING.csv (account segment mapping).
@@ -4217,6 +4223,7 @@ class OracleFusionIntegration:
         journal_entries = []
         batch_name_counter = 1
         journal_entry_counter = 1
+        negative_amount_count = 0
 
         def _to_text(value) -> str:
             """Convert any value to text, handling nulls/NaN/None properly."""
@@ -4255,6 +4262,15 @@ class OracleFusionIntegration:
 
             # Resolve cost center for this store/provider (when metadata loaded)
             cost_center = cost_center_lookup.get((warehouse, payment_method), "")
+
+            # Check if amount is negative to determine if we should reverse the entry order
+            is_negative_amount = amount < 0
+            # Use absolute value for the amounts in journal entries
+            abs_amount = abs(amount)
+
+            # Count negative amounts for reporting
+            if is_negative_amount:
+                negative_amount_count += 1
 
             if sp_meta is not None and not sp_meta.empty:
                 sp_rows = sp_meta[sp_meta["SERVICE_PROVIDER"] == payment_method]
@@ -4328,24 +4344,29 @@ class OracleFusionIntegration:
             debit_entry = {
                 **common,
                 **debit_segments,
-                "Entered Debit Amount": amount,
+                "Entered Debit Amount": abs_amount,
                 "Entered Credit Amount": "",
-                "Converted Debit Amount": amount,
+                "Converted Debit Amount": abs_amount,
                 "Converted Credit Amount": "",
             }
             credit_entry = {
                 **common,
                 **credit_segments,
                 "Entered Debit Amount": "",
-                "Entered Credit Amount": amount,
+                "Entered Credit Amount": abs_amount,
                 "Converted Debit Amount": "",
-                "Converted Credit Amount": amount,
+                "Converted Credit Amount": abs_amount,
             }
 
-            # IMPORTANT: Credit entry must come first, then debit entry
+            # IMPORTANT: For positive amounts, credit entry comes first, then debit entry
+            # For negative amounts (refunds/returns), reverse the order: debit first, then credit
             # This matches the Oracle Fusion template format requirement
-            journal_entries.append(credit_entry)
-            journal_entries.append(debit_entry)
+            if is_negative_amount:
+                journal_entries.append(debit_entry)
+                journal_entries.append(credit_entry)
+            else:
+                journal_entries.append(credit_entry)
+                journal_entries.append(debit_entry)
 
             journal_entry_counter += 1
             if journal_entry_counter % 10 == 0:
@@ -4419,6 +4440,8 @@ class OracleFusionIntegration:
         journal_df = journal_df[template_columns]
 
         print(f"✓  Generated {len(journal_df)} journal entries ({len(journal_df)//2} transactions)")
+        if negative_amount_count > 0:
+            print(f"ℹ️  Note: {negative_amount_count} transaction(s) with negative amounts had reversed debit/credit order")
         print("=" * 72)
 
         return journal_df
