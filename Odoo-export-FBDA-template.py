@@ -3393,7 +3393,9 @@ class OracleFusionIntegration:
         # Optional date column
         date_col = find_col(pf, [
             "Date", "Payment Date", "Transaction Date",
-            "Payments/Date", "Order Date",
+            "Payments/Date", "Payments/Payment Date", "Order Date",
+            "Date Order", "Create Date", "Accounting Date",
+            "Invoice Date", "Order Lines/Create Date",
         ])
         # Optional branch/store column
         branch_col = find_col(pf, [
@@ -3464,6 +3466,10 @@ class OracleFusionIntegration:
                   f"AR Invoice Sales Order reference (amount: {unmatched_amount:,.2f} SAR)")
             print(f"    ✓ These payments WILL still generate standard receipts with fallback AR transaction numbers")
         print(f"  ✓ Payment file loaded: {len(result):,} total invoice references ({len(result) - unmatched:,} matched, {unmatched:,} unmatched)")
+        if date_col:
+            print(f"  ✓ Captured transaction dates for {len(dates):,} transactions from column '{date_col}'")
+        else:
+            print(f"  ⚠ No date column found in payment file - will use current date as fallback")
         if branch_col:
             print(f"  ✓ Captured Branch/Store names for {len(branches):,} transactions")
         return (result, dates, branches)
@@ -4226,7 +4232,7 @@ class OracleFusionIntegration:
 
         for _, row in grouped.iterrows():
             payment_method = str(row["Receipt Method Name"]).upper()
-            amount = abs(float(row["Transaction Line Amount"]))
+            amount = float(row["Transaction Line Amount"])
             transaction_date = pd.to_datetime(row["Transaction Date"]).strftime("%Y/%m/%d")
             warehouse = str(row.get("Warehouse Code", "") or "").strip().upper()
 
