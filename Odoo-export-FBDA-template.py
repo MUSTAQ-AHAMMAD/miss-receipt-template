@@ -4032,10 +4032,9 @@ class OracleFusionIntegration:
                 return pd.DataFrame()
 
         # Determine which payment methods qualify
-        if sp_meta is not None and not sp_meta.empty:
-            valid_providers = set(sp_meta["SERVICE_PROVIDER"].unique())
-        else:
-            valid_providers = {"TAMARA", "TABBY"}
+        # Journal templates are ONLY for TABBY and TAMARA (Buy Now Pay Later providers)
+        # Other payment methods (Cash, Mada, Visa, etc.) use receipts, not journal entries
+        valid_providers = {"TAMARA", "TABBY"}
 
         # Guard: ensure we have either payment file data or Receipt Method Name column
         if not payment_data and (self.ar_df is None or "Receipt Method Name" not in self.ar_df.columns):
@@ -4272,7 +4271,7 @@ class OracleFusionIntegration:
             # Count negative amounts for reporting
             if is_negative_amount:
                 negative_amount_count += 1
-                print(f"  ℹ️  Negative amount detected: {amount:.2f} → Will use absolute value {abs_amount:.2f} in credit column")
+                print(f"  ℹ️  Negative amount detected: {amount:.2f} → Will use double-debit format with absolute value {abs_amount:.2f}")
 
             if sp_meta is not None and not sp_meta.empty:
                 sp_rows = sp_meta[sp_meta["SERVICE_PROVIDER"] == payment_method]
@@ -4343,26 +4342,44 @@ class OracleFusionIntegration:
                 "Period Name": formatted_period_name,
             }
 
-            # IMPORTANT: For both positive and negative amounts, put amounts in CREDIT columns
-            # For negative amounts, use absolute value (no negative sign)
-            # Debit entry always goes in Entered Debit Amount column
-            debit_entry = {
-                **common,
-                **debit_segments,
-                "Entered Debit Amount": abs_amount,
-                "Entered Credit Amount": "",
-                "Converted Debit Amount": abs_amount,
-                "Converted Credit Amount": "",
-            }
-            # Credit entry always goes in Entered Credit Amount column (for both positive and negative)
-            credit_entry = {
-                **common,
-                **credit_segments,
-                "Entered Debit Amount": "",
-                "Entered Credit Amount": abs_amount,
-                "Converted Debit Amount": "",
-                "Converted Credit Amount": abs_amount,
-            }
+            # Handle positive vs negative amounts with different formats
+            if is_negative_amount:
+                # NEGATIVE AMOUNTS: Use double-debit format (both entries in Debit column)
+                # This signals to Oracle Fusion that this is a reversal transaction
+                debit_entry = {
+                    **common,
+                    **debit_segments,
+                    "Entered Debit Amount": abs_amount,
+                    "Entered Credit Amount": "",
+                    "Converted Debit Amount": abs_amount,
+                    "Converted Credit Amount": "",
+                }
+                credit_entry = {
+                    **common,
+                    **credit_segments,
+                    "Entered Debit Amount": abs_amount,
+                    "Entered Credit Amount": "",
+                    "Converted Debit Amount": abs_amount,
+                    "Converted Credit Amount": "",
+                }
+            else:
+                # POSITIVE AMOUNTS: Use standard debit/credit split
+                debit_entry = {
+                    **common,
+                    **debit_segments,
+                    "Entered Debit Amount": abs_amount,
+                    "Entered Credit Amount": "",
+                    "Converted Debit Amount": abs_amount,
+                    "Converted Credit Amount": "",
+                }
+                credit_entry = {
+                    **common,
+                    **credit_segments,
+                    "Entered Debit Amount": "",
+                    "Entered Credit Amount": abs_amount,
+                    "Converted Debit Amount": "",
+                    "Converted Credit Amount": abs_amount,
+                }
 
             # For both positive and negative amounts, credit entry comes first, then debit entry
             journal_entries.append(credit_entry)
