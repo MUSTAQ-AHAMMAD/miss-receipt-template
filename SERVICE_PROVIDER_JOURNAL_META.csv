@@ -13,11 +13,3 @@
 4,SA,300000001418025,,2001,HUNGERSTATION,DEBIT,Vend Sales Issue Hanger,Vend RMA Hanger,"01","5000104","52","00","01","00",,,,Vend,Vend,"0",,25,0.025
 5,SA,300000001418025,,2001,MRSOOL,CREDIT,Vend Sales Issue Marsool,Vend RMA Marsool,"01","3010009","53","00","01","00",,,,Vend,Vend,"1",,,0.15
 6,SA,300000001418025,,2001,MRSOOL,DEBIT,Vend Sales Issue Marsool,Vend RMA Marsool,"01","5000104","53","00","01","00",,,,Vend,Vend,"1",,,0.15
-15,SA,300000001418025,,2001,CASH,CREDIT,Vend Sales Issue Hanger,Vend RMA Hanger,"01","3020044","46","00","01","00",,,,Vend,Vend,"0",,1,
-16,SA,300000001418025,,2001,CASH,DEBIT,Vend Sales Issue Hanger,Vend RMA Hanger,"01","5000104","46","00","01","00",,,,Vend,Vend,"0",,1,
-17,SA,300000001418025,,2001,MADA,CREDIT,Vend Sales Issue Hanger,Vend RMA Hanger,"01","3020044","46","00","01","00",,,,Vend,Vend,"0",,1,
-18,SA,300000001418025,,2001,MADA,DEBIT,Vend Sales Issue Hanger,Vend RMA Hanger,"01","5000104","46","00","01","00",,,,Vend,Vend,"0",,1,
-19,SA,300000001418025,,2001,VISA,CREDIT,Vend Sales Issue Hanger,Vend RMA Hanger,"01","3020044","46","00","01","00",,,,Vend,Vend,"0",,1,
-20,SA,300000001418025,,2001,VISA,DEBIT,Vend Sales Issue Hanger,Vend RMA Hanger,"01","5000104","46","00","01","00",,,,Vend,Vend,"0",,1,
-21,SA,300000001418025,,2001,MASTER,CREDIT,Vend Sales Issue Hanger,Vend RMA Hanger,"01","3020044","46","00","01","00",,,,Vend,Vend,"0",,1,
-22,SA,300000001418025,,2001,MASTER,DEBIT,Vend Sales Issue Hanger,Vend RMA Hanger,"01","5000104","46","00","01","00",,,,Vend,Vend,"0",,1,
