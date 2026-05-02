@@ -4272,7 +4272,7 @@ class OracleFusionIntegration:
             # Count negative amounts for reporting
             if is_negative_amount:
                 negative_amount_count += 1
-                print(f"  ℹ️  Negative amount detected: {amount:.2f} → Will use double-debit format with absolute value {abs_amount:.2f}")
+                print(f"  ℹ️  Negative amount detected: {amount:.2f} → Will use absolute value {abs_amount:.2f} in credit column")
 
             if sp_meta is not None and not sp_meta.empty:
                 sp_rows = sp_meta[sp_meta["SERVICE_PROVIDER"] == payment_method]
@@ -4343,45 +4343,26 @@ class OracleFusionIntegration:
                 "Period Name": formatted_period_name,
             }
 
-            # IMPORTANT: For negative amounts (refunds/returns), put amount in DEBIT column for both entries
-            # This signals to Oracle that this is a reversal transaction
-            if is_negative_amount:
-                # For negative amounts: both entries use DEBIT column with absolute value
-                # Keep the same account segments (no swapping)
-                credit_entry = {
-                    **common,
-                    **credit_segments,  # Use normal credit segments
-                    "Entered Debit Amount": abs_amount,  # Amount in DEBIT column
-                    "Entered Credit Amount": "",
-                    "Converted Debit Amount": abs_amount,
-                    "Converted Credit Amount": "",
-                }
-                debit_entry = {
-                    **common,
-                    **debit_segments,  # Use normal debit segments
-                    "Entered Debit Amount": abs_amount,  # Amount in DEBIT column
-                    "Entered Credit Amount": "",
-                    "Converted Debit Amount": abs_amount,
-                    "Converted Credit Amount": "",
-                }
-            else:
-                # Normal flow for positive amounts
-                debit_entry = {
-                    **common,
-                    **debit_segments,
-                    "Entered Debit Amount": abs_amount,
-                    "Entered Credit Amount": "",
-                    "Converted Debit Amount": abs_amount,
-                    "Converted Credit Amount": "",
-                }
-                credit_entry = {
-                    **common,
-                    **credit_segments,
-                    "Entered Debit Amount": "",
-                    "Entered Credit Amount": abs_amount,
-                    "Converted Debit Amount": "",
-                    "Converted Credit Amount": abs_amount,
-                }
+            # IMPORTANT: For both positive and negative amounts, put amounts in CREDIT columns
+            # For negative amounts, use absolute value (no negative sign)
+            # Debit entry always goes in Entered Debit Amount column
+            debit_entry = {
+                **common,
+                **debit_segments,
+                "Entered Debit Amount": abs_amount,
+                "Entered Credit Amount": "",
+                "Converted Debit Amount": abs_amount,
+                "Converted Credit Amount": "",
+            }
+            # Credit entry always goes in Entered Credit Amount column (for both positive and negative)
+            credit_entry = {
+                **common,
+                **credit_segments,
+                "Entered Debit Amount": "",
+                "Entered Credit Amount": abs_amount,
+                "Converted Debit Amount": "",
+                "Converted Credit Amount": abs_amount,
+            }
 
             # For both positive and negative amounts, credit entry comes first, then debit entry
             journal_entries.append(credit_entry)
