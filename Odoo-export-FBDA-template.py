@@ -4271,7 +4271,7 @@ class OracleFusionIntegration:
             # Count negative amounts for reporting
             if is_negative_amount:
                 negative_amount_count += 1
-                print(f"  ℹ️  Negative amount detected: {amount:.2f} → Will use double-debit format with absolute value {abs_amount:.2f}")
+                print(f"  ℹ️  Negative amount detected: {amount:.2f} → Will swap account segments for reversal with absolute value {abs_amount:.2f}")
 
             if sp_meta is not None and not sp_meta.empty:
                 sp_rows = sp_meta[sp_meta["SERVICE_PROVIDER"] == payment_method]
@@ -4344,11 +4344,12 @@ class OracleFusionIntegration:
 
             # Handle positive vs negative amounts with different formats
             if is_negative_amount:
-                # NEGATIVE AMOUNTS: Use double-debit format (both entries in Debit column)
-                # This signals to Oracle Fusion that this is a reversal transaction
+                # NEGATIVE AMOUNTS: Swap account segments to create reversal
+                # For reversal: credit account gets debited, debit account gets credited
+                # This ensures entries remain balanced (total debits = total credits)
                 debit_entry = {
                     **common,
-                    **debit_segments,
+                    **credit_segments,  # Use credit account segments for the debit entry
                     "Entered Debit Amount": abs_amount,
                     "Entered Credit Amount": "",
                     "Converted Debit Amount": abs_amount,
@@ -4356,11 +4357,11 @@ class OracleFusionIntegration:
                 }
                 credit_entry = {
                     **common,
-                    **credit_segments,
-                    "Entered Debit Amount": abs_amount,
-                    "Entered Credit Amount": "",
-                    "Converted Debit Amount": abs_amount,
-                    "Converted Credit Amount": "",
+                    **debit_segments,  # Use debit account segments for the credit entry
+                    "Entered Debit Amount": "",
+                    "Entered Credit Amount": abs_amount,
+                    "Converted Debit Amount": "",
+                    "Converted Credit Amount": abs_amount,
                 }
             else:
                 # POSITIVE AMOUNTS: Use standard debit/credit split
@@ -4458,7 +4459,7 @@ class OracleFusionIntegration:
 
         print(f"✓  Generated {len(journal_df)} journal entries ({len(journal_df)//2} transactions)")
         if negative_amount_count > 0:
-            print(f"ℹ️  Note: {negative_amount_count} transaction(s) with negative amounts used double-debit format (both entries in debit column)")
+            print(f"ℹ️  Note: {negative_amount_count} transaction(s) with negative amounts used swapped account segments for reversal")
         print("=" * 72)
 
         return journal_df
