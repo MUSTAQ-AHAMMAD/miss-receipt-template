@@ -4348,25 +4348,25 @@ class OracleFusionIntegration:
             # - Sum of Debit amounts MUST equal sum of Credit amounts (balanced entries)
 
             if is_negative_amount:
-                # NEGATIVE AMOUNTS: Use double-credit format (both entries in Credit column)
+                # NEGATIVE AMOUNTS: Use double-debit format (both entries in Debit column)
                 # This creates an unbalanced entry that signals Oracle Fusion it's a reversal
-                # 3-series (credit_segments) goes in CREDIT column (reversed from normal debit)
-                # 5-series (debit_segments) goes in CREDIT column (reversed from normal credit)
+                # 3-series (credit_segments) goes in DEBIT column (reversed from normal credit)
+                # 5-series (debit_segments) goes in DEBIT column (reversed from normal debit)
                 credit_account_entry = {
                     **common,
                     **credit_segments,  # 3-series account (3020044)
-                    "Entered Debit Amount": "",
-                    "Entered Credit Amount": abs_amount,  # Amount in CREDIT column (reversed)
-                    "Converted Debit Amount": "",
-                    "Converted Credit Amount": abs_amount,
+                    "Entered Debit Amount": abs_amount,  # Amount in DEBIT column (reversed)
+                    "Entered Credit Amount": "",
+                    "Converted Debit Amount": abs_amount,
+                    "Converted Credit Amount": "",
                 }
                 debit_account_entry = {
                     **common,
                     **debit_segments,  # 5-series account (5000104)
-                    "Entered Debit Amount": "",
-                    "Entered Credit Amount": abs_amount,  # Amount in CREDIT column (reversed)
-                    "Converted Debit Amount": "",
-                    "Converted Credit Amount": abs_amount,
+                    "Entered Debit Amount": abs_amount,  # Amount in DEBIT column (reversed)
+                    "Entered Credit Amount": "",
+                    "Converted Debit Amount": abs_amount,
+                    "Converted Credit Amount": "",
                 }
             else:
                 # POSITIVE AMOUNTS: Use standard format
