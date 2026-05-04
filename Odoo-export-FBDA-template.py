@@ -4346,11 +4346,11 @@ class OracleFusionIntegration:
             # - 3 Series accounts (3020044) must ALWAYS be in DEBIT column
             # - 5 Series accounts (5000104) must ALWAYS be in CREDIT column
             # - Sum of Debit amounts MUST equal sum of Credit amounts (balanced entries)
-            #
-            # For BOTH positive and negative amounts:
-            # - 3-series (credit_segments with account 3020044) goes in DEBIT column
-            # - 5-series (debit_segments with account 5000104) goes in CREDIT column
-            # - Always use absolute value to maintain proper balance
+            # - This applies to BOTH positive and negative amounts (use absolute values)
+
+            # Standard balanced format for ALL amounts (positive and negative)
+            # 3-series (credit_segments with account 3020044) goes in DEBIT column
+            # 5-series (debit_segments with account 5000104) goes in CREDIT column
 
             credit_account_entry = {
                 **common,
