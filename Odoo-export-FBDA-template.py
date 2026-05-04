@@ -4342,31 +4342,31 @@ class OracleFusionIntegration:
                 "Period Name": formatted_period_name,
             }
 
-            # CRITICAL: Per "Journal Entire Steps.docx" requirements:
-            # - 3 Series accounts (3020044) must ALWAYS be in DEBIT column
-            # - 5 Series accounts (5000104) must ALWAYS be in CREDIT column
+            # CRITICAL: Metadata labels indicate destination columns:
+            # - Rows labeled "CREDIT" in metadata have account 3020044 → goes in CREDIT column
+            # - Rows labeled "DEBIT" in metadata have account 5000104 → goes in DEBIT column
             # - Sum of Debit amounts MUST equal sum of Credit amounts (balanced entries)
             # - This applies to BOTH positive and negative amounts (use absolute values)
 
             # Standard balanced format for ALL amounts (positive and negative)
-            # 3-series (credit_segments with account 3020044) goes in DEBIT column
-            # 5-series (debit_segments with account 5000104) goes in CREDIT column
+            # credit_segments (from "CREDIT" row, has 3020044) goes in CREDIT column
+            # debit_segments (from "DEBIT" row, has 5000104) goes in DEBIT column
 
             credit_account_entry = {
                 **common,
-                **credit_segments,  # 3-series account (3020044)
-                "Entered Debit Amount": abs_amount,  # Amount in DEBIT column
-                "Entered Credit Amount": "",
-                "Converted Debit Amount": abs_amount,
-                "Converted Credit Amount": "",
-            }
-            debit_account_entry = {
-                **common,
-                **debit_segments,  # 5-series account (5000104)
+                **credit_segments,  # 3020044 from "CREDIT" metadata row
                 "Entered Debit Amount": "",
                 "Entered Credit Amount": abs_amount,  # Amount in CREDIT column
                 "Converted Debit Amount": "",
                 "Converted Credit Amount": abs_amount,
+            }
+            debit_account_entry = {
+                **common,
+                **debit_segments,  # 5000104 from "DEBIT" metadata row
+                "Entered Debit Amount": abs_amount,  # Amount in DEBIT column
+                "Entered Credit Amount": "",
+                "Converted Debit Amount": abs_amount,
+                "Converted Credit Amount": "",
             }
 
             # Append entries in order: credit account (3-series) first, then debit account (5-series)
