@@ -4271,7 +4271,7 @@ class OracleFusionIntegration:
             # Count negative amounts for reporting
             if is_negative_amount:
                 negative_amount_count += 1
-                print(f"  ℹ️  Negative amount detected: {amount:.2f} → Will use standard balanced format with absolute value {abs_amount:.2f} (3-series in Debit, 5-series in Credit)")
+                print(f"  ℹ️  Negative amount detected: {amount:.2f} → Will use reversal format with absolute value {abs_amount:.2f} (3-series in Credit, 5-series in Debit)")
 
             if sp_meta is not None and not sp_meta.empty:
                 sp_rows = sp_meta[sp_meta["SERVICE_PROVIDER"] == payment_method]
@@ -4342,32 +4342,51 @@ class OracleFusionIntegration:
                 "Period Name": formatted_period_name,
             }
 
-            # CRITICAL: Metadata labels indicate destination columns:
-            # - Rows labeled "CREDIT" in metadata have account 3020044 → goes in CREDIT column
-            # - Rows labeled "DEBIT" in metadata have account 5000104 → goes in DEBIT column
-            # - Sum of Debit amounts MUST equal sum of Credit amounts (balanced entries)
-            # - This applies to BOTH positive and negative amounts (use absolute values)
+            # CRITICAL: Amount sign determines debit/credit placement:
+            # POSITIVE amounts:
+            #   - 3-series accounts (3020044) → DEBIT columns
+            #   - 5-series accounts (5000104) → CREDIT columns
+            # NEGATIVE amounts (reversals):
+            #   - 3-series accounts (3020044) → CREDIT columns
+            #   - 5-series accounts (5000104) → DEBIT columns
+            # Always use absolute values for amounts
 
-            # Standard balanced format for ALL amounts (positive and negative)
-            # credit_segments (from "CREDIT" row, has 3020044) goes in CREDIT column
-            # debit_segments (from "DEBIT" row, has 5000104) goes in DEBIT column
-
-            credit_account_entry = {
-                **common,
-                **credit_segments,  # 3020044 from "CREDIT" metadata row
-                "Entered Debit Amount": "",
-                "Entered Credit Amount": abs_amount,  # Amount in CREDIT column
-                "Converted Debit Amount": "",
-                "Converted Credit Amount": abs_amount,
-            }
-            debit_account_entry = {
-                **common,
-                **debit_segments,  # 5000104 from "DEBIT" metadata row
-                "Entered Debit Amount": abs_amount,  # Amount in DEBIT column
-                "Entered Credit Amount": "",
-                "Converted Debit Amount": abs_amount,
-                "Converted Credit Amount": "",
-            }
+            if is_negative_amount:
+                # NEGATIVE: 3-series in Credit, 5-series in Debit
+                credit_account_entry = {
+                    **common,
+                    **credit_segments,  # 3020044 from "CREDIT" metadata row
+                    "Entered Debit Amount": "",
+                    "Entered Credit Amount": abs_amount,  # 3-series in CREDIT for negative
+                    "Converted Debit Amount": "",
+                    "Converted Credit Amount": abs_amount,
+                }
+                debit_account_entry = {
+                    **common,
+                    **debit_segments,  # 5000104 from "DEBIT" metadata row
+                    "Entered Debit Amount": abs_amount,  # 5-series in DEBIT for negative
+                    "Entered Credit Amount": "",
+                    "Converted Debit Amount": abs_amount,
+                    "Converted Credit Amount": "",
+                }
+            else:
+                # POSITIVE: 3-series in Debit, 5-series in Credit
+                credit_account_entry = {
+                    **common,
+                    **credit_segments,  # 3020044 from "CREDIT" metadata row
+                    "Entered Debit Amount": abs_amount,  # 3-series in DEBIT for positive
+                    "Entered Credit Amount": "",
+                    "Converted Debit Amount": abs_amount,
+                    "Converted Credit Amount": "",
+                }
+                debit_account_entry = {
+                    **common,
+                    **debit_segments,  # 5000104 from "DEBIT" metadata row
+                    "Entered Debit Amount": "",
+                    "Entered Credit Amount": abs_amount,  # 5-series in CREDIT for positive
+                    "Converted Debit Amount": "",
+                    "Converted Credit Amount": abs_amount,
+                }
 
             # Append entries in order: credit account (3-series) first, then debit account (5-series)
             journal_entries.append(credit_account_entry)
