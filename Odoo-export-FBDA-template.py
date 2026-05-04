@@ -4351,6 +4351,7 @@ class OracleFusionIntegration:
             # Standard balanced format for ALL amounts (positive and negative)
             # 3-series (credit_segments with account 3020044) goes in DEBIT column
             # 5-series (debit_segments with account 5000104) goes in CREDIT column
+
             credit_account_entry = {
                 **common,
                 **credit_segments,  # 3-series account (3020044)
