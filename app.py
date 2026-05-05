@@ -298,6 +298,8 @@ def _run_integration(sid: str, cfg: dict):
                         service_provider_meta_path=cfg.get("service_provider_meta", ""),
                         cost_center_meta_path=cfg.get("cost_center_meta", ""),
                         payment_file_path="",
+                        sales_lines_file_path="",
+                        charges_file_path="",
                     )
                     if not journal_df.empty:
                         integration.save_journal_template(journal_df)
@@ -352,6 +354,8 @@ def _run_integration(sid: str, cfg: dict):
                         service_provider_meta_path=cfg.get("service_provider_meta", ""),
                         cost_center_meta_path=cfg.get("cost_center_meta", ""),
                         payment_file_path=cfg.get("journal_payment_file", ""),
+                        sales_lines_file_path=cfg.get("journal_sales_lines_file", ""),
+                        charges_file_path=cfg.get("journal_charges_file", ""),
                     )
                     if not journal_df.empty:
                         integration.save_journal_template(journal_df)
@@ -627,6 +631,16 @@ def run_integration():
         journal_payment_file = _save_upload(sid, "journal-payment-file")
         if journal_payment_file:
             cfg["journal_payment_file"] = journal_payment_file
+
+        # Optional sales lines file for journal mode (for per-item charge calculation)
+        journal_sales_lines_file = _save_upload(sid, "journal-sales-lines-file")
+        if journal_sales_lines_file:
+            cfg["journal_sales_lines_file"] = journal_sales_lines_file
+
+        # Optional charges file for journal mode (defaults to SERVICE_PROVIDER_JOURNAL_META_Charges.csv)
+        journal_charges_file = _save_upload(sid, "journal-charges-file")
+        if journal_charges_file:
+            cfg["journal_charges_file"] = journal_charges_file
 
         # AR Invoice is now optional if payment file is provided
         if "ar_invoice" not in cfg and not journal_payment_file:
