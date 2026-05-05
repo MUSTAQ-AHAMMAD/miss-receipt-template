@@ -75,10 +75,17 @@ def process_orders(sales_file, payment_file, charges_file):
     print(f"✓ Loaded charges data: {len(charges_lookup)} provider configurations")
 
     # Show available charge rates
-    print("\nCharge Rates Configuration:")
+    print("\nCharge Rates Configuration (from CSV):")
     for (provider, is_cash), rate in sorted(charges_lookup.items()):
         cash_label = "CASH" if is_cash == "1" else "NON-CASH"
         print(f"  {provider:15s} ({cash_label:8s}): {rate*100:.2f}%")
+
+    # Override with user-specified rates for TABBY and TAMARA
+    print("\n⚠️  NOTE: Using USER-SPECIFIED rates (overriding CSV):")
+    print("  TABBY:  0.5% (0.005)")
+    print("  TAMARA: 0.3% (0.003)")
+    charges_lookup[('TABBY', '0')] = 0.005
+    charges_lookup[('TAMARA', '0')] = 0.003
 
     # Filter payment file to only TABBY and TAMARA
     valid_providers = {'TABBY', 'TAMARA'}

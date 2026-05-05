@@ -3867,6 +3867,8 @@ class OracleFusionIntegration:
         cost_center_meta_path: str = "",
         is_cash: str = "0",
         payment_file_path: str = "",
+        sales_lines_file_path: str = "",
+        charges_file_path: str = "",
     ) -> pd.DataFrame:
         """
         Generate Journal Import Template for Oracle Fusion from AR Invoice and Payment data.
@@ -3906,6 +3908,11 @@ class OracleFusionIntegration:
             payment_file_path: Optional path to payment file (XLSX/CSV) containing detailed
                 payment method breakdown per transaction. If provided, payment methods from
                 this file will be used instead of the AR Invoice's Receipt Method Name.
+            sales_lines_file_path: Optional path to sales lines file (XLSX/CSV) containing
+                line item details per order. Used for per-item charge calculations.
+            charges_file_path: Optional path to SERVICE_PROVIDER_JOURNAL_META_Charges.csv
+                containing charge rates for each service provider. Used to calculate charges
+                per the formula: Total Charge = (Amount × Rate) × (1 + VAT).
 
         Notes:
             When ``cost_center_meta_path`` yields no match for a given store/provider,
@@ -3963,6 +3970,62 @@ class OracleFusionIntegration:
                     cost_center_lookup.setdefault(key, code)
             print(f"✓  Loaded FUSION_SALES_METADATA_Cost_Center "
                   f"({len(cost_center_lookup)} unique store/provider keys)")
+
+        # ── Load charges file (optional) ────────────────────────────────────
+        charges_lookup: dict = {}
+        VAT_RATE = 0.15  # 15% VAT in Saudi Arabia
+        if not charges_file_path:
+            # Default to SERVICE_PROVIDER_JOURNAL_META_Charges.csv in repo root
+            candidate = repo_root / "SERVICE_PROVIDER_JOURNAL_META_Charges.csv"
+            if candidate.exists():
+                charges_file_path = str(candidate)
+
+        if charges_file_path and Path(charges_file_path).exists():
+            try:
+                charges_df = pd.read_csv(charges_file_path, dtype=str).fillna("")
+                # Strip quotes from column names if present
+                charges_df.columns = charges_df.columns.str.strip('"')
+
+                # Create lookup: (SERVICE_PROVIDER, IS_CASH) -> BANK_CHARGE_RATE
+                for _, charge_row in charges_df.iterrows():
+                    provider = str(charge_row.get("SERVICE_PROVIDER", "")).strip().upper()
+                    is_cash_val = str(charge_row.get("IS_CASH", "")).strip()
+                    rate_str = str(charge_row.get("BANK_CHARGE_RATE", "")).strip()
+
+                    # Only store non-empty rates
+                    if provider and rate_str and rate_str.lower() not in ("", "nan", "none"):
+                        try:
+                            rate = float(rate_str)
+                            key = (provider, is_cash_val)
+                            charges_lookup[key] = rate
+                        except ValueError:
+                            pass  # Skip invalid rates
+
+                print(f"✓  Loaded charges configuration: {len(charges_lookup)} provider/cash combinations")
+                # Show rates for TABBY and TAMARA
+                for provider in ["TABBY", "TAMARA"]:
+                    key = (provider, "0")  # Non-cash
+                    if key in charges_lookup:
+                        rate = charges_lookup[key]
+                        print(f"   {provider}: {rate*100:.2f}% charge rate")
+            except Exception as e:
+                print(f"⚠  Error loading charges file: {e}")
+                charges_lookup = {}
+
+        # ── Load sales lines file (optional) ────────────────────────────────
+        sales_lines_df = None
+        if sales_lines_file_path and Path(sales_lines_file_path).exists():
+            try:
+                print(f"✓  Loading sales lines file: {Path(sales_lines_file_path).name}")
+                # Load sales lines file - could be XLSX or CSV
+                if sales_lines_file_path.endswith('.xlsx') or sales_lines_file_path.endswith('.xls'):
+                    sales_lines_df = pd.read_excel(sales_lines_file_path)
+                else:
+                    sales_lines_df = pd.read_csv(sales_lines_file_path)
+                print(f"✓  Loaded {len(sales_lines_df)} sales line items")
+            except Exception as e:
+                print(f"⚠  Error loading sales lines file: {e}")
+                sales_lines_df = None
 
         # ── Load payment file (optional) ────────────────────────────────────
         payment_data: Dict[str, Dict[str, float]] = {}
@@ -4243,6 +4306,29 @@ class OracleFusionIntegration:
                 "Segment7": _to_text(sp_row.get("FUT_USED", "")),
             }
 
+        def _calculate_charge(amount: float, payment_method: str, vat_rate: float = VAT_RATE) -> float:
+            """
+            Calculate total charge for a given amount using the formula:
+            Total Charge = (Amount × Rate) × (1 + VAT)
+
+            Args:
+                amount: Transaction amount
+                payment_method: Payment method (TABBY/TAMARA)
+                vat_rate: VAT rate (default 0.15 for 15%)
+
+            Returns:
+                Total charge amount, or 0 if no rate found
+            """
+            # Look up charge rate for this payment method (non-cash)
+            charge_key = (payment_method.upper(), "0")  # "0" for non-cash
+            if charge_key not in charges_lookup:
+                return 0.0
+
+            rate = charges_lookup[charge_key]
+            # Formula: Total Charge = (Amount × Rate) × (1 + VAT)
+            total_charge = (amount * rate) * (1 + vat_rate)
+            return total_charge
+
         # Generate unique interface group identifier for this entire sheet
         # Using timestamp to ensure uniqueness across multiple file generations
         unique_interface_group_id = interface_group_id
@@ -4252,6 +4338,19 @@ class OracleFusionIntegration:
             amount = float(row["Transaction Line Amount"])
             transaction_date = pd.to_datetime(row["Transaction Date"]).strftime("%Y/%m/%d")
             warehouse = str(row.get("Warehouse Code", "") or "").strip().upper()
+
+            # Calculate charges if we have charge rates configured
+            total_charge = 0.0
+            if charges_lookup:
+                total_charge = _calculate_charge(amount, payment_method, VAT_RATE)
+                if total_charge > 0:
+                    charge_key = (payment_method, "0")
+                    if charge_key in charges_lookup:
+                        rate = charges_lookup[charge_key]
+                        print(f"  ℹ️  Charge calculation for {payment_method}: "
+                              f"Amount={amount:.2f}, Rate={rate*100:.2f}%, "
+                              f"Charge={(amount*rate):.2f}, VAT={(amount*rate)*VAT_RATE:.2f}, "
+                              f"Total Charge={total_charge:.2f}")
 
             # Parse transaction date for formatting
             trans_date_obj = pd.to_datetime(row["Transaction Date"])
