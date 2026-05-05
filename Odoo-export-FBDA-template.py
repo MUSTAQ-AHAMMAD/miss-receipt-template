@@ -3973,7 +3973,6 @@ class OracleFusionIntegration:
 
         # ── Load charges file (optional) ────────────────────────────────────
         charges_lookup: dict = {}
-        VAT_RATE = 0.15  # 15% VAT in Saudi Arabia
         if not charges_file_path:
             # Default to SERVICE_PROVIDER_JOURNAL_META_Charges.csv in repo root
             candidate = repo_root / "SERVICE_PROVIDER_JOURNAL_META_Charges.csv"
@@ -3986,18 +3985,23 @@ class OracleFusionIntegration:
                 # Strip quotes from column names if present
                 charges_df.columns = charges_df.columns.str.strip('"')
 
-                # Create lookup: (SERVICE_PROVIDER, IS_CASH) -> BANK_CHARGE_RATE
+                # Create lookup: (SERVICE_PROVIDER, IS_CASH) -> (FIXED_FREIGHT_CHARGE, BANK_CHARGE_RATE)
                 for _, charge_row in charges_df.iterrows():
                     provider = str(charge_row.get("SERVICE_PROVIDER", "")).strip().upper()
                     is_cash_val = str(charge_row.get("IS_CASH", "")).strip()
                     rate_str = str(charge_row.get("BANK_CHARGE_RATE", "")).strip()
+                    fixed_str = str(charge_row.get("FIXED_FREIGHT_CHARGE", "")).strip()
 
-                    # Only store non-empty rates
+                    # Only store if we have at least a rate
                     if provider and rate_str and rate_str.lower() not in ("", "nan", "none"):
                         try:
                             rate = float(rate_str)
+                            fixed_charge = 0.0
+                            if fixed_str and fixed_str.lower() not in ("", "nan", "none"):
+                                fixed_charge = float(fixed_str)
+
                             key = (provider, is_cash_val)
-                            charges_lookup[key] = rate
+                            charges_lookup[key] = (fixed_charge, rate)
                         except ValueError:
                             pass  # Skip invalid rates
 
@@ -4006,8 +4010,8 @@ class OracleFusionIntegration:
                 for provider in ["TABBY", "TAMARA"]:
                     key = (provider, "0")  # Non-cash
                     if key in charges_lookup:
-                        rate = charges_lookup[key]
-                        print(f"   {provider}: {rate*100:.2f}% charge rate")
+                        fixed_charge, rate = charges_lookup[key]
+                        print(f"   {provider}: Fixed={fixed_charge}, Rate={rate*100:.2f}%")
             except Exception as e:
                 print(f"⚠  Error loading charges file: {e}")
                 charges_lookup = {}
@@ -4306,27 +4310,26 @@ class OracleFusionIntegration:
                 "Segment7": _to_text(sp_row.get("FUT_USED", "")),
             }
 
-        def _calculate_charge(amount: float, payment_method: str, vat_rate: float = VAT_RATE) -> float:
+        def _calculate_charge(amount: float, payment_method: str) -> float:
             """
             Calculate total charge for a given amount using the formula:
-            Total Charge = (Amount × Rate) × (1 + VAT)
+            Total Charge = FIXED_FREIGHT_CHARGE + (Amount × BANK_CHARGE_RATE)
 
             Args:
                 amount: Transaction amount
                 payment_method: Payment method (TABBY/TAMARA)
-                vat_rate: VAT rate (default 0.15 for 15%)
 
             Returns:
                 Total charge amount, or 0 if no rate found
             """
-            # Look up charge rate for this payment method (non-cash)
+            # Look up charge configuration for this payment method (non-cash)
             charge_key = (payment_method.upper(), "0")  # "0" for non-cash
             if charge_key not in charges_lookup:
                 return 0.0
 
-            rate = charges_lookup[charge_key]
-            # Formula: Total Charge = (Amount × Rate) × (1 + VAT)
-            total_charge = (amount * rate) * (1 + vat_rate)
+            fixed_charge, rate = charges_lookup[charge_key]
+            # Formula: Total Charge = FIXED_FREIGHT_CHARGE + (Amount × BANK_CHARGE_RATE)
+            total_charge = fixed_charge + (amount * rate)
             return total_charge
 
         # Generate unique interface group identifier for this entire sheet
@@ -4342,14 +4345,14 @@ class OracleFusionIntegration:
             # Calculate charges if we have charge rates configured
             total_charge = 0.0
             if charges_lookup:
-                total_charge = _calculate_charge(amount, payment_method, VAT_RATE)
+                total_charge = _calculate_charge(amount, payment_method)
                 if total_charge > 0:
                     charge_key = (payment_method, "0")
                     if charge_key in charges_lookup:
-                        rate = charges_lookup[charge_key]
+                        fixed_charge, rate = charges_lookup[charge_key]
                         print(f"  ℹ️  Charge calculation for {payment_method}: "
-                              f"Amount={amount:.2f}, Rate={rate*100:.2f}%, "
-                              f"Charge={(amount*rate):.2f}, VAT={(amount*rate)*VAT_RATE:.2f}, "
+                              f"Amount={amount:.2f}, Fixed={fixed_charge:.2f}, Rate={rate*100:.2f}%, "
+                              f"Variable Charge={amount*rate:.2f}, "
                               f"Total Charge={total_charge:.2f}")
 
             # Parse transaction date for formatting
