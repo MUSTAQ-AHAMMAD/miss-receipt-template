@@ -4529,50 +4529,51 @@ class OracleFusionIntegration:
                 "Period Name": formatted_period_name,
             }
 
-            # CRITICAL: Amount sign determines debit/credit placement:
-            # POSITIVE amounts (STANDARD):
-            #   - 3-series accounts (3020044) → CREDIT columns
-            #   - 5-series accounts (5000104) → DEBIT columns
-            # NEGATIVE amounts (REVERSED for reversals):
+            # CRITICAL: Payment entry debit/credit logic for sales lines amounts
+            # This matches the charge entry logic (opposite of old payment logic)
+            # POSITIVE amounts:
             #   - 3-series accounts (3020044) → DEBIT columns
             #   - 5-series accounts (5000104) → CREDIT columns
+            # NEGATIVE amounts:
+            #   - 3-series accounts (3020044) → CREDIT columns
+            #   - 5-series accounts (5000104) → DEBIT columns
             # Always use absolute values for amounts
 
             if is_negative_amount:
-                # NEGATIVE: Reverse the normal placement (3-series in Debit, 5-series in Credit)
+                # NEGATIVE: 3-series in Credit, 5-series in Debit
                 credit_account_entry = {
                     **common,
                     **credit_segments,  # 3020044 from "CREDIT" metadata row
-                    "Entered Debit Amount": abs_amount,  # 3-series in DEBIT for negative (reversed)
-                    "Entered Credit Amount": "",
-                    "Converted Debit Amount": abs_amount,
-                    "Converted Credit Amount": "",
+                    "Entered Debit Amount": "",
+                    "Entered Credit Amount": abs_amount,  # 3-series in CREDIT for negative
+                    "Converted Debit Amount": "",
+                    "Converted Credit Amount": abs_amount,
                 }
                 debit_account_entry = {
                     **common,
                     **debit_segments,  # 5000104 from "DEBIT" metadata row
-                    "Entered Debit Amount": "",
-                    "Entered Credit Amount": abs_amount,  # 5-series in CREDIT for negative (reversed)
-                    "Converted Debit Amount": "",
-                    "Converted Credit Amount": abs_amount,
+                    "Entered Debit Amount": abs_amount,  # 5-series in DEBIT for negative
+                    "Entered Credit Amount": "",
+                    "Converted Debit Amount": abs_amount,
+                    "Converted Credit Amount": "",
                 }
             else:
-                # POSITIVE: Standard placement (3-series in Credit, 5-series in Debit)
+                # POSITIVE: 3-series in Debit, 5-series in Credit
                 credit_account_entry = {
                     **common,
                     **credit_segments,  # 3020044 from "CREDIT" metadata row
-                    "Entered Debit Amount": "",
-                    "Entered Credit Amount": abs_amount,  # 3-series in CREDIT for positive
-                    "Converted Debit Amount": "",
-                    "Converted Credit Amount": abs_amount,
-                }
-                debit_account_entry = {
-                    **common,
-                    **debit_segments,  # 5000104 from "DEBIT" metadata row
-                    "Entered Debit Amount": abs_amount,  # 5-series in DEBIT for positive
+                    "Entered Debit Amount": abs_amount,  # 3-series in DEBIT for positive
                     "Entered Credit Amount": "",
                     "Converted Debit Amount": abs_amount,
                     "Converted Credit Amount": "",
+                }
+                debit_account_entry = {
+                    **common,
+                    **debit_segments,  # 5-series from "DEBIT" metadata row
+                    "Entered Debit Amount": "",
+                    "Entered Credit Amount": abs_amount,  # 5-series in CREDIT for positive
+                    "Converted Debit Amount": "",
+                    "Converted Credit Amount": abs_amount,
                 }
 
             # ── JOURNAL TEMPLATE CHANGE: Only generate charge entries, not payment entries ──
