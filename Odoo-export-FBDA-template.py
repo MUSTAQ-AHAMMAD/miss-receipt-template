@@ -4039,9 +4039,11 @@ class OracleFusionIntegration:
                         break
 
                 # Common column names for amount/price
+                # Prioritize "Order Lines/Subtotal w/o Tax" when available
                 amt_col = None
-                for col_name in ["Price Subtotal", "Subtotal", "Amount", "Line Amount",
-                                 "Order Lines/Price Subtotal", "Total", "Line Total"]:
+                for col_name in ["Order Lines/Subtotal w/o Tax", "Price Subtotal", "Subtotal",
+                                 "Amount", "Line Amount", "Order Lines/Price Subtotal",
+                                 "Order Lines/Subtotal", "Total", "Line Total"]:
                     if col_name in sales_lines_df.columns:
                         amt_col = col_name
                         break
