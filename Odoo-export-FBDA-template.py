@@ -4018,6 +4018,7 @@ class OracleFusionIntegration:
 
         # ── Load sales lines file (optional) ────────────────────────────────
         sales_lines_df = None
+        sales_lines_totals: Dict[str, float] = {}  # {sales_order_ref: total_amount}
         if sales_lines_file_path and Path(sales_lines_file_path).exists():
             try:
                 print(f"✓  Loading sales lines file: {Path(sales_lines_file_path).name}")
@@ -4027,9 +4028,59 @@ class OracleFusionIntegration:
                 else:
                     sales_lines_df = pd.read_csv(sales_lines_file_path)
                 print(f"✓  Loaded {len(sales_lines_df)} sales line items")
+
+                # Find columns for Sales Order Number and Amount
+                # Common column names for sales order reference
+                so_col = None
+                for col_name in ["Sales Order Number", "Order Ref", "Order Reference", "Sales Order",
+                                 "Order Lines/Order Ref", "SO Number", "Invoice Number", "Reference"]:
+                    if col_name in sales_lines_df.columns:
+                        so_col = col_name
+                        break
+
+                # Common column names for amount/price
+                amt_col = None
+                for col_name in ["Price Subtotal", "Subtotal", "Amount", "Line Amount",
+                                 "Order Lines/Price Subtotal", "Total", "Line Total"]:
+                    if col_name in sales_lines_df.columns:
+                        amt_col = col_name
+                        break
+
+                if so_col and amt_col:
+                    # Aggregate amounts by Sales Order Number
+                    sales_lines_df[so_col] = sales_lines_df[so_col].fillna("").astype(str).str.strip()
+                    sales_lines_df[amt_col] = pd.to_numeric(sales_lines_df[amt_col], errors='coerce').fillna(0)
+
+                    # Group by Sales Order and sum amounts
+                    sales_order_totals = sales_lines_df.groupby(so_col)[amt_col].sum()
+                    sales_lines_totals = sales_order_totals.to_dict()
+
+                    # Remove empty keys
+                    sales_lines_totals = {k: v for k, v in sales_lines_totals.items() if k}
+
+                    print(f"✓  Aggregated amounts for {len(sales_lines_totals)} unique sales orders from sales lines")
+                    print(f"   Column used for Sales Order: '{so_col}'")
+                    print(f"   Column used for Amount: '{amt_col}'")
+
+                    # Show sample
+                    if sales_lines_totals:
+                        sample_orders = list(sales_lines_totals.items())[:3]
+                        print(f"   Sample totals:")
+                        for order_ref, total in sample_orders:
+                            print(f"     - {order_ref}: {total:.2f} SAR")
+                else:
+                    missing = []
+                    if not so_col:
+                        missing.append("Sales Order Number column")
+                    if not amt_col:
+                        missing.append("Amount column")
+                    print(f"⚠  Could not find required columns in sales lines file: {', '.join(missing)}")
+                    print(f"   Available columns: {list(sales_lines_df.columns)}")
+
             except Exception as e:
                 print(f"⚠  Error loading sales lines file: {e}")
                 sales_lines_df = None
+                sales_lines_totals = {}
 
         # ── Load payment file (optional) ────────────────────────────────────
         payment_data: Dict[str, Dict[str, float]] = {}
@@ -4235,12 +4286,21 @@ class OracleFusionIntegration:
                     for method, method_amt in methods_dict.items():
                         method_upper = method.upper()
                         if method_upper in valid_providers:
+                            # Use amount from sales lines if available, otherwise fall back to payment amount
+                            if sales_lines_totals and sales_order_ref in sales_lines_totals:
+                                final_amount = sales_lines_totals[sales_order_ref]
+                                print(f"  ℹ️  Using sales lines amount for {sales_order_ref}: {final_amount:.2f} SAR (payment file had: {method_amt:.2f} SAR)")
+                            else:
+                                final_amount = method_amt
+                                if sales_lines_totals:
+                                    print(f"  ⚠  No sales lines data found for {sales_order_ref}, using payment amount: {method_amt:.2f} SAR")
+
                             expanded_rows.append({
                                 "Transaction Number": sales_order_ref,  # Use Sales Order as Transaction Number
                                 "Sales Order Number": sales_order_ref,
                                 "Receipt Method Name": method_upper,
                                 "Transaction Date": transaction_date,
-                                "Transaction Line Amount": method_amt,
+                                "Transaction Line Amount": final_amount,
                                 "Warehouse Code": warehouse_code,
                             })
 
@@ -4263,12 +4323,21 @@ class OracleFusionIntegration:
                         for method, method_amt in methods_dict.items():
                             method_upper = method.upper()
                             if method_upper in valid_providers:
+                                # Use amount from sales lines if available, otherwise fall back to payment amount
+                                if sales_lines_totals and sales_order_ref in sales_lines_totals:
+                                    final_amount = sales_lines_totals[sales_order_ref]
+                                    print(f"  ℹ️  Using sales lines amount for {sales_order_ref}: {final_amount:.2f} SAR (payment file had: {method_amt:.2f} SAR)")
+                                else:
+                                    final_amount = method_amt
+                                    if sales_lines_totals:
+                                        print(f"  ⚠  No sales lines data found for {sales_order_ref}, using payment amount: {method_amt:.2f} SAR")
+
                                 expanded_rows.append({
                                     "Transaction Number": ar_row.get("Transaction Number"),
                                     "Sales Order Number": sales_order_ref,
                                     "Receipt Method Name": method_upper,
                                     "Transaction Date": ar_row.get("Transaction Date"),
-                                    "Transaction Line Amount": method_amt,
+                                    "Transaction Line Amount": final_amount,
                                     "Warehouse Code": warehouse_code,
                                 })
 
