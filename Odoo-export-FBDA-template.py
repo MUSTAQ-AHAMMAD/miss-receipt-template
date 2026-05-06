@@ -4041,7 +4041,8 @@ class OracleFusionIntegration:
                 # Common column names for amount/price
                 amt_col = None
                 for col_name in ["Price Subtotal", "Subtotal", "Amount", "Line Amount",
-                                 "Order Lines/Price Subtotal", "Total", "Line Total"]:
+                                 "Order Lines/Price Subtotal", "Order Lines/Subtotal",
+                                 "Order Lines/Subtotal w/o Tax", "Total", "Line Total"]:
                     if col_name in sales_lines_df.columns:
                         amt_col = col_name
                         break
