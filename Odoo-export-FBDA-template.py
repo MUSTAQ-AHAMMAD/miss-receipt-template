@@ -4291,6 +4291,7 @@ class OracleFusionIntegration:
         batch_name_counter = 1
         journal_entry_counter = 1
         negative_amount_count = 0
+        charge_entries_count = 0
 
         def _to_text(value) -> str:
             """Convert any value to text, handling nulls/NaN/None properly."""
@@ -4336,12 +4337,6 @@ class OracleFusionIntegration:
             transaction_date = pd.to_datetime(row["Transaction Date"]).strftime("%Y/%m/%d")
             warehouse = str(row.get("Warehouse Code", "") or "").strip().upper()
 
-            # Calculate charges: 1 SAR per order (flat rate)
-            total_charge = 1.0
-            if total_charge > 0:
-                print(f"  ℹ️  Charge for {payment_method}: "
-                      f"1 SAR per order (flat rate)")
-
             # Parse transaction date for formatting
             trans_date_obj = pd.to_datetime(row["Transaction Date"])
             # Format Period Name as "26-Mar" (day-month abbreviation)
@@ -4361,6 +4356,18 @@ class OracleFusionIntegration:
             if is_negative_amount:
                 negative_amount_count += 1
                 print(f"  ℹ️  Negative amount detected: {amount:.2f} → Will use reversal format with absolute value {abs_amount:.2f} (3-series in Credit, 5-series in Debit)")
+
+            # Calculate charges based on charges_lookup if available
+            total_charge = 0.0
+            charge_key = (payment_method, str(is_cash).strip())
+            if charge_key in charges_lookup:
+                fixed_charge, rate = charges_lookup[charge_key]
+                # Formula: Total Charge = Fixed Charge + (Amount × Rate)
+                # Note: VAT is already included in the rate configuration
+                total_charge = fixed_charge + (abs_amount * rate)
+                if total_charge > 0:
+                    print(f"  ℹ️  Charge for {payment_method}: "
+                          f"Fixed={fixed_charge:.2f}, Rate={rate*100:.2f}%, Total Charge={total_charge:.2f}")
 
             if sp_meta is not None and not sp_meta.empty:
                 sp_rows = sp_meta[sp_meta["SERVICE_PROVIDER"] == payment_method]
@@ -4481,6 +4488,55 @@ class OracleFusionIntegration:
             journal_entries.append(credit_account_entry)
             journal_entries.append(debit_account_entry)
 
+            # ── Generate charge entries if charges are applicable ──────────────
+            if total_charge > 0:
+                # Charges follow the same debit/credit logic as payment amounts
+                # For positive amounts: 3-series in Debit, 5-series in Credit
+                # For negative amounts: 3-series in Credit, 5-series in Debit
+
+                if is_negative_amount:
+                    # NEGATIVE: 3-series in Credit, 5-series in Debit (same as payment logic)
+                    charge_credit_entry = {
+                        **common,
+                        **credit_segments,  # 3020044 from "CREDIT" metadata row
+                        "Entered Debit Amount": "",
+                        "Entered Credit Amount": total_charge,  # 3-series in CREDIT for negative charge
+                        "Converted Debit Amount": "",
+                        "Converted Credit Amount": total_charge,
+                    }
+                    charge_debit_entry = {
+                        **common,
+                        **debit_segments,  # 5000104 from "DEBIT" metadata row
+                        "Entered Debit Amount": total_charge,  # 5-series in DEBIT for negative charge
+                        "Entered Credit Amount": "",
+                        "Converted Debit Amount": total_charge,
+                        "Converted Credit Amount": "",
+                    }
+                else:
+                    # POSITIVE: 3-series in Debit, 5-series in Credit (same as payment logic)
+                    charge_credit_entry = {
+                        **common,
+                        **credit_segments,  # 3020044 from "CREDIT" metadata row
+                        "Entered Debit Amount": total_charge,  # 3-series in DEBIT for positive charge
+                        "Entered Credit Amount": "",
+                        "Converted Debit Amount": total_charge,
+                        "Converted Credit Amount": "",
+                    }
+                    charge_debit_entry = {
+                        **common,
+                        **debit_segments,  # 5000104 from "DEBIT" metadata row
+                        "Entered Debit Amount": "",
+                        "Entered Credit Amount": total_charge,  # 5-series in CREDIT for positive charge
+                        "Converted Debit Amount": "",
+                        "Converted Credit Amount": total_charge,
+                    }
+
+                # Append charge entries
+                journal_entries.append(charge_credit_entry)
+                journal_entries.append(charge_debit_entry)
+                charge_entries_count += 1
+                print(f"  ℹ️  Added charge entries for {payment_method}: {total_charge:.2f} SAR")
+
             journal_entry_counter += 1
             if journal_entry_counter % 10 == 0:
                 batch_name_counter += 1
@@ -4552,9 +4608,12 @@ class OracleFusionIntegration:
         # Reorder columns to match template
         journal_df = journal_df[template_columns]
 
-        print(f"✓  Generated {len(journal_df)} journal entries ({len(journal_df)//2} transactions)")
+        print(f"✓  Generated {len(journal_df)} journal entries")
+        print(f"   - Payment entries: {len(journal_df) - (charge_entries_count * 2)} lines ({(len(journal_df) - (charge_entries_count * 2))//2} transactions)")
+        if charge_entries_count > 0:
+            print(f"   - Charge entries: {charge_entries_count * 2} lines ({charge_entries_count} charges)")
         if negative_amount_count > 0:
-            print(f"ℹ️  Note: {negative_amount_count} transaction(s) with negative amounts used double-debit format (both entries in Debit column)")
+            print(f"ℹ️  Note: {negative_amount_count} transaction(s) with negative amounts used reversal format")
         print("=" * 72)
 
         return journal_df
