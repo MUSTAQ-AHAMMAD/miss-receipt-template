@@ -5,11 +5,11 @@
 2,SA,300000001418025,,2001,HUNGERSTATION,DEBIT,Vend Sales Issue Hanger,Vend RMA Hanger,"01","5000104","52","00","01","00",,,,Vend,Vend,"1",,25,
 5,SA,300000001418025,,2001,MRSOOL,CREDIT,Vend Sales Issue Marsool,Vend RMA Marsool,"01","3010009","53","00","01","00",,,,Vend,Vend,"1",,,0.15
 6,SA,300000001418025,,2001,MRSOOL,DEBIT,Vend Sales Issue Marsool,Vend RMA Marsool,"01","5000104","53","00","01","00",,,,Vend,Vend,"1",,,0.15
-7,SA,300000001418025,,2001,TABBY,CREDIT,Vend Sales Issue Hanger,Vend RMA Hanger,"01","3020044","46","00","01","00",,,,Vend,Vend,"0",,1,0.055
+7,SA,300000001418025,,2001,TABBY,CREDIT,Vend Sales Issue Hanger,Vend RMA Hanger,"01","3020044","46","00","01","00",,,,Vend,Vend,"0",,1,0.05
 11,SA,300000001418025,,2001,TABBY,CREDIT,Vend Sales Issue Hanger,Vend RMA Hanger,"01","3020044","46","00","01","00",,,,Vend,Vend,"1",,1,
-8,SA,300000001418025,,2001,TABBY,DEBIT,Vend Sales Issue Hanger,Vend RMA Hanger,"01","5000104","46","00","01","00",,,,Vend,Vend,"0",,1,0.055
+8,SA,300000001418025,,2001,TABBY,DEBIT,Vend Sales Issue Hanger,Vend RMA Hanger,"01","5000104","46","00","01","00",,,,Vend,Vend,"0",,1,0.05
 12,SA,300000001418025,,2001,TABBY,DEBIT,Vend Sales Issue Hanger,Vend RMA Hanger,"01","5000104","46","00","01","00",,,,Vend,Vend,"1",,1,
-9,SA,300000001418025,,2001,TAMARA,CREDIT,Vend Sales Issue Hanger,Vend RMA Hanger,"01","3020044","46","00","01","00",,,,Vend,Vend,"0",,1.5,0.0599
+9,SA,300000001418025,,2001,TAMARA,CREDIT,Vend Sales Issue Hanger,Vend RMA Hanger,"01","3020044","46","00","01","00",,,,Vend,Vend,"0",,1.5,0.0425
 13,SA,300000001418025,,2001,TAMARA,CREDIT,Vend Sales Issue Hanger,Vend RMA Hanger,"01","3020044","46","00","01","00",,,,Vend,Vend,"1",,1,
-10,SA,300000001418025,,2001,TAMARA,DEBIT,Vend Sales Issue Hanger,Vend RMA Hanger,"01","5000104","46","00","01","00",,,,Vend,Vend,"0",,1.5,0.0599
+10,SA,300000001418025,,2001,TAMARA,DEBIT,Vend Sales Issue Hanger,Vend RMA Hanger,"01","5000104","46","00","01","00",,,,Vend,Vend,"0",,1.5,0.0425
 14,SA,300000001418025,,2001,TAMARA,DEBIT,Vend Sales Issue Hanger,Vend RMA Hanger,"01","5000104","46","00","01","00",,,,Vend,Vend,"1",,1,
