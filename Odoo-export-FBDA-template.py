@@ -4355,7 +4355,7 @@ class OracleFusionIntegration:
             # Count negative amounts for reporting
             if is_negative_amount:
                 negative_amount_count += 1
-                print(f"  ℹ️  Negative amount detected: {amount:.2f} → Will use reversal format with absolute value {abs_amount:.2f} (3-series in Credit, 5-series in Debit)")
+                print(f"  ℹ️  Negative amount detected: {amount:.2f} → Will use reversal format with absolute value {abs_amount:.2f} (3-series in Debit, 5-series in Credit)")
 
             # Calculate charges based on charges_lookup if available
             total_charge = 0.0
@@ -4439,49 +4439,49 @@ class OracleFusionIntegration:
             }
 
             # CRITICAL: Amount sign determines debit/credit placement:
-            # POSITIVE amounts:
-            #   - 3-series accounts (3020044) → DEBIT columns
-            #   - 5-series accounts (5000104) → CREDIT columns
-            # NEGATIVE amounts (reversals):
+            # POSITIVE amounts (STANDARD):
             #   - 3-series accounts (3020044) → CREDIT columns
             #   - 5-series accounts (5000104) → DEBIT columns
+            # NEGATIVE amounts (REVERSED for reversals):
+            #   - 3-series accounts (3020044) → DEBIT columns
+            #   - 5-series accounts (5000104) → CREDIT columns
             # Always use absolute values for amounts
 
             if is_negative_amount:
-                # NEGATIVE: 3-series in Credit, 5-series in Debit
+                # NEGATIVE: Reverse the normal placement (3-series in Debit, 5-series in Credit)
                 credit_account_entry = {
                     **common,
                     **credit_segments,  # 3020044 from "CREDIT" metadata row
-                    "Entered Debit Amount": "",
-                    "Entered Credit Amount": abs_amount,  # 3-series in CREDIT for negative
-                    "Converted Debit Amount": "",
-                    "Converted Credit Amount": abs_amount,
+                    "Entered Debit Amount": abs_amount,  # 3-series in DEBIT for negative (reversed)
+                    "Entered Credit Amount": "",
+                    "Converted Debit Amount": abs_amount,
+                    "Converted Credit Amount": "",
                 }
                 debit_account_entry = {
                     **common,
                     **debit_segments,  # 5000104 from "DEBIT" metadata row
-                    "Entered Debit Amount": abs_amount,  # 5-series in DEBIT for negative
-                    "Entered Credit Amount": "",
-                    "Converted Debit Amount": abs_amount,
-                    "Converted Credit Amount": "",
+                    "Entered Debit Amount": "",
+                    "Entered Credit Amount": abs_amount,  # 5-series in CREDIT for negative (reversed)
+                    "Converted Debit Amount": "",
+                    "Converted Credit Amount": abs_amount,
                 }
             else:
-                # POSITIVE: 3-series in Debit, 5-series in Credit
+                # POSITIVE: Standard placement (3-series in Credit, 5-series in Debit)
                 credit_account_entry = {
                     **common,
                     **credit_segments,  # 3020044 from "CREDIT" metadata row
-                    "Entered Debit Amount": abs_amount,  # 3-series in DEBIT for positive
-                    "Entered Credit Amount": "",
-                    "Converted Debit Amount": abs_amount,
-                    "Converted Credit Amount": "",
+                    "Entered Debit Amount": "",
+                    "Entered Credit Amount": abs_amount,  # 3-series in CREDIT for positive
+                    "Converted Debit Amount": "",
+                    "Converted Credit Amount": abs_amount,
                 }
                 debit_account_entry = {
                     **common,
                     **debit_segments,  # 5000104 from "DEBIT" metadata row
-                    "Entered Debit Amount": "",
-                    "Entered Credit Amount": abs_amount,  # 5-series in CREDIT for positive
-                    "Converted Debit Amount": "",
-                    "Converted Credit Amount": abs_amount,
+                    "Entered Debit Amount": abs_amount,  # 5-series in DEBIT for positive
+                    "Entered Credit Amount": "",
+                    "Converted Debit Amount": abs_amount,
+                    "Converted Credit Amount": "",
                 }
 
             # Append entries in order: credit account (3-series) first, then debit account (5-series)
@@ -4491,44 +4491,44 @@ class OracleFusionIntegration:
             # ── Generate charge entries if charges are applicable ──────────────
             if total_charge > 0:
                 # Charges follow the same debit/credit logic as payment amounts
-                # For positive amounts: 3-series in Debit, 5-series in Credit
-                # For negative amounts: 3-series in Credit, 5-series in Debit
+                # For positive amounts: 3-series in Credit, 5-series in Debit
+                # For negative amounts: 3-series in Debit, 5-series in Credit
 
                 if is_negative_amount:
-                    # NEGATIVE: 3-series in Credit, 5-series in Debit (same as payment logic)
+                    # NEGATIVE: 3-series in Debit, 5-series in Credit (reversed)
                     charge_credit_entry = {
                         **common,
                         **credit_segments,  # 3020044 from "CREDIT" metadata row
-                        "Entered Debit Amount": "",
-                        "Entered Credit Amount": total_charge,  # 3-series in CREDIT for negative charge
-                        "Converted Debit Amount": "",
-                        "Converted Credit Amount": total_charge,
+                        "Entered Debit Amount": total_charge,  # 3-series in DEBIT for negative charge
+                        "Entered Credit Amount": "",
+                        "Converted Debit Amount": total_charge,
+                        "Converted Credit Amount": "",
                     }
                     charge_debit_entry = {
                         **common,
                         **debit_segments,  # 5000104 from "DEBIT" metadata row
-                        "Entered Debit Amount": total_charge,  # 5-series in DEBIT for negative charge
-                        "Entered Credit Amount": "",
-                        "Converted Debit Amount": total_charge,
-                        "Converted Credit Amount": "",
+                        "Entered Debit Amount": "",
+                        "Entered Credit Amount": total_charge,  # 5-series in CREDIT for negative charge
+                        "Converted Debit Amount": "",
+                        "Converted Credit Amount": total_charge,
                     }
                 else:
-                    # POSITIVE: 3-series in Debit, 5-series in Credit (same as payment logic)
+                    # POSITIVE: 3-series in Credit, 5-series in Debit (standard)
                     charge_credit_entry = {
                         **common,
                         **credit_segments,  # 3020044 from "CREDIT" metadata row
-                        "Entered Debit Amount": total_charge,  # 3-series in DEBIT for positive charge
-                        "Entered Credit Amount": "",
-                        "Converted Debit Amount": total_charge,
-                        "Converted Credit Amount": "",
+                        "Entered Debit Amount": "",
+                        "Entered Credit Amount": total_charge,  # 3-series in CREDIT for positive charge
+                        "Converted Debit Amount": "",
+                        "Converted Credit Amount": total_charge,
                     }
                     charge_debit_entry = {
                         **common,
                         **debit_segments,  # 5000104 from "DEBIT" metadata row
-                        "Entered Debit Amount": "",
-                        "Entered Credit Amount": total_charge,  # 5-series in CREDIT for positive charge
-                        "Converted Debit Amount": "",
-                        "Converted Credit Amount": total_charge,
+                        "Entered Debit Amount": total_charge,  # 5-series in DEBIT for positive charge
+                        "Entered Credit Amount": "",
+                        "Converted Debit Amount": total_charge,
+                        "Converted Credit Amount": "",
                     }
 
                 # Append charge entries
