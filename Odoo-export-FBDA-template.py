@@ -4018,6 +4018,7 @@ class OracleFusionIntegration:
 
         # ── Load sales lines file (optional) ────────────────────────────────
         sales_lines_df = None
+        sales_lines_totals: Dict[str, float] = {}  # {sales_order_ref: total_amount}
         if sales_lines_file_path and Path(sales_lines_file_path).exists():
             try:
                 print(f"✓  Loading sales lines file: {Path(sales_lines_file_path).name}")
@@ -4027,9 +4028,59 @@ class OracleFusionIntegration:
                 else:
                     sales_lines_df = pd.read_csv(sales_lines_file_path)
                 print(f"✓  Loaded {len(sales_lines_df)} sales line items")
+
+                # Find columns for Sales Order Number and Amount
+                # Common column names for sales order reference
+                so_col = None
+                for col_name in ["Sales Order Number", "Order Ref", "Order Reference", "Sales Order",
+                                 "Order Lines/Order Ref", "SO Number", "Invoice Number", "Reference"]:
+                    if col_name in sales_lines_df.columns:
+                        so_col = col_name
+                        break
+
+                # Common column names for amount/price
+                amt_col = None
+                for col_name in ["Price Subtotal", "Subtotal", "Amount", "Line Amount",
+                                 "Order Lines/Price Subtotal", "Total", "Line Total"]:
+                    if col_name in sales_lines_df.columns:
+                        amt_col = col_name
+                        break
+
+                if so_col and amt_col:
+                    # Aggregate amounts by Sales Order Number
+                    sales_lines_df[so_col] = sales_lines_df[so_col].fillna("").astype(str).str.strip()
+                    sales_lines_df[amt_col] = pd.to_numeric(sales_lines_df[amt_col], errors='coerce').fillna(0)
+
+                    # Group by Sales Order and sum amounts
+                    sales_order_totals = sales_lines_df.groupby(so_col)[amt_col].sum()
+                    sales_lines_totals = sales_order_totals.to_dict()
+
+                    # Remove empty keys
+                    sales_lines_totals = {k: v for k, v in sales_lines_totals.items() if k}
+
+                    print(f"✓  Aggregated amounts for {len(sales_lines_totals)} unique sales orders from sales lines")
+                    print(f"   Column used for Sales Order: '{so_col}'")
+                    print(f"   Column used for Amount: '{amt_col}'")
+
+                    # Show sample
+                    if sales_lines_totals:
+                        sample_orders = list(sales_lines_totals.items())[:3]
+                        print(f"   Sample totals:")
+                        for order_ref, total in sample_orders:
+                            print(f"     - {order_ref}: {total:.2f} SAR")
+                else:
+                    missing = []
+                    if not so_col:
+                        missing.append("Sales Order Number column")
+                    if not amt_col:
+                        missing.append("Amount column")
+                    print(f"⚠  Could not find required columns in sales lines file: {', '.join(missing)}")
+                    print(f"   Available columns: {list(sales_lines_df.columns)}")
+
             except Exception as e:
                 print(f"⚠  Error loading sales lines file: {e}")
                 sales_lines_df = None
+                sales_lines_totals = {}
 
         # ── Load payment file (optional) ────────────────────────────────────
         payment_data: Dict[str, Dict[str, float]] = {}
@@ -4235,12 +4286,21 @@ class OracleFusionIntegration:
                     for method, method_amt in methods_dict.items():
                         method_upper = method.upper()
                         if method_upper in valid_providers:
+                            # Use amount from sales lines if available, otherwise fall back to payment amount
+                            if sales_lines_totals and sales_order_ref in sales_lines_totals:
+                                final_amount = sales_lines_totals[sales_order_ref]
+                                print(f"  ℹ️  Using sales lines amount for {sales_order_ref}: {final_amount:.2f} SAR (payment file had: {method_amt:.2f} SAR)")
+                            else:
+                                final_amount = method_amt
+                                if sales_lines_totals:
+                                    print(f"  ⚠  No sales lines data found for {sales_order_ref}, using payment amount: {method_amt:.2f} SAR")
+
                             expanded_rows.append({
                                 "Transaction Number": sales_order_ref,  # Use Sales Order as Transaction Number
                                 "Sales Order Number": sales_order_ref,
                                 "Receipt Method Name": method_upper,
                                 "Transaction Date": transaction_date,
-                                "Transaction Line Amount": method_amt,
+                                "Transaction Line Amount": final_amount,
                                 "Warehouse Code": warehouse_code,
                             })
 
@@ -4263,12 +4323,21 @@ class OracleFusionIntegration:
                         for method, method_amt in methods_dict.items():
                             method_upper = method.upper()
                             if method_upper in valid_providers:
+                                # Use amount from sales lines if available, otherwise fall back to payment amount
+                                if sales_lines_totals and sales_order_ref in sales_lines_totals:
+                                    final_amount = sales_lines_totals[sales_order_ref]
+                                    print(f"  ℹ️  Using sales lines amount for {sales_order_ref}: {final_amount:.2f} SAR (payment file had: {method_amt:.2f} SAR)")
+                                else:
+                                    final_amount = method_amt
+                                    if sales_lines_totals:
+                                        print(f"  ⚠  No sales lines data found for {sales_order_ref}, using payment amount: {method_amt:.2f} SAR")
+
                                 expanded_rows.append({
                                     "Transaction Number": ar_row.get("Transaction Number"),
                                     "Sales Order Number": sales_order_ref,
                                     "Receipt Method Name": method_upper,
                                     "Transaction Date": ar_row.get("Transaction Date"),
-                                    "Transaction Line Amount": method_amt,
+                                    "Transaction Line Amount": final_amount,
                                     "Warehouse Code": warehouse_code,
                                 })
 
@@ -4330,6 +4399,26 @@ class OracleFusionIntegration:
         # Generate unique interface group identifier for this entire sheet
         # Using timestamp to ensure uniqueness across multiple file generations
         unique_interface_group_id = interface_group_id
+
+        # ══════════════════════════════════════════════════════════════════════
+        # IMPORTANT: Journal Template - CHARGES ONLY Mode
+        # ══════════════════════════════════════════════════════════════════════
+        # This journal template generates entries for SERVICE PROVIDER CHARGES only.
+        # Payment amounts are NOT included in the journal entries.
+        #
+        # Each order will have:
+        #   - 2 charge entries (debit/credit pair) for the service fee
+        #   - NO payment amount entries
+        #
+        # To include payment amounts, see commented code at line ~4562
+        # ══════════════════════════════════════════════════════════════════════
+        print("\n" + "═" * 80)
+        print("JOURNAL TEMPLATE MODE: CHARGES ONLY")
+        print("═" * 80)
+        print("ℹ️  This journal template will generate entries for SERVICE CHARGES ONLY")
+        print("ℹ️  Payment amounts will NOT be included in the journal entries")
+        print("ℹ️  Each qualifying order will have one debit/credit pair for charges")
+        print("═" * 80 + "\n")
 
         for _, row in grouped.iterrows():
             payment_method = str(row["Receipt Method Name"]).upper()
@@ -4484,9 +4573,14 @@ class OracleFusionIntegration:
                     "Converted Credit Amount": "",
                 }
 
-            # Append entries in order: credit account (3-series) first, then debit account (5-series)
-            journal_entries.append(credit_account_entry)
-            journal_entries.append(debit_account_entry)
+            # ── JOURNAL TEMPLATE CHANGE: Only generate charge entries, not payment entries ──
+            # The payment amounts are already recorded elsewhere in the system.
+            # Journal template should ONLY show the service provider charges (TABBY/TAMARA fees).
+            # Therefore, we skip appending the payment amount entries and only generate charge entries.
+            #
+            # NOTE: If you need to restore payment entries, uncomment the lines below:
+            # journal_entries.append(credit_account_entry)
+            # journal_entries.append(debit_account_entry)
 
             # ── Generate charge entries if charges are applicable ──────────────
             if total_charge > 0:
@@ -4536,6 +4630,9 @@ class OracleFusionIntegration:
                 journal_entries.append(charge_debit_entry)
                 charge_entries_count += 1
                 print(f"  ℹ️  Added charge entries for {payment_method}: {total_charge:.2f} SAR")
+            else:
+                # No charges for this transaction - skip entirely in charges-only mode
+                print(f"  ⚠️  No charges calculated for {payment_method} (Amount: {abs_amount:.2f} SAR) - skipping entry")
 
             journal_entry_counter += 1
             if journal_entry_counter % 10 == 0:
@@ -4608,13 +4705,29 @@ class OracleFusionIntegration:
         # Reorder columns to match template
         journal_df = journal_df[template_columns]
 
-        print(f"✓  Generated {len(journal_df)} journal entries")
-        print(f"   - Payment entries: {len(journal_df) - (charge_entries_count * 2)} lines ({(len(journal_df) - (charge_entries_count * 2))//2} transactions)")
+        # Summary output
+        print("\n" + "═" * 80)
+        print("JOURNAL TEMPLATE GENERATION COMPLETE - CHARGES ONLY MODE")
+        print("═" * 80)
+        print(f"✓  Generated {len(journal_df)} journal entry lines")
+        print(f"   - Charge entries: {charge_entries_count * 2} lines ({charge_entries_count} charge transactions)")
+        print(f"   - Payment entries: 0 lines (EXCLUDED in charges-only mode)")
         if charge_entries_count > 0:
-            print(f"   - Charge entries: {charge_entries_count * 2} lines ({charge_entries_count} charges)")
+            total_charges = sum(
+                pd.to_numeric(journal_df['Entered Debit Amount'], errors='coerce').fillna(0)
+            )
+            print(f"   - Total charges amount: {total_charges:,.2f} SAR")
         if negative_amount_count > 0:
             print(f"ℹ️  Note: {negative_amount_count} transaction(s) with negative amounts used reversal format")
-        print("=" * 72)
+
+        if len(journal_df) == 0:
+            print("\n⚠️  WARNING: No journal entries generated!")
+            print("   This could mean:")
+            print("   - No charges file was provided")
+            print("   - Charges lookup returned 0 for all transactions")
+            print("   - No qualifying TABBY/TAMARA transactions found")
+
+        print("═" * 80 + "\n")
 
         return journal_df
 
