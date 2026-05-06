@@ -922,6 +922,40 @@
           </div>
         </div>
 
+        <!-- Sales Lines (Optional) -->
+        <div class="file-zone" id="zone-journal-sales-lines-file" ondragover="onDragOver(event,'journal-sales-lines-file')" ondragleave="onDragLeave('journal-sales-lines-file')" ondrop="onDrop(event,'journal-sales-lines-file')">
+          <input type="file" id="file-journal-sales-lines-file" accept=".csv,.xlsx,.xls" onchange="onFileChange('journal-sales-lines-file',this)" />
+          <div class="fz-header">
+            <div class="fz-icon"><i class="fa-solid fa-list"></i></div>
+            <div>
+              <div class="fz-title">Sales Lines CSV/XLSX</div>
+              <div class="fz-subtitle">Line item details for per-item charge calculations</div>
+              <span class="fz-badge opt">Optional</span>
+            </div>
+          </div>
+          <div class="fz-msg">
+            <p>Click to browse or drag & drop</p>
+            <small>CSV/XLSX file containing order line items (for detailed charge calculations)</small>
+          </div>
+        </div>
+
+        <!-- Charges Configuration (Optional) -->
+        <div class="file-zone" id="zone-journal-charges-file" ondragover="onDragOver(event,'journal-charges-file')" ondragleave="onDragLeave('journal-charges-file')" ondrop="onDrop(event,'journal-charges-file')">
+          <input type="file" id="file-journal-charges-file" accept=".csv" onchange="onFileChange('journal-charges-file',this)" />
+          <div class="fz-header">
+            <div class="fz-icon"><i class="fa-solid fa-calculator"></i></div>
+            <div>
+              <div class="fz-title">Charges Configuration CSV</div>
+              <div class="fz-subtitle">Charge rates for service providers (auto-loaded from server if not provided)</div>
+              <span class="fz-badge opt">Optional</span>
+            </div>
+          </div>
+          <div class="fz-msg">
+            <p>Click to browse or drag & drop</p>
+            <small>SERVICE_PROVIDER_JOURNAL_META_Charges.csv - leave empty to use server default</small>
+          </div>
+        </div>
+
         <!-- AR Invoice (Optional) -->
         <div class="file-zone" id="zone-journal-ar" ondragover="onDragOver(event,'journal-ar')" ondragleave="onDragLeave('journal-ar')" ondrop="onDrop(event,'journal-ar')">
           <input type="file" id="file-journal-ar" accept=".csv" onchange="onFileChange('journal-ar',this)" />
