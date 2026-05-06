@@ -4337,18 +4337,6 @@ class OracleFusionIntegration:
             transaction_date = pd.to_datetime(row["Transaction Date"]).strftime("%Y/%m/%d")
             warehouse = str(row.get("Warehouse Code", "") or "").strip().upper()
 
-            # Calculate charges based on charges_lookup if available
-            total_charge = 0.0
-            charge_key = (payment_method, str(is_cash).strip())
-            if charge_key in charges_lookup:
-                fixed_charge, rate = charges_lookup[charge_key]
-                # Formula: Total Charge = Fixed Charge + (Amount × Rate)
-                # Note: VAT is already included in the rate configuration
-                total_charge = fixed_charge + (abs_amount * rate)
-                if total_charge > 0:
-                    print(f"  ℹ️  Charge for {payment_method}: "
-                          f"Fixed={fixed_charge:.2f}, Rate={rate*100:.2f}%, Total Charge={total_charge:.2f}")
-
             # Parse transaction date for formatting
             trans_date_obj = pd.to_datetime(row["Transaction Date"])
             # Format Period Name as "26-Mar" (day-month abbreviation)
@@ -4368,6 +4356,18 @@ class OracleFusionIntegration:
             if is_negative_amount:
                 negative_amount_count += 1
                 print(f"  ℹ️  Negative amount detected: {amount:.2f} → Will use reversal format with absolute value {abs_amount:.2f} (3-series in Credit, 5-series in Debit)")
+
+            # Calculate charges based on charges_lookup if available
+            total_charge = 0.0
+            charge_key = (payment_method, str(is_cash).strip())
+            if charge_key in charges_lookup:
+                fixed_charge, rate = charges_lookup[charge_key]
+                # Formula: Total Charge = Fixed Charge + (Amount × Rate)
+                # Note: VAT is already included in the rate configuration
+                total_charge = fixed_charge + (abs_amount * rate)
+                if total_charge > 0:
+                    print(f"  ℹ️  Charge for {payment_method}: "
+                          f"Fixed={fixed_charge:.2f}, Rate={rate*100:.2f}%, Total Charge={total_charge:.2f}")
 
             if sp_meta is not None and not sp_meta.empty:
                 sp_rows = sp_meta[sp_meta["SERVICE_PROVIDER"] == payment_method]
