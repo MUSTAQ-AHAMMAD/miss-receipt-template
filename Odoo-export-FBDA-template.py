@@ -4312,25 +4312,19 @@ class OracleFusionIntegration:
 
         def _calculate_charge(amount: float, payment_method: str) -> float:
             """
-            Calculate total charge for a given amount using the formula:
-            Total Charge = FIXED_FREIGHT_CHARGE + (Amount × BANK_CHARGE_RATE)
+            Calculate total charge for a given order.
+
+            Simplified charging: 1 SAR per order (flat rate, not per line item).
 
             Args:
-                amount: Transaction amount
+                amount: Transaction amount (not used in calculation)
                 payment_method: Payment method (TABBY/TAMARA)
 
             Returns:
-                Total charge amount, or 0 if no rate found
+                Fixed charge of 1 SAR per order
             """
-            # Look up charge configuration for this payment method (non-cash)
-            charge_key = (payment_method.upper(), "0")  # "0" for non-cash
-            if charge_key not in charges_lookup:
-                return 0.0
-
-            fixed_charge, rate = charges_lookup[charge_key]
-            # Formula: Total Charge = FIXED_FREIGHT_CHARGE + (Amount × BANK_CHARGE_RATE)
-            total_charge = fixed_charge + (amount * rate)
-            return total_charge
+            # Flat 1 SAR per order, regardless of amount or payment method
+            return 1.0
 
         # Generate unique interface group identifier for this entire sheet
         # Using timestamp to ensure uniqueness across multiple file generations
@@ -4342,18 +4336,11 @@ class OracleFusionIntegration:
             transaction_date = pd.to_datetime(row["Transaction Date"]).strftime("%Y/%m/%d")
             warehouse = str(row.get("Warehouse Code", "") or "").strip().upper()
 
-            # Calculate charges if we have charge rates configured
-            total_charge = 0.0
-            if charges_lookup:
-                total_charge = _calculate_charge(amount, payment_method)
-                if total_charge > 0:
-                    charge_key = (payment_method, "0")
-                    if charge_key in charges_lookup:
-                        fixed_charge, rate = charges_lookup[charge_key]
-                        print(f"  ℹ️  Charge calculation for {payment_method}: "
-                              f"Amount={amount:.2f}, Fixed={fixed_charge:.2f}, Rate={rate*100:.2f}%, "
-                              f"Variable Charge={amount*rate:.2f}, "
-                              f"Total Charge={total_charge:.2f}")
+            # Calculate charges: 1 SAR per order (flat rate)
+            total_charge = 1.0
+            if total_charge > 0:
+                print(f"  ℹ️  Charge for {payment_method}: "
+                      f"1 SAR per order (flat rate)")
 
             # Parse transaction date for formatting
             trans_date_obj = pd.to_datetime(row["Transaction Date"])
