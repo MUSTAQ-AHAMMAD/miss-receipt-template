@@ -892,15 +892,14 @@
       <div style="padding:20px; background:rgba(16,185,129,.08); border:1px solid rgba(16,185,129,.25); border-radius:12px; margin-bottom:20px;">
         <h4 style="margin-bottom:10px; color:var(--accent-green);"><i class="fa-solid fa-book"></i> Generate Journal Template for Service Providers</h4>
         <p style="font-size:.85rem; color:var(--text-muted); margin-bottom:16px;">
-          Upload a Payment Lines file (required) to generate Oracle Fusion Journal Import templates for service provider transactions (TAMARA, TABBY, HUNGERSTATION, MRSOOL).
+          Upload <strong>Payment Lines</strong> and <strong>Sales Lines</strong> files (both required) to generate Oracle Fusion Journal Import templates for service provider transactions (TAMARA, TABBY, HUNGERSTATION, MRSOOL).
           The system will automatically filter qualifying transactions and create balanced debit/credit journal entries using the configured account mappings.
-          You can optionally upload an AR Invoice CSV file for additional transaction details.
         </p>
         <div style="font-size:.80rem; color:var(--text-muted); margin-top:12px; padding:10px; background:rgba(16,185,129,.05); border-left:3px solid var(--accent-green); border-radius:6px;">
-          <strong>Configuration Modes:</strong><br/>
-          • <strong>Preferred:</strong> Upload SERVICE_PROVIDER_JOURNAL_META.csv for enhanced multi-provider support<br/>
-          • <strong>Legacy:</strong> Uses JOURNAL_CONFIG.csv + JOURNAL_ACCOUNT_MAPPING.csv (TAMARA/TABBY only)<br/>
-          • <strong>Auto-detect:</strong> Files are auto-loaded from server if not uploaded
+          <strong>Configuration Files:</strong><br/>
+          • All configuration files (JOURNAL_CONFIG.csv, JOURNAL_ACCOUNT_MAPPING.csv, SERVICE_PROVIDER_JOURNAL_META.csv, FUSION_SALES_METADATA_Cost_Center.csv) are automatically loaded from the server repository<br/>
+          • <strong>You only need to upload Payment Lines and Sales Lines files</strong><br/>
+          • AR Invoice and Charges files are optional
         </div>
       </div>
 
@@ -922,15 +921,15 @@
           </div>
         </div>
 
-        <!-- Sales Lines (Optional) -->
+        <!-- Sales Lines (REQUIRED) -->
         <div class="file-zone" id="zone-journal-sales-lines-file" ondragover="onDragOver(event,'journal-sales-lines-file')" ondragleave="onDragLeave('journal-sales-lines-file')" ondrop="onDrop(event,'journal-sales-lines-file')">
           <input type="file" id="file-journal-sales-lines-file" accept=".csv,.xlsx,.xls" onchange="onFileChange('journal-sales-lines-file',this)" />
           <div class="fz-header">
-            <div class="fz-icon"><i class="fa-solid fa-list"></i></div>
+            <div class="fz-icon required"><i class="fa-solid fa-list"></i></div>
             <div>
               <div class="fz-title">Sales Lines CSV/XLSX</div>
               <div class="fz-subtitle">Line item details for per-item charge calculations</div>
-              <span class="fz-badge opt">Optional</span>
+              <span class="fz-badge req">Required</span>
             </div>
           </div>
           <div class="fz-msg">
@@ -973,90 +972,6 @@
           </div>
         </div>
 
-        <!-- Journal Config (Optional) -->
-        <div class="file-zone" id="zone-journal-config-file" ondragover="onDragOver(event,'journal-config-file')" ondragleave="onDragLeave('journal-config-file')" ondrop="onDrop(event,'journal-config-file')">
-          <input type="file" id="file-journal-config-file" accept=".csv" onchange="onFileChange('journal-config-file',this)" />
-          <div class="fz-header">
-            <div class="fz-icon"><i class="fa-solid fa-cog"></i></div>
-            <div>
-              <div class="fz-title">Journal Config CSV</div>
-              <div class="fz-subtitle">Business unit configuration (auto-loaded from server if not provided)</div>
-              <span class="fz-badge opt">Optional</span>
-            </div>
-          </div>
-          <div class="fz-msg">
-            <p>Click to browse or drag & drop</p>
-            <small>JOURNAL_CONFIG.csv - leave empty to use server default</small>
-          </div>
-        </div>
-
-        <!-- Journal Account Mapping (Optional) -->
-        <div class="file-zone" id="zone-journal-mapping-file" ondragover="onDragOver(event,'journal-mapping-file')" ondragleave="onDragLeave('journal-mapping-file')" ondrop="onDrop(event,'journal-mapping-file')">
-          <input type="file" id="file-journal-mapping-file" accept=".csv" onchange="onFileChange('journal-mapping-file',this)" />
-          <div class="fz-header">
-            <div class="fz-icon"><i class="fa-solid fa-map"></i></div>
-            <div>
-              <div class="fz-title">Account Mapping CSV</div>
-              <div class="fz-subtitle">Payment method account mapping (auto-loaded from server if not provided)</div>
-              <span class="fz-badge opt">Optional</span>
-            </div>
-          </div>
-          <div class="fz-msg">
-            <p>Click to browse or drag & drop</p>
-            <small>JOURNAL_ACCOUNT_MAPPING.csv - leave empty to use server default</small>
-          </div>
-        </div>
-
-        <!-- Service Provider Metadata (Optional - Preferred) -->
-        <div class="file-zone" id="zone-journal-service-provider" ondragover="onDragOver(event,'journal-service-provider')" ondragleave="onDragLeave('journal-service-provider')" ondrop="onDrop(event,'journal-service-provider')">
-          <input type="file" id="file-journal-service-provider" accept=".csv" onchange="onFileChange('journal-service-provider',this)" />
-          <div class="fz-header">
-            <div class="fz-icon"><i class="fa-solid fa-building"></i></div>
-            <div>
-              <div class="fz-title">Service Provider Metadata</div>
-              <div class="fz-subtitle">Per-provider segment configuration (supports all providers)</div>
-              <span class="fz-badge opt">Optional</span>
-            </div>
-          </div>
-          <div class="fz-msg">
-            <p>Click to browse or drag & drop</p>
-            <small>SERVICE_PROVIDER_JOURNAL_META.csv - leave empty to use server default</small>
-          </div>
-        </div>
-
-        <!-- Cost Center Metadata (Optional) -->
-        <div class="file-zone" id="zone-journal-cost-center" ondragover="onDragOver(event,'journal-cost-center')" ondragleave="onDragLeave('journal-cost-center')" ondrop="onDrop(event,'journal-cost-center')">
-          <input type="file" id="file-journal-cost-center" accept=".csv" onchange="onFileChange('journal-cost-center',this)" />
-          <div class="fz-header">
-            <div class="fz-icon"><i class="fa-solid fa-store"></i></div>
-            <div>
-              <div class="fz-title">Cost Center Metadata</div>
-              <div class="fz-subtitle">Per-store cost center mapping (Segment4)</div>
-              <span class="fz-badge opt">Optional</span>
-            </div>
-          </div>
-          <div class="fz-msg">
-            <p>Click to browse or drag & drop</p>
-            <small>FUSION_SALES_METADATA_Cost_Center.csv - leave empty to use server default</small>
-          </div>
-        </div>
-
-        <!-- Payment File (Optional) -->
-        <div class="file-zone" id="zone-journal-payment-file" ondragover="onDragOver(event,'journal-payment-file')" ondragleave="onDragLeave('journal-payment-file')" ondrop="onDrop(event,'journal-payment-file')">
-          <input type="file" id="file-journal-payment-file" accept=".xlsx,.csv" onchange="onFileChange('journal-payment-file',this)" />
-          <div class="fz-header">
-            <div class="fz-icon"><i class="fa-solid fa-credit-card"></i></div>
-            <div>
-              <div class="fz-title">Payment File</div>
-              <div class="fz-subtitle">Detailed payment method breakdown per transaction</div>
-              <span class="fz-badge opt">Optional</span>
-            </div>
-          </div>
-          <div class="fz-msg">
-            <p>Click to browse or drag & drop</p>
-            <small>XLSX/CSV with payment methods per transaction - overrides AR Invoice payment methods</small>
-          </div>
-        </div>
       </div>
 
       <!-- Journal Template Parameters -->
@@ -1086,7 +1001,7 @@
         </div>
         <div style="margin-top:12px; padding:12px; background:rgba(16,185,129,.08); border:1px solid rgba(16,185,129,.25); border-radius:8px; font-size:.82rem; color:var(--text-muted);">
           <i class="fa-solid fa-info-circle" style="color:var(--accent-green);"></i>
-          <strong>Note:</strong> The system will automatically detect qualifying service provider transactions (TAMARA, TABBY, HUNGERSTATION, MRSOOL) from the Payment Lines file and generate balanced debit/credit journal entries. Payment Lines file is required; AR Invoice is optional for additional transaction details. Service provider metadata enables support for all providers; legacy configuration supports TAMARA/TABBY only.
+          <strong>Note:</strong> Both Payment Lines and Sales Lines files are required for journal generation. The system will automatically detect qualifying service provider transactions (TAMARA, TABBY, HUNGERSTATION, MRSOOL) and generate balanced debit/credit journal entries. All configuration files are automatically loaded from the server repository.
         </div>
       </div>
     </div><!-- /uploads-journal -->
@@ -1596,6 +1511,10 @@
     } else if (currentMode === 'journal') {
       if (!fileMap['journal-payment-file']) {
         showBanner('error', 'Please upload your Payment Lines CSV/XLSX file for journal generation.');
+        return;
+      }
+      if (!fileMap['journal-sales-lines-file']) {
+        showBanner('error', 'Please upload your Sales Lines CSV/XLSX file for journal generation.');
         return;
       }
     }
