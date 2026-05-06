@@ -4400,6 +4400,26 @@ class OracleFusionIntegration:
         # Using timestamp to ensure uniqueness across multiple file generations
         unique_interface_group_id = interface_group_id
 
+        # ══════════════════════════════════════════════════════════════════════
+        # IMPORTANT: Journal Template - CHARGES ONLY Mode
+        # ══════════════════════════════════════════════════════════════════════
+        # This journal template generates entries for SERVICE PROVIDER CHARGES only.
+        # Payment amounts are NOT included in the journal entries.
+        #
+        # Each order will have:
+        #   - 2 charge entries (debit/credit pair) for the service fee
+        #   - NO payment amount entries
+        #
+        # To include payment amounts, see commented code at line ~4562
+        # ══════════════════════════════════════════════════════════════════════
+        print("\n" + "═" * 80)
+        print("JOURNAL TEMPLATE MODE: CHARGES ONLY")
+        print("═" * 80)
+        print("ℹ️  This journal template will generate entries for SERVICE CHARGES ONLY")
+        print("ℹ️  Payment amounts will NOT be included in the journal entries")
+        print("ℹ️  Each qualifying order will have one debit/credit pair for charges")
+        print("═" * 80 + "\n")
+
         for _, row in grouped.iterrows():
             payment_method = str(row["Receipt Method Name"]).upper()
             amount = float(row["Transaction Line Amount"])
@@ -4553,9 +4573,14 @@ class OracleFusionIntegration:
                     "Converted Credit Amount": "",
                 }
 
-            # Append entries in order: credit account (3-series) first, then debit account (5-series)
-            journal_entries.append(credit_account_entry)
-            journal_entries.append(debit_account_entry)
+            # ── JOURNAL TEMPLATE CHANGE: Only generate charge entries, not payment entries ──
+            # The payment amounts are already recorded elsewhere in the system.
+            # Journal template should ONLY show the service provider charges (TABBY/TAMARA fees).
+            # Therefore, we skip appending the payment amount entries and only generate charge entries.
+            #
+            # NOTE: If you need to restore payment entries, uncomment the lines below:
+            # journal_entries.append(credit_account_entry)
+            # journal_entries.append(debit_account_entry)
 
             # ── Generate charge entries if charges are applicable ──────────────
             if total_charge > 0:
@@ -4605,6 +4630,9 @@ class OracleFusionIntegration:
                 journal_entries.append(charge_debit_entry)
                 charge_entries_count += 1
                 print(f"  ℹ️  Added charge entries for {payment_method}: {total_charge:.2f} SAR")
+            else:
+                # No charges for this transaction - skip entirely in charges-only mode
+                print(f"  ⚠️  No charges calculated for {payment_method} (Amount: {abs_amount:.2f} SAR) - skipping entry")
 
             journal_entry_counter += 1
             if journal_entry_counter % 10 == 0:
@@ -4677,13 +4705,29 @@ class OracleFusionIntegration:
         # Reorder columns to match template
         journal_df = journal_df[template_columns]
 
-        print(f"✓  Generated {len(journal_df)} journal entries")
-        print(f"   - Payment entries: {len(journal_df) - (charge_entries_count * 2)} lines ({(len(journal_df) - (charge_entries_count * 2))//2} transactions)")
+        # Summary output
+        print("\n" + "═" * 80)
+        print("JOURNAL TEMPLATE GENERATION COMPLETE - CHARGES ONLY MODE")
+        print("═" * 80)
+        print(f"✓  Generated {len(journal_df)} journal entry lines")
+        print(f"   - Charge entries: {charge_entries_count * 2} lines ({charge_entries_count} charge transactions)")
+        print(f"   - Payment entries: 0 lines (EXCLUDED in charges-only mode)")
         if charge_entries_count > 0:
-            print(f"   - Charge entries: {charge_entries_count * 2} lines ({charge_entries_count} charges)")
+            total_charges = sum(
+                pd.to_numeric(journal_df['Entered Debit Amount'], errors='coerce').fillna(0)
+            )
+            print(f"   - Total charges amount: {total_charges:,.2f} SAR")
         if negative_amount_count > 0:
             print(f"ℹ️  Note: {negative_amount_count} transaction(s) with negative amounts used reversal format")
-        print("=" * 72)
+
+        if len(journal_df) == 0:
+            print("\n⚠️  WARNING: No journal entries generated!")
+            print("   This could mean:")
+            print("   - No charges file was provided")
+            print("   - Charges lookup returned 0 for all transactions")
+            print("   - No qualifying TABBY/TAMARA transactions found")
+
+        print("═" * 80 + "\n")
 
         return journal_df
 
