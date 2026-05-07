@@ -4288,14 +4288,13 @@ class OracleFusionIntegration:
                     for method, method_amt in methods_dict.items():
                         method_upper = method.upper()
                         if method_upper in valid_providers:
-                            # Use amount from sales lines if available, otherwise fall back to payment amount
+                            # Use amount from payment file (prioritized over sales lines)
+                            final_amount = method_amt
                             if sales_lines_totals and sales_order_ref in sales_lines_totals:
-                                final_amount = sales_lines_totals[sales_order_ref]
-                                print(f"  ℹ️  Using sales lines amount for {sales_order_ref}: {final_amount:.2f} SAR (payment file had: {method_amt:.2f} SAR)")
+                                sales_lines_amt = sales_lines_totals[sales_order_ref]
+                                print(f"  ℹ️  Using payment file amount for {sales_order_ref}: {final_amount:.2f} SAR (sales lines had: {sales_lines_amt:.2f} SAR)")
                             else:
-                                final_amount = method_amt
-                                if sales_lines_totals:
-                                    print(f"  ⚠  No sales lines data found for {sales_order_ref}, using payment amount: {method_amt:.2f} SAR")
+                                print(f"  ℹ️  Using payment file amount for {sales_order_ref}: {final_amount:.2f} SAR")
 
                             expanded_rows.append({
                                 "Transaction Number": sales_order_ref,  # Use Sales Order as Transaction Number
