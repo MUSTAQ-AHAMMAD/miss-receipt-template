@@ -577,6 +577,84 @@ def safe_float(val, default: float = 0.0) -> float:
         return default
 
 
+def parse_flexible_date(date_val):
+    """Parse dates in multiple formats commonly found in Odoo exports.
+
+    Handles formats like:
+    - 2026-03-05 23:50:01 (ISO datetime)
+    - 2026-03-05 (ISO date)
+    - 3/9/2026 (US format)
+    - 09/03/2026 (EU format)
+    - 05-Mar-2026 (Month name format)
+
+    For ambiguous dates (like 5/3/2026), defaults to day-first interpretation
+    which is more common in international contexts.
+
+    Returns a pd.Timestamp or pd.NaT if parsing fails.
+    """
+    if pd.isna(date_val) or date_val == "":
+        return pd.NaT
+
+    # Already a datetime
+    if isinstance(date_val, (datetime, pd.Timestamp)):
+        return pd.Timestamp(date_val)
+
+    date_str = str(date_val).strip()
+    if not date_str:
+        return pd.NaT
+
+    # Try common explicit formats first (these are unambiguous)
+    unambiguous_formats = [
+        "%Y-%m-%d %H:%M:%S",  # 2026-03-05 23:50:01
+        "%Y-%m-%d",           # 2026-03-05
+        "%d-%b-%Y",           # 05-Mar-2026
+        "%d %b %Y",           # 05 Mar 2026
+        "%d-%b-%y",           # 05-Mar-26
+        "%Y/%m/%d",           # 2026/03/05
+    ]
+
+    for fmt in unambiguous_formats:
+        try:
+            return pd.Timestamp(datetime.strptime(date_str, fmt))
+        except (ValueError, TypeError):
+            continue
+
+    # For potentially ambiguous formats (slashes, dashes, dots),
+    # try dayfirst=True first (common in Middle East, Europe, Asia)
+    try:
+        parsed = pd.to_datetime(date_str, dayfirst=True, errors="coerce")
+        if pd.notna(parsed):
+            return parsed
+    except:
+        pass
+
+    # Fall back to pandas default parser (monthfirst=True for US-style dates)
+    try:
+        parsed = pd.to_datetime(date_str, errors="coerce")
+        if pd.notna(parsed):
+            return parsed
+    except:
+        pass
+
+    # Try remaining explicit formats as last resort
+    remaining_formats = [
+        "%m/%d/%Y",           # 3/9/2026 (US format)
+        "%d/%m/%Y",           # 9/3/2026 (EU format)
+        "%d-%m-%Y",           # 05-03-2026
+        "%d.%m.%Y",           # 05.03.2026
+        "%m/%d/%y",           # 3/9/26
+        "%d/%m/%y",           # 9/3/26
+    ]
+
+    for fmt in remaining_formats:
+        try:
+            return pd.Timestamp(datetime.strptime(date_str, fmt))
+        except (ValueError, TypeError):
+            continue
+
+    return pd.NaT
+
+
 def format_datetime(dt) -> str:
     if isinstance(dt, datetime):
         return dt.strftime("%Y-%m-%d %H:%M:%S")
@@ -675,8 +753,15 @@ LINE_ITEMS_COL_MAP = {
     "Sale Date": [
         "Order Lines/Order Ref/Date",
         "Order Lines/Date",
+        "Order Lines/Create Date",
         "Sale Date",
         "Date",
+        "Order Date",
+        "Invoice Date",
+        "Transaction Date",
+        "Create Date",
+        "Accounting Date",
+        "Date Order",
     ],
     "Store Name": [
         "Order Lines/Register Name",
@@ -2171,9 +2256,21 @@ class OracleFusionIntegration:
             self.line_items["Order Ref"].apply(clean_order_ref)
         )
 
-        self.line_items["Sale Date"] = pd.to_datetime(
-            self.line_items["Sale Date"], errors="coerce"
-        )
+        # Improved date parsing with multiple format support
+        vl.add("  Parsing Sale Date column with flexible format detection...")
+        self.line_items["Sale Date"] = self.line_items["Sale Date"].apply(parse_flexible_date)
+
+        # Report date parsing success rate
+        valid_dates = self.line_items["Sale Date"].notna().sum()
+        total_rows = len(self.line_items)
+        vl.add(f"  ✓ Successfully parsed {valid_dates}/{total_rows} dates ({100*valid_dates/total_rows:.1f}%)")
+        if valid_dates < total_rows:
+            failed_dates = total_rows - valid_dates
+            vl.add(f"    ⚠ {failed_dates} row(s) have invalid/missing dates - will use current date as fallback")
+            # Show sample of failed dates for diagnostics
+            failed_samples = self.line_items[self.line_items["Sale Date"].isna()]["Sale Date"].head(5)
+            if len(failed_samples) > 0:
+                vl.add(f"    Sample of unparseable date values: {list(failed_samples)[:3]}")
 
         if res.get("Store Name") is None:
             self.line_items["Store Name"] = self.line_items["Order Ref"].apply(
@@ -3441,7 +3538,7 @@ class OracleFusionIntegration:
             # This ensures we capture valid dates even when previous rows had invalid/empty dates
             if date_col:
                 try:
-                    date_parsed = pd.to_datetime(row.get(date_col), errors="coerce")
+                    date_parsed = parse_flexible_date(row.get(date_col))
                     if pd.notna(date_parsed):
                         # Always update with valid date (overwrites previous invalid dates or keeps first valid date)
                         if inv not in dates or dates[inv] is None or pd.isna(dates.get(inv)):
