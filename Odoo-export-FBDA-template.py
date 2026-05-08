@@ -4380,22 +4380,6 @@ class OracleFusionIntegration:
                 "Segment7": _to_text(sp_row.get("FUT_USED", "")),
             }
 
-        def _calculate_charge(amount: float, payment_method: str) -> float:
-            """
-            Calculate total charge for a given order.
-
-            Simplified charging: 1 SAR per order (flat rate, not per line item).
-
-            Args:
-                amount: Transaction amount (not used in calculation)
-                payment_method: Payment method (TABBY/TAMARA)
-
-            Returns:
-                Fixed charge of 1 SAR per order
-            """
-            # Flat 1 SAR per order, regardless of amount or payment method
-            return 1.0
-
         # Generate unique interface group identifier for this entire sheet
         # Using timestamp to ensure uniqueness across multiple file generations
         unique_interface_group_id = interface_group_id
@@ -4455,8 +4439,11 @@ class OracleFusionIntegration:
                 # Note: VAT is already included in the rate configuration
                 total_charge = round(fixed_charge + (abs_amount * rate), 2)
                 if total_charge > 0:
-                    print(f"  ℹ️  Charge for {payment_method}: "
-                          f"Fixed={fixed_charge:.2f}, Rate={rate*100:.2f}%, Total Charge={total_charge:.2f}")
+                    print(f"  ℹ️  {payment_method} charge for {abs_amount:.2f} SAR invoice: "
+                          f"Fixed={fixed_charge:.2f} + Variable=({abs_amount:.2f}×{rate*100:.2f}%)={abs_amount*rate:.2f} "
+                          f"= Total Charge={total_charge:.2f} SAR")
+            else:
+                print(f"  ⚠️  No charge configuration found for {payment_method} (IS_CASH={is_cash})")
 
             if sp_meta is not None and not sp_meta.empty:
                 sp_rows = sp_meta[sp_meta["SERVICE_PROVIDER"] == payment_method]
