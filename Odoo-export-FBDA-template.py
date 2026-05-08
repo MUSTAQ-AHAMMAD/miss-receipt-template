@@ -4325,15 +4325,25 @@ class OracleFusionIntegration:
 
                 # Group by Payment Method + Date + Sign (separate positive from negative)
                 # This ensures refunds are charged separately from regular transactions
-                # Formula: One fixed fee per group + (group total × rate)
+                # Formula: (Fixed fee × transaction count) + (group total × rate)
+                # We need to track the transaction count to apply fixed fees correctly
                 group_cols = ["Receipt Method Name", "Transaction Date", "Amount Sign"]
                 if "Warehouse Code" in temp_df.columns:
                     group_cols.append("Warehouse Code")
 
                 grouped = temp_df.groupby(group_cols, dropna=False).agg({
                     "Transaction Line Amount": "sum",
-                    "Transaction Number": "first"  # Keep a transaction number for reference
+                    "Transaction Number": ["first", "count"]  # Keep a transaction number and count transactions
                 }).reset_index()
+
+                # Flatten column names after aggregation
+                grouped.columns = [' '.join(col).strip() if col[1] else col[0] for col in grouped.columns.values]
+                # Rename the aggregated columns back to simpler names
+                grouped = grouped.rename(columns={
+                    "Transaction Number count": "Transaction Count",
+                    "Transaction Number first": "Transaction Number",
+                    "Transaction Line Amount sum": "Transaction Line Amount"
+                })
 
                 # Remove the "Amount Sign" column after grouping (not needed in output)
                 grouped = grouped.drop(columns=["Amount Sign"])
@@ -4451,23 +4461,21 @@ class OracleFusionIntegration:
         unique_interface_group_id = interface_group_id
 
         # ══════════════════════════════════════════════════════════════════════
-        # Journal Template Generation Mode
+        # IMPORTANT: Journal Template - CHARGES ONLY Mode
         # ══════════════════════════════════════════════════════════════════════
-        # This journal template generates entries for both:
-        #   1. Payment amounts (transaction amounts)
-        #   2. Service provider charges (TABBY/TAMARA fees)
+        # This journal template generates entries for SERVICE PROVIDER CHARGES only.
+        # Payment amounts are NOT included in the journal entries.
         #
-        # Each qualifying transaction will have:
-        #   - 2 payment amount entries (debit/credit pair)
+        # Each transaction will have:
         #   - 2 charge entries (debit/credit pair) for the service fee
+        #   - NO payment amount entries
         # ══════════════════════════════════════════════════════════════════════
         print("\n" + "═" * 80)
-        print("JOURNAL TEMPLATE MODE: FULL (Payments + Charges)")
+        print("JOURNAL TEMPLATE MODE: CHARGES ONLY")
         print("═" * 80)
-        print("ℹ️  This journal template will generate entries for:")
-        print("ℹ️    1. Payment amounts (transaction amounts)")
-        print("ℹ️    2. Service provider charges (TABBY/TAMARA fees)")
-        print("ℹ️  Each transaction will have 4 journal entries (2 for payment + 2 for charges)")
+        print("ℹ️  This journal template will generate entries for SERVICE CHARGES ONLY")
+        print("ℹ️  Payment amounts will NOT be included in the journal entries")
+        print("ℹ️  Each qualifying transaction will have one debit/credit pair for charges")
         print("═" * 80 + "\n")
 
         for _, row in grouped.iterrows():
@@ -4496,18 +4504,27 @@ class OracleFusionIntegration:
                 negative_amount_count += 1
                 print(f"  ℹ️  Negative amount detected: {amount:.2f} → Will use reversal format with absolute value {abs_amount:.2f} (3-series in Debit, 5-series in Credit)")
 
+            # Get transaction count from the grouped row (defaults to 1 if not available)
+            transaction_count = int(row.get("Transaction Count", 1))
+
             # Calculate charges based on charges_lookup if available
             total_charge = 0.0
             charge_key = (payment_method, str(is_cash).strip())
             if charge_key in charges_lookup:
                 fixed_charge, rate = charges_lookup[charge_key]
-                # Formula: Total Charge = Fixed Charge + (Amount × Rate)
+                # Formula: Total Charge = (Fixed Charge × Transaction Count) + (Amount × Rate)
+                # This ensures each transaction gets its own fixed fee
                 # Note: VAT is already included in the rate configuration
-                total_charge = round(fixed_charge + (abs_amount * rate), 2)
+                total_charge = round((fixed_charge * transaction_count) + (abs_amount * rate), 2)
                 if total_charge > 0:
-                    print(f"  ℹ️  {payment_method} charge for {abs_amount:.2f} SAR invoice: "
-                          f"Fixed={fixed_charge:.2f} + Variable=({abs_amount:.2f}×{rate*100:.2f}%)={abs_amount*rate:.2f} "
-                          f"= Total Charge={total_charge:.2f} SAR")
+                    if transaction_count > 1:
+                        print(f"  ℹ️  {payment_method} charge for {transaction_count} transactions totaling {abs_amount:.2f} SAR: "
+                              f"Fixed=({fixed_charge:.2f}×{transaction_count})={fixed_charge*transaction_count:.2f} + Variable=({abs_amount:.2f}×{rate*100:.2f}%)={abs_amount*rate:.2f} "
+                              f"= Total Charge={total_charge:.2f} SAR")
+                    else:
+                        print(f"  ℹ️  {payment_method} charge for {abs_amount:.2f} SAR invoice: "
+                              f"Fixed={fixed_charge:.2f} + Variable=({abs_amount:.2f}×{rate*100:.2f}%)={abs_amount*rate:.2f} "
+                              f"= Total Charge={total_charge:.2f} SAR")
             else:
                 print(f"  ⚠️  No charge configuration found for {payment_method} (IS_CASH={is_cash})")
 
@@ -4627,10 +4644,14 @@ class OracleFusionIntegration:
                     "Converted Credit Amount": abs_amount,
                 }
 
-            # ── JOURNAL TEMPLATE: Generate payment amount entries ──
-            # Include payment amounts in journal entries along with charges
-            journal_entries.append(credit_account_entry)
-            journal_entries.append(debit_account_entry)
+            # ── JOURNAL TEMPLATE CHANGE: Only generate charge entries, not payment entries ──
+            # The payment amounts are already recorded elsewhere in the system.
+            # Journal template should ONLY show the service provider charges (TABBY/TAMARA fees).
+            # Therefore, we skip appending the payment amount entries and only generate charge entries.
+            #
+            # NOTE: Payment entries are NOT included in charges-only mode:
+            # journal_entries.append(credit_account_entry)
+            # journal_entries.append(debit_account_entry)
 
             # ── Generate charge entries if charges are applicable ──────────────
             if total_charge > 0:
@@ -4757,24 +4778,16 @@ class OracleFusionIntegration:
 
         # Summary output
         print("\n" + "═" * 80)
-        print("JOURNAL TEMPLATE GENERATION COMPLETE - FULL MODE (Payments + Charges)")
+        print("JOURNAL TEMPLATE GENERATION COMPLETE - CHARGES ONLY MODE")
         print("═" * 80)
         print(f"✓  Generated {len(journal_df)} journal entry lines")
-        # Count actual payment and charge entries based on journal_entry_counter
-        payment_entries = journal_entry_counter * 2  # 2 entries per payment transaction
-        charge_entries = charge_entries_count * 2    # 2 entries per charge transaction
-        print(f"   - Payment entries: {payment_entries} lines ({journal_entry_counter} payment transactions)")
-        print(f"   - Charge entries: {charge_entries} lines ({charge_entries_count} charge transactions)")
-        if len(journal_df) > 0:
-            total_debits = sum(
+        print(f"   - Charge entries: {charge_entries_count * 2} lines ({charge_entries_count} charge transactions)")
+        print(f"   - Payment entries: 0 lines (EXCLUDED in charges-only mode)")
+        if charge_entries_count > 0:
+            total_charges = sum(
                 pd.to_numeric(journal_df['Entered Debit Amount'], errors='coerce').fillna(0)
             )
-            total_credits = sum(
-                pd.to_numeric(journal_df['Entered Credit Amount'], errors='coerce').fillna(0)
-            )
-            print(f"   - Total Debits: {total_debits:,.2f} SAR")
-            print(f"   - Total Credits: {total_credits:,.2f} SAR")
-            print(f"   - Balance: {abs(total_debits - total_credits):,.2f} SAR difference")
+            print(f"   - Total charges amount: {total_charges:,.2f} SAR")
         if negative_amount_count > 0:
             print(f"ℹ️  Note: {negative_amount_count} transaction(s) with negative amounts used reversal format")
 
