@@ -4309,8 +4309,36 @@ class OracleFusionIntegration:
                     print("⚠️  No qualifying payment methods found in payment file data")
                     return pd.DataFrame()
 
-                grouped = pd.DataFrame(expanded_rows)
-                print(f"✓  Created {len(grouped)} journal entries from payment file")
+                # Convert to DataFrame first
+                temp_df = pd.DataFrame(expanded_rows)
+
+                # Normalize Transaction Date to date-only (remove time component) for proper daily aggregation
+                # This ensures all transactions on the same calendar day are grouped together
+                temp_df["Transaction Date"] = pd.to_datetime(temp_df["Transaction Date"]).dt.date
+
+                # Add a "Sign" column to separate positive and negative amounts
+                # This is CRITICAL for correct charge calculation:
+                # - Positive amounts get normal charges
+                # - Negative amounts (refunds) get reversal charges
+                # They must NOT be netted together before calculating charges
+                temp_df["Amount Sign"] = temp_df["Transaction Line Amount"].apply(lambda x: "positive" if x >= 0 else "negative")
+
+                # Group by Payment Method + Date + Sign (separate positive from negative)
+                # This ensures refunds are charged separately from regular transactions
+                # Formula: One fixed fee per group + (group total × rate)
+                group_cols = ["Receipt Method Name", "Transaction Date", "Amount Sign"]
+                if "Warehouse Code" in temp_df.columns:
+                    group_cols.append("Warehouse Code")
+
+                grouped = temp_df.groupby(group_cols, dropna=False).agg({
+                    "Transaction Line Amount": "sum",
+                    "Transaction Number": "first"  # Keep a transaction number for reference
+                }).reset_index()
+
+                # Remove the "Amount Sign" column after grouping (not needed in output)
+                grouped = grouped.drop(columns=["Amount Sign"])
+
+                print(f"✓  Created {len(grouped)} journal entries from payment file (aggregated by day+sign from {len(temp_df)} transactions)")
             else:
                 # AR Invoice is available - use it to enrich payment data
                 for _, ar_row in invoices.iterrows():
@@ -4345,16 +4373,54 @@ class OracleFusionIntegration:
                     print("⚠️  No qualifying payment methods found in payment file data")
                     return pd.DataFrame()
 
-                grouped = pd.DataFrame(expanded_rows)
-                print(f"✓  Expanded {len(invoices)} AR transactions into {len(grouped)} payment entries")
+                # Convert to DataFrame first
+                temp_df = pd.DataFrame(expanded_rows)
+
+                # Normalize Transaction Date to date-only (remove time component) for proper daily aggregation
+                # This ensures all transactions on the same calendar day are grouped together
+                temp_df["Transaction Date"] = pd.to_datetime(temp_df["Transaction Date"]).dt.date
+
+                # Add a "Sign" column to separate positive and negative amounts
+                # This is CRITICAL for correct charge calculation:
+                # - Positive amounts get normal charges
+                # - Negative amounts (refunds) get reversal charges
+                # They must NOT be netted together before calculating charges
+                temp_df["Amount Sign"] = temp_df["Transaction Line Amount"].apply(lambda x: "positive" if x >= 0 else "negative")
+
+                # Group by Payment Method + Date + Sign (separate positive from negative)
+                # This ensures refunds are charged separately from regular transactions
+                # Formula: One fixed fee per group + (group total × rate)
+                group_cols = ["Receipt Method Name", "Transaction Date", "Amount Sign"]
+                if "Warehouse Code" in temp_df.columns:
+                    group_cols.append("Warehouse Code")
+
+                grouped = temp_df.groupby(group_cols, dropna=False).agg({
+                    "Transaction Line Amount": "sum",
+                    "Transaction Number": "first"  # Keep a transaction number for reference
+                }).reset_index()
+
+                # Remove the "Amount Sign" column after grouping (not needed in output)
+                grouped = grouped.drop(columns=["Amount Sign"])
+
+                print(f"✓  Expanded {len(invoices)} AR transactions into {len(grouped)} payment entries (aggregated by day+sign from {len(temp_df)} transactions)")
         else:
-            # Group by Transaction + Payment Method + Date, and (when available) Warehouse Code
-            group_cols = ["Transaction Number", "Receipt Method Name", "Transaction Date"]
+            # AR Invoice-only path: Add sign-based grouping for correct charge calculation
+            # Separate positive and negative amounts to avoid netting refunds with sales
+            invoices["Amount Sign"] = invoices["Transaction Line Amount"].apply(lambda x: "positive" if x >= 0 else "negative")
+
+            # Group by Payment Method + Date + Sign (separate positive from negative)
+            # This ensures refunds are charged separately from regular transactions
+            # Formula: One fixed fee per group + (group total × rate)
+            group_cols = ["Receipt Method Name", "Transaction Date", "Amount Sign"]
             if "Warehouse Code" in invoices.columns:
                 group_cols.append("Warehouse Code")
             grouped = invoices.groupby(group_cols, dropna=False).agg({
-                "Transaction Line Amount": "sum"
+                "Transaction Line Amount": "sum",
+                "Transaction Number": "first"  # Keep a transaction number for reference
             }).reset_index()
+
+            # Remove the "Amount Sign" column after grouping (not needed in output)
+            grouped = grouped.drop(columns=["Amount Sign"])
 
         journal_entries = []
         batch_name_counter = 1
@@ -4379,22 +4445,6 @@ class OracleFusionIntegration:
                 "Segment6": _to_text(sp_row.get("INTER_COMPANY", "")),
                 "Segment7": _to_text(sp_row.get("FUT_USED", "")),
             }
-
-        def _calculate_charge(amount: float, payment_method: str) -> float:
-            """
-            Calculate total charge for a given order.
-
-            Simplified charging: 1 SAR per order (flat rate, not per line item).
-
-            Args:
-                amount: Transaction amount (not used in calculation)
-                payment_method: Payment method (TABBY/TAMARA)
-
-            Returns:
-                Fixed charge of 1 SAR per order
-            """
-            # Flat 1 SAR per order, regardless of amount or payment method
-            return 1.0
 
         # Generate unique interface group identifier for this entire sheet
         # Using timestamp to ensure uniqueness across multiple file generations
@@ -4455,8 +4505,11 @@ class OracleFusionIntegration:
                 # Note: VAT is already included in the rate configuration
                 total_charge = round(fixed_charge + (abs_amount * rate), 2)
                 if total_charge > 0:
-                    print(f"  ℹ️  Charge for {payment_method}: "
-                          f"Fixed={fixed_charge:.2f}, Rate={rate*100:.2f}%, Total Charge={total_charge:.2f}")
+                    print(f"  ℹ️  {payment_method} charge for {abs_amount:.2f} SAR invoice: "
+                          f"Fixed={fixed_charge:.2f} + Variable=({abs_amount:.2f}×{rate*100:.2f}%)={abs_amount*rate:.2f} "
+                          f"= Total Charge={total_charge:.2f} SAR")
+            else:
+                print(f"  ⚠️  No charge configuration found for {payment_method} (IS_CASH={is_cash})")
 
             if sp_meta is not None and not sp_meta.empty:
                 sp_rows = sp_meta[sp_meta["SERVICE_PROVIDER"] == payment_method]
