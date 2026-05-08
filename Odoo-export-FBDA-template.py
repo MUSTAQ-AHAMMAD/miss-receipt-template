@@ -4309,8 +4309,26 @@ class OracleFusionIntegration:
                     print("⚠️  No qualifying payment methods found in payment file data")
                     return pd.DataFrame()
 
-                grouped = pd.DataFrame(expanded_rows)
-                print(f"✓  Created {len(grouped)} journal entries from payment file")
+                # Convert to DataFrame first
+                temp_df = pd.DataFrame(expanded_rows)
+
+                # Normalize Transaction Date to date-only (remove time component) for proper daily aggregation
+                # This ensures all transactions on the same calendar day are grouped together
+                temp_df["Transaction Date"] = pd.to_datetime(temp_df["Transaction Date"]).dt.date
+
+                # Group by Payment Method + Date ONLY (aggregate all transactions per day)
+                # This ensures charges are calculated on daily totals, not per transaction
+                # Formula: One fixed fee per day + (total daily amount × rate)
+                group_cols = ["Receipt Method Name", "Transaction Date"]
+                if "Warehouse Code" in temp_df.columns:
+                    group_cols.append("Warehouse Code")
+
+                grouped = temp_df.groupby(group_cols, dropna=False).agg({
+                    "Transaction Line Amount": "sum",
+                    "Transaction Number": "first"  # Keep a transaction number for reference
+                }).reset_index()
+
+                print(f"✓  Created {len(grouped)} journal entries from payment file (aggregated by day from {len(temp_df)} transactions)")
             else:
                 # AR Invoice is available - use it to enrich payment data
                 for _, ar_row in invoices.iterrows():
@@ -4345,15 +4363,36 @@ class OracleFusionIntegration:
                     print("⚠️  No qualifying payment methods found in payment file data")
                     return pd.DataFrame()
 
-                grouped = pd.DataFrame(expanded_rows)
-                print(f"✓  Expanded {len(invoices)} AR transactions into {len(grouped)} payment entries")
+                # Convert to DataFrame first
+                temp_df = pd.DataFrame(expanded_rows)
+
+                # Normalize Transaction Date to date-only (remove time component) for proper daily aggregation
+                # This ensures all transactions on the same calendar day are grouped together
+                temp_df["Transaction Date"] = pd.to_datetime(temp_df["Transaction Date"]).dt.date
+
+                # Group by Payment Method + Date ONLY (aggregate all transactions per day)
+                # This ensures charges are calculated on daily totals, not per transaction
+                # Formula: One fixed fee per day + (total daily amount × rate)
+                group_cols = ["Receipt Method Name", "Transaction Date"]
+                if "Warehouse Code" in temp_df.columns:
+                    group_cols.append("Warehouse Code")
+
+                grouped = temp_df.groupby(group_cols, dropna=False).agg({
+                    "Transaction Line Amount": "sum",
+                    "Transaction Number": "first"  # Keep a transaction number for reference
+                }).reset_index()
+
+                print(f"✓  Expanded {len(invoices)} AR transactions into {len(grouped)} payment entries (aggregated by day from {len(temp_df)} transactions)")
         else:
-            # Group by Transaction + Payment Method + Date, and (when available) Warehouse Code
-            group_cols = ["Transaction Number", "Receipt Method Name", "Transaction Date"]
+            # Group by Payment Method + Date ONLY (aggregate all transactions per day)
+            # This ensures charges are calculated on daily totals, not per transaction
+            # Formula: One fixed fee per day + (total daily amount × rate)
+            group_cols = ["Receipt Method Name", "Transaction Date"]
             if "Warehouse Code" in invoices.columns:
                 group_cols.append("Warehouse Code")
             grouped = invoices.groupby(group_cols, dropna=False).agg({
-                "Transaction Line Amount": "sum"
+                "Transaction Line Amount": "sum",
+                "Transaction Number": "first"  # Keep a transaction number for reference
             }).reset_index()
 
         journal_entries = []
