@@ -4490,9 +4490,12 @@ class OracleFusionIntegration:
                 fixed_charge, rate = charges_lookup[charge_key]
                 # Formula: Total Charge = Fixed Charge + (Amount × Rate)
                 # Note: VAT is already included in the rate configuration
-                total_charge = round(fixed_charge + (abs_amount * rate), 2)
-                if total_charge > 0:
-                    print(f"  ℹ️  {payment_method} charge for {abs_amount:.2f} SAR: "
+                # IMPORTANT: For negative amounts (refunds), the charge must also be negative
+                # This ensures that refunds reverse both the payment AND the associated charges
+                charge_magnitude = round(fixed_charge + (abs_amount * rate), 2)
+                total_charge = -charge_magnitude if is_negative_amount else charge_magnitude
+                if total_charge != 0:
+                    print(f"  ℹ️  {payment_method} charge for {amount:.2f} SAR: "
                           f"Fixed={fixed_charge:.2f} + Variable=({abs_amount:.2f}×{rate*100:.2f}%)={abs_amount*rate:.2f} "
                           f"= Total Charge={total_charge:.2f} SAR")
             else:
@@ -4624,46 +4627,51 @@ class OracleFusionIntegration:
             # journal_entries.append(debit_account_entry)
 
             # ── Generate charge entries if charges are applicable ──────────────
-            if total_charge > 0:
-                # ORIGINAL charge debit/credit logic (DO NOT CHANGE):
-                # For positive amounts: 3-series in DEBIT, 5-series in CREDIT
-                # For negative amounts: 3-series in CREDIT, 5-series in DEBIT
+            if total_charge != 0:
+                # Use absolute value for journal entry amounts (all amounts in journals are positive)
+                # The debit/credit positioning determines the direction (positive vs negative)
+                abs_charge = abs(total_charge)
+
+                # Charge debit/credit logic based on whether this is a charge or charge reversal:
+                # For POSITIVE charges (normal sales): 3-series in DEBIT, 5-series in CREDIT
+                # For NEGATIVE charges (refunds): 3-series in CREDIT, 5-series in DEBIT
+                # This matches the payment entry logic
 
                 if is_negative_amount:
-                    # NEGATIVE: 3-series in Credit, 5-series in Debit (same as original payment logic)
+                    # NEGATIVE charge (refund - charge reversal): 3-series in Credit, 5-series in Debit
                     charge_credit_entry = {
                         **common,
                         **credit_segments,  # 3020044 from "CREDIT" metadata row
                         "Entered Debit Amount": "",
-                        "Entered Credit Amount": total_charge,  # 3-series in CREDIT for negative charge
+                        "Entered Credit Amount": abs_charge,  # 3-series in CREDIT for negative charge
                         "Converted Debit Amount": "",
-                        "Converted Credit Amount": total_charge,
+                        "Converted Credit Amount": abs_charge,
                     }
                     charge_debit_entry = {
                         **common,
                         **debit_segments,  # 5000104 from "DEBIT" metadata row
-                        "Entered Debit Amount": total_charge,  # 5-series in DEBIT for negative charge
+                        "Entered Debit Amount": abs_charge,  # 5-series in DEBIT for negative charge
                         "Entered Credit Amount": "",
-                        "Converted Debit Amount": total_charge,
+                        "Converted Debit Amount": abs_charge,
                         "Converted Credit Amount": "",
                     }
                 else:
-                    # POSITIVE: 3-series in Debit, 5-series in Credit (same as original payment logic)
+                    # POSITIVE charge (normal sale): 3-series in Debit, 5-series in Credit
                     charge_credit_entry = {
                         **common,
                         **credit_segments,  # 3020044 from "CREDIT" metadata row
-                        "Entered Debit Amount": total_charge,  # 3-series in DEBIT for positive charge
+                        "Entered Debit Amount": abs_charge,  # 3-series in DEBIT for positive charge
                         "Entered Credit Amount": "",
-                        "Converted Debit Amount": total_charge,
+                        "Converted Debit Amount": abs_charge,
                         "Converted Credit Amount": "",
                     }
                     charge_debit_entry = {
                         **common,
                         **debit_segments,  # 5000104 from "DEBIT" metadata row
                         "Entered Debit Amount": "",
-                        "Entered Credit Amount": total_charge,  # 5-series in CREDIT for positive charge
+                        "Entered Credit Amount": abs_charge,  # 5-series in CREDIT for positive charge
                         "Converted Debit Amount": "",
-                        "Converted Credit Amount": total_charge,
+                        "Converted Credit Amount": abs_charge,
                     }
 
                 # Append charge entries
