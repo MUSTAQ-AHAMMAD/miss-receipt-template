@@ -1572,7 +1572,8 @@ class OracleFusionIntegration:
                 row["Bill-to Customer Site Number"]           = bill_to_site
                 row["Transaction Line Type"]                  = AR_STATIC["Transaction Line Type"]
                 row["Transaction Line Description"]           = (
-                    "Discount Item" if (is_disc or not barcode) else product_name[:240]
+                    "Discount Item" if (is_disc or not barcode)
+                    else (product_name[:240] if product_name else barcode[:240])
                 )
                 row["Currency Code"]                          = AR_STATIC["Currency Code"]
                 row["Currency Conversion Type"]               = AR_STATIC["Currency Conversion Type"]
