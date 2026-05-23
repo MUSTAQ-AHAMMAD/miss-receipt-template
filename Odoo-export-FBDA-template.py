@@ -121,6 +121,7 @@ MISC_RECEIPT_COLUMNS = [
     "GlDate",
     "OrgId",
     "ReceiptNumber",
+    "ReceiptMethodId",
     "ReceiptMethodName",
     "ReceivableActivityName",
     "BankAccountNumber",
@@ -2906,6 +2907,7 @@ class OracleFusionIntegration:
             ar_txn         = agg_ar_txn.get((store, date_str), "")
             org_id         = MISS_RECEIPT_ORG_ID
             activity       = cfg.get("activity", "Misc Activity")  if cfg else "Misc Activity"
+            method_id      = cfg.get("method_id", "")              if cfg else ""
             charge_rate    = cfg.get("rate", 0.0)                  if cfg else 0.0
 
             receipt_method, bank_name, bank_num = self.receipt_methods.get_bank_account(store, method)
@@ -2927,6 +2929,7 @@ class OracleFusionIntegration:
                 "GlDate":                 date_str,
                 "OrgId":                  org_id,
                 "ReceiptNumber":          receipt_number,
+                "ReceiptMethodId":        method_id,
                 "ReceiptMethodName":      receipt_method,
                 "ReceivableActivityName": MISS_RECEIPT_ACTIVITY,
                 "BankAccountNumber":      bank_num,

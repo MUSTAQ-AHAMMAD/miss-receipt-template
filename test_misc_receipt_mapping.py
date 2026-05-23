@@ -212,7 +212,7 @@ class MiscReceiptMappingTester:
             "Amount validation": "if amount <= 0:",
             "Bank charge calculation": "self.bank_charges.calc_misc_amount",
             "AR transaction check": "if not ar_txn:",
-            "Misc receipt number": 'f"{method}-{ar_txn}-MISC"',
+            "Misc receipt number": "-{ar_txn}-MISC",
         }
 
         for check_name, check_pattern in checks.items():

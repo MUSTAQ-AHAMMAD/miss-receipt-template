@@ -328,7 +328,10 @@ class ReceiptFunctionalityTester:
 
             for endpoint in endpoints:
                 print_test(f"Checking endpoint: {endpoint}")
-                if f'"{endpoint}"' in app_code or f"'{endpoint}'" in app_code:
+                # Match exact string OR route with path/query parameters (e.g. "/api/stream/<sid>")
+                if (f'"{endpoint}"' in app_code or f"'{endpoint}'" in app_code
+                        or f'"{endpoint}/' in app_code or f"'{endpoint}/" in app_code
+                        or f'"{endpoint}<' in app_code or f"'{endpoint}<" in app_code):
                     print_success(f"Endpoint found: {endpoint}")
                     self.record_result(f"Endpoint: {endpoint}", True)
                 else:
@@ -421,7 +424,10 @@ class ReceiptFunctionalityTester:
             ]
 
             for path in expected_paths:
-                if path in source_code:
+                # Check for plain string or pathlib-style "Receipts" / "Misc"
+                path_parts = path.split("/")
+                pathlib_pattern = " / ".join(f'"{p}"' for p in path_parts)
+                if path in source_code or pathlib_pattern in source_code:
                     print_success(f"Output path defined: {path}")
                     self.record_result(f"Output Path: {path}", True)
                 else:

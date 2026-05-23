@@ -1,13 +1,13 @@
 ================================================================================
 MISCELLANEOUS RECEIPT MAPPING TEST RESULTS
-Generated: 2026-05-23 04:08:22
+Generated: 2026-05-23 04:14:21
 ================================================================================
 
 Total Tests: 19
-Passed: 16
-Failed: 2
+Passed: 18
+Failed: 0
 Warnings: 1
-Success Rate: 84.2%
+Success Rate: 94.7%
 
 DETAILED RESULTS:
 --------------------------------------------------------------------------------
@@ -21,10 +21,8 @@ DETAILED RESULTS:
 [PASS] Logic: Amount validation
 [PASS] Logic: Bank charge calculation
 [PASS] Logic: AR transaction check
-[FAIL] Logic: Misc receipt number
-      Note: Pattern not found
-[FAIL] MISC_RECEIPT_COLUMNS complete
-      Note: Missing columns
+[PASS] Logic: Misc receipt number
+[PASS] MISC_RECEIPT_COLUMNS complete
 [PASS] Misc receipt payment filters
 [PASS] Diagnostic: Section 8b header
 [PASS] Diagnostic: Card methods accepted tracking

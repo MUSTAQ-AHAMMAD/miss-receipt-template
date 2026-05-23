@@ -1,11 +1,11 @@
 ================================================================================
 RECEIPT FUNCTIONALITY TEST RESULTS
-Generated: 2026-05-23 04:07:22
+Generated: 2026-05-23 04:14:16
 ================================================================================
 
 Total Tests: 30
-Passed: 25
-Failed: 5
+Passed: 30
+Failed: 0
 Warnings: 0
 
 DETAILED RESULTS:
@@ -15,8 +15,7 @@ DETAILED RESULTS:
 [PASS] Standard Receipt Columns
 [PASS] Misc Receipt Method
 [PASS] Misc Receipt Save Method
-[FAIL] Misc Receipt Columns
-      Note: Missing: ['ReceiptMethodId']
+[PASS] Misc Receipt Columns
 [PASS] Card Payment Methods
 [PASS] Reference File: RCPT_Mapping_DATA.csv
 [PASS] Reference File: Receipt_Methods.csv
@@ -27,12 +26,9 @@ DETAILED RESULTS:
 [PASS] AR Invoice Check - Misc
 [PASS] Endpoint: /api/session
 [PASS] Endpoint: /api/run
-[FAIL] Endpoint: /api/stream
-      Note: Not found
-[FAIL] Endpoint: /api/status
-      Note: Not found
-[FAIL] Endpoint: /api/download
-      Note: Not found
+[PASS] Endpoint: /api/stream
+[PASS] Endpoint: /api/status
+[PASS] Endpoint: /api/download
 [PASS] Endpoint: /api/merge-csv
 [PASS] Endpoint: /api/generate-report
 [PASS] API calls standard receipts
@@ -41,7 +37,6 @@ DETAILED RESULTS:
 [PASS] No-Receipt Payment Methods
 [PASS] Card Payment Methods
 [PASS] Output Path: Receipts
-[FAIL] Output Path: Receipts/Misc
-      Note: Not found in code
+[PASS] Output Path: Receipts/Misc
 [PASS] Output Path: AR_Invoices
 [PASS] Receipt Organization
