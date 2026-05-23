@@ -1,11 +1,11 @@
 ================================================================================
 RECEIPT FUNCTIONALITY TEST RESULTS
-Generated: 2026-04-19 14:00:07
+Generated: 2026-05-23 04:07:22
 ================================================================================
 
 Total Tests: 30
-Passed: 26
-Failed: 4
+Passed: 25
+Failed: 5
 Warnings: 0
 
 DETAILED RESULTS:
@@ -15,7 +15,8 @@ DETAILED RESULTS:
 [PASS] Standard Receipt Columns
 [PASS] Misc Receipt Method
 [PASS] Misc Receipt Save Method
-[PASS] Misc Receipt Columns
+[FAIL] Misc Receipt Columns
+      Note: Missing: ['ReceiptMethodId']
 [PASS] Card Payment Methods
 [PASS] Reference File: RCPT_Mapping_DATA.csv
 [PASS] Reference File: Receipt_Methods.csv

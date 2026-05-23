@@ -1,14 +1,14 @@
 ================================================================================
 DETAILED INTEGRATION TEST RESULTS
-Generated: 2026-04-19 14:01:51
+Generated: 2026-05-23 04:09:32
 ================================================================================
 
 Total Tests: 10
-Passed: 10
+Passed: 9
 Failed: 0
-Warnings: 0
+Warnings: 1
 Skipped: 0
-Success Rate: 100.0%
+Success Rate: 90.0%
 
 --------------------------------------------------------------------------------
 
@@ -26,8 +26,8 @@ Success Rate: 100.0%
 [PASS] Standard Receipt Logic
   Note: All logic checks passed
 
-[PASS] Misc Receipt Logic
-  Note: All logic checks passed
+[WARN] Misc Receipt Logic
+  Note: Some checks unclear
 
 [PASS] Edge Cases
   Note: 5/5 cases handled
